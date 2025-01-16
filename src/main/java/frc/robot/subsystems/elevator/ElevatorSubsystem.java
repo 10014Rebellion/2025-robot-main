@@ -1,28 +1,31 @@
 package frc.robot.subsystems.elevator;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
-  public enum ElevatorState {STOPPED, MOVING};
+  public enum ElevatorState {
+    STOPPED,
+    MOVING
+  };
+
   private ElevatorState mState;
   private final ElevatorIO mIo;
   private final ElevatorIOInputsAutoLogged mInputs = new ElevatorIOInputsAutoLogged();
-  private final PIDController mElevatorController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
+  private final PIDController mElevatorController =
+      new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
 
   public ElevatorSubsystem(ElevatorIO pIo) {
     this.mIo = pIo;
     mElevatorController.setTolerance(ElevatorConstants.kControllerTolerance);
     setDefaultCommand(
-      runOnce(
-        () -> {
-          mIo.disable();
-        })
-        .andThen(run(() -> {}))
-        .withName("Idle")
-    );
+        runOnce(
+                () -> {
+                  mIo.disable();
+                })
+            .andThen(run(() -> {}))
+            .withName("Idle"));
     mState = ElevatorState.STOPPED;
   }
 
@@ -45,5 +48,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public boolean PIDFinished() {
     return mElevatorController.atSetpoint();
+  }
+
+  public ElevatorState getState() {
+    return mState;
   }
 }

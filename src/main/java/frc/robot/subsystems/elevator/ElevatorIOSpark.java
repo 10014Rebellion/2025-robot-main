@@ -32,7 +32,9 @@ public class ElevatorIOSpark implements ElevatorIO {
         new DoubleSupplier[] {mElevatorMotor::getAppliedOutput, mElevatorMotor::getBusVoltage},
         (values) -> pInputs.mAppliedVolts = values[0] * values[1]);
     SparkUtil.ifOk(
-        mElevatorMotor, mElevatorMotor::getOutputCurrent, (value) -> pInputs.mAppliedCurrent = value);
+        mElevatorMotor,
+        mElevatorMotor::getOutputCurrent,
+        (value) -> pInputs.mAppliedCurrent = value);
   }
 
   @Override
@@ -54,4 +56,4 @@ public class ElevatorIOSpark implements ElevatorIO {
   public double getExtension() {
     return mEncoder.getPosition();
   }
-} 
+}
