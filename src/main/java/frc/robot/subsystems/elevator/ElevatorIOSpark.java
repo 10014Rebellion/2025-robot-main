@@ -8,40 +8,50 @@ import frc.robot.util.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 public class ElevatorIOSpark implements ElevatorIO {
-  private final SparkMax elevatorMotor =
+  private final SparkMax mElevatorMotor =
       new SparkMax(ElevatorConstants.kMotorId, MotorType.kBrushless);
-  private final RelativeEncoder encoder = elevatorMotor.getEncoder();
+  private final RelativeEncoder mEncoder = mElevatorMotor.getEncoder();
 
   public ElevatorIOSpark() {
     ConfigMotor.configSparkMax(
-        elevatorMotor,
+        mElevatorMotor,
         ElevatorConstants.kInverted,
         ElevatorConstants.kCurrentLimit,
         ElevatorConstants.kIdleMode,
-        encoder,
+        mEncoder,
         ElevatorConstants.kEncConversionFactor,
         ElevatorConstants.kEncCPR);
   }
 
   @Override
-  public void updateInputs(ElevatorIOInputs inputs) {
-    SparkUtil.ifOk(elevatorMotor, encoder::getPosition, (value) -> inputs.position = value);
-    SparkUtil.ifOk(elevatorMotor, encoder::getVelocity, (value) -> inputs.velocity = value);
+  public void updateInputs(ElevatorIOInputs pInputs) {
+    SparkUtil.ifOk(mElevatorMotor, mEncoder::getPosition, (value) -> pInputs.mPosition = value);
+    SparkUtil.ifOk(mElevatorMotor, mEncoder::getVelocity, (value) -> pInputs.mVelocity = value);
     SparkUtil.ifOk(
-        elevatorMotor,
-        new DoubleSupplier[] {elevatorMotor::getAppliedOutput, elevatorMotor::getBusVoltage},
-        (values) -> inputs.appliedVolts = values[0] * values[1]);
+        mElevatorMotor,
+        new DoubleSupplier[] {mElevatorMotor::getAppliedOutput, mElevatorMotor::getBusVoltage},
+        (values) -> pInputs.mAppliedVolts = values[0] * values[1]);
     SparkUtil.ifOk(
-        elevatorMotor, elevatorMotor::getOutputCurrent, (value) -> inputs.appliedCurrent = value);
+        mElevatorMotor, mElevatorMotor::getOutputCurrent, (value) -> pInputs.mAppliedCurrent = value);
   }
 
   @Override
-  public void setVoltage(double voltage) {
-    elevatorMotor.setVoltage(voltage);
+  public void setVoltage(double pVoltage) {
+    mElevatorMotor.setVoltage(pVoltage);
   }
 
   @Override
-  public void setPercentOutput(double speed) {
-    elevatorMotor.set(speed);
+  public void setPercentOutput(double pSpeed) {
+    mElevatorMotor.set(pSpeed);
   }
-}
+
+  @Override
+  public void disable() {
+    mElevatorMotor.disable();
+  }
+
+  @Override
+  public double getExtension() {
+    return mEncoder.getPosition();
+  }
+} 

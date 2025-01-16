@@ -16,7 +16,14 @@ public class ElevatorConstants {
     public static double kI;
     public static double kD;
     public static double FF;
+    public static double kControllerTolerance;
     
     public static double kMaxHeight;
     public static double kMinHeight;
+    public static double kL1Height;
+    public static double kL2Height;
+    public static double kL3Height;
+    public static double kL4Height;
+    public static double kProcessorHeight;
+    public static double kNetHeight;
 }
