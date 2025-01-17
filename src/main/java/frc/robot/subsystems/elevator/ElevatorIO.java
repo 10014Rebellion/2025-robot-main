@@ -18,9 +18,4 @@ public interface ElevatorIO {
   public default void setPercentOutput(double pOutput) {}
 
   public default void disable() {}
-
-  // TODO: Fix this
-  public default double getExtension() {
-    return 0;
-  }
 }

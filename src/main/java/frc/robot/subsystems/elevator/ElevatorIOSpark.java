@@ -51,9 +51,4 @@ public class ElevatorIOSpark implements ElevatorIO {
   public void disable() {
     mElevatorMotor.disable();
   }
-
-  @Override
-  public double getExtension() {
-    return mEncoder.getPosition();
-  }
 }

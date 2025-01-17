@@ -41,9 +41,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void doPID(double pSetpoint) {
-    double calculatedOutput = mElevatorController.calculate(mIo.getExtension(), pSetpoint);
+    double calculatedOutput = mElevatorController.calculate(mInputs.mPosition, pSetpoint);
     mIo.setVoltage(calculatedOutput);
     mState = ElevatorState.MOVING;
+  }
+
+  public double getExtension() {
+    return mInputs.mPosition;
   }
 
   public boolean PIDFinished() {
