@@ -23,8 +23,8 @@ import edu.wpi.first.math.util.Units;
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.8;
   public static final double odometryFrequency = 100.0; // Hz
-  public static final double trackWidth = Units.inchesToMeters(26.5);
-  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double trackWidth = Units.inchesToMeters(25);
+  public static final double wheelBase = Units.inchesToMeters(27);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
@@ -35,29 +35,34 @@ public class DriveConstants {
       };
 
   // Zeroed rotation values for each module, see setup instructions
-  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
-  public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
+  //   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.2009058);
+  //   public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.8087860);
+  //   public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.2965502);
+  //   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.7473245);
+
+  public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0);
+  public static final Rotation2d frontRightZeroRotation = new Rotation2d(0);
+  public static final Rotation2d backLeftZeroRotation = new Rotation2d(0);
+  public static final Rotation2d backRightZeroRotation = new Rotation2d(0);
 
   // Device CAN IDs
-  public static final int pigeonCanId = 9;
+  public static final int pigeonCanId = 2;
 
-  public static final int frontLeftDriveCanId = 1;
-  public static final int backLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 5;
-  public static final int backRightDriveCanId = 7;
+  public static final int frontLeftDriveCanId = 11;
+  public static final int backLeftDriveCanId = 14;
+  public static final int frontRightDriveCanId = 12;
+  public static final int backRightDriveCanId = 13;
 
-  public static final int frontLeftTurnCanId = 2;
-  public static final int backLeftTurnCanId = 4;
-  public static final int frontRightTurnCanId = 6;
-  public static final int backRightTurnCanId = 8;
+  public static final int frontLeftTurnCanId = 21;
+  public static final int backLeftTurnCanId = 24;
+  public static final int frontRightTurnCanId = 22;
+  public static final int backRightTurnCanId = 23;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
   public static final double driveMotorReduction =
-      (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+      (45.0 * 22.0) / (13.0 * 15.0); // MAXSwerve with 13 pinion teeth and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
 
   // Drive encoder configuration
@@ -76,6 +81,8 @@ public class DriveConstants {
   public static final double driveSimKs = 0.0;
   public static final double driveSimKv = 0.0789;
 
+  //
+
   // Turn motor configuration
   public static final boolean turnInverted = false;
   public static final int turnMotorCurrentLimit = 20;
@@ -88,17 +95,17 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 2.0;
+  public static final double turnKp = 1.0;
   public static final double turnKd = 0.0;
-  public static final double turnSimP = 8.0;
+  public static final double turnSimP = 0.0;
   public static final double turnSimD = 0.0;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
-  public static final double robotMassKg = 74.088;
-  public static final double robotMOI = 6.883;
-  public static final double wheelCOF = 1.2;
+  public static final double robotMassKg = 74.088; // TODO: CONFIGURE ME
+  public static final double robotMOI = 6.883; // TODO: CONFIGURE ME
+  public static final double wheelCOF = 1.2; // TODO: CONFIGURE ME
   public static final RobotConfig ppConfig =
       new RobotConfig(
           robotMassKg,

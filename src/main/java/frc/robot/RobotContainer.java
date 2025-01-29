@@ -25,6 +25,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // Axes Multipler
+  private final double kDriveSwerveMultipler = 0.5;
+  private final double kRotationSwerveMultipler = 0.6;
+
   // Subsystems
   private final Drive drive;
 
@@ -105,9 +109,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -controller.getLeftY() * kDriveSwerveMultipler,
+            () -> -controller.getLeftX() * kDriveSwerveMultipler,
+            () -> -controller.getRightX() * kRotationSwerveMultipler));
 
     // Lock to 0° when A button is held
     controller
@@ -115,8 +119,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
+                () -> -controller.getLeftY() * kDriveSwerveMultipler,
+                () -> -controller.getLeftX() * kDriveSwerveMultipler,
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
