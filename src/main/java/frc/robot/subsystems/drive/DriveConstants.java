@@ -95,7 +95,7 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 1.0;
+  public static final double turnKp = 1.5;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 0.0;
   public static final double turnSimD = 0.0;
