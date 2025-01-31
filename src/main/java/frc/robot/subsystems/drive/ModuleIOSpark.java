@@ -54,10 +54,10 @@ public class ModuleIOSpark implements ModuleIO {
   public ModuleIOSpark(int module) {
     zeroRotation =
         switch (module) {
-          case 0 -> new Rotation2d(frontLeftZeroRotation.getRadians() + Math.PI / 2.0 + Math.PI);
-          case 1 -> new Rotation2d(frontRightZeroRotation.getRadians());
-          case 2 -> new Rotation2d(backLeftZeroRotation.getRadians() + Math.PI);
-          case 3 -> new Rotation2d(backRightZeroRotation.getRadians() + Math.PI / 2.0);
+          case 0 -> frontLeftZeroRotation;
+          case 1 -> frontRightZeroRotation;
+          case 2 -> backLeftZeroRotation;
+          case 3 -> backRightZeroRotation;
           default -> new Rotation2d();
         };
     driveSpark =

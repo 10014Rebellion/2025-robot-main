@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -34,6 +35,9 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+
+  // Field Oriented
+  private boolean mSwerveFieldOriented = true;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -109,9 +113,12 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY() * kDriveSwerveMultipler,
-            () -> -controller.getLeftX() * kDriveSwerveMultipler,
-            () -> -controller.getRightX() * kRotationSwerveMultipler));
+            () -> controller.getLeftY() * kDriveSwerveMultipler,
+            () -> controller.getLeftX() * kDriveSwerveMultipler,
+            () -> -controller.getRightX() * kRotationSwerveMultipler,
+            () -> mSwerveFieldOriented));
+
+    controller.y().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
     // Lock to 0° when A button is held
     controller
@@ -119,8 +126,8 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> -controller.getLeftY() * kDriveSwerveMultipler,
-                () -> -controller.getLeftX() * kDriveSwerveMultipler,
+                () -> controller.getLeftY() * kDriveSwerveMultipler,
+                () -> controller.getLeftX() * kDriveSwerveMultipler,
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
