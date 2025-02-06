@@ -11,12 +11,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.elevator.Elevator;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -32,6 +34,8 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private final Claw claw;
+  private final Elevator elevator;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -44,6 +48,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    claw = new Claw();
+    elevator = new Elevator();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -99,7 +106,8 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
-    configureButtonBindings();
+    // configureButtonBindings();
+    configureTestButtonBindings();
   }
 
   /**
@@ -108,6 +116,38 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
+  private void configureTestButtonBindings() {
+    controller
+        .povUp()
+        .onTrue(new InstantCommand(() -> claw.setMotor(2)))
+        .onFalse(new InstantCommand(() -> claw.setMotor(0)));
+
+    controller
+        .povDown()
+        .onTrue(new InstantCommand(() -> claw.setMotor(-2)))
+        .onFalse(new InstantCommand(() -> claw.setMotor(0)));
+
+    controller
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> elevator.setMotor(3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotor(0)));
+
+    controller
+        .leftTrigger()
+        .onTrue(new InstantCommand(() -> elevator.setMotor(-3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotor(0)));
+
+    controller
+        .x()
+        .onTrue(new InstantCommand(() -> claw.setClaw(1)))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+
+    controller
+        .b()
+        .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+  }
+
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(

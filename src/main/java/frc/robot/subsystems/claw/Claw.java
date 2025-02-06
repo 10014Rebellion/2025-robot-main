@@ -4,14 +4,62 @@
 
 package frc.robot.subsystems.claw;
 
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.claw.ClawConstants.Wrist;
 
 public class Claw extends SubsystemBase {
-  /** Creates a new Claw. */
-  public Claw() {}
+  private final SparkMax mWristSparkMax;
+  private final SparkFlex mLeftClawSparkMax;
+  private final SparkFlex mRightClawSparkMax;
+
+  private final SparkClosedLoopController mWristController;
+  private final AbsoluteEncoder mWristEncoder;
+
+  public Claw() {
+    this.mLeftClawSparkMax =
+        new SparkFlex(ClawConstants.Claw.kLeftClawID, ClawConstants.Claw.kMotorType);
+    this.mRightClawSparkMax =
+        new SparkFlex(ClawConstants.Claw.kRightClawID, ClawConstants.Claw.kMotorType);
+
+    this.mWristSparkMax = new SparkMax(Wrist.kMotorID, Wrist.kMotorType);
+    this.mWristController = mWristSparkMax.getClosedLoopController();
+    this.mWristEncoder = mWristSparkMax.getAbsoluteEncoder();
+  }
+
+  public void setClaw(double pVoltage) {
+    mLeftClawSparkMax.setVoltage(filterVoltage(pVoltage));
+    mRightClawSparkMax.setVoltage(filterVoltage(-pVoltage));
+  }
+
+  public void setMotor(double pVoltage) {
+    mWristSparkMax.setVoltage(filterVoltage(pVoltage));
+  }
+
+  private double filterVoltage(double pVoltage) {
+    return (MathUtil.clamp(pVoltage, -12.0, 12.0));
+  }
+
+  // private double filterToLimits(double pInput) {
+  //   return (pInput > 0 && mWristEncoder.getPosition() >= ElevatorConstants.kForwardSoftLimit)
+  //           || (pInput < 0 && mWristEncoder.getPosition() <= ElevatorConstants.kReverseSoftLimit)
+  //       ? 0.0
+  //       : pInput;
+  // }
+
+  public void goToSetpoint(double pSetpoint) {
+    mWristController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Wrist Angle", mWristEncoder.getPosition());
+    SmartDashboard.putNumber("Wrist Voltage", mWristSparkMax.getBusVoltage());
   }
 }
