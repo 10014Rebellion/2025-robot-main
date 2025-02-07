@@ -18,18 +18,20 @@ public class ElevatorConstants {
   public static double kMaxVelocity = 6000;
   public static double kTolerance = 1;
 
-  public static double kForwardSoftLimit = 10014;
+  public static double kForwardSoftLimit = 70;
   public static double kReverseSoftLimit = 0;
 
   public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
   public static double kDrumCircumference = kDrumDiameterM * Math.PI;
 
-  public static double kGearRatio = 25 / 1;
+  // public static double kGearRatio = 25 / 1;
 
-  public static double kPositionConversionFactor =
-      ((kDrumDiameterM * Math.PI) * kGearRatio)
-          / 1.0; // (Drum Circumference * Final Gear Ratio) / One Encoder Revolution (if its 1:1
-  // with motor shaft)  // TODO: Configure me!
+  public static double kS = 0.0;
+  public static double kG = 0.0;
+  public static double kV = 0.0;
+  public static double kA = 0.0;
+
+  public static double kPositionConversionFactor = 1.21875; // 1.0 / kDrumCircumference
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();

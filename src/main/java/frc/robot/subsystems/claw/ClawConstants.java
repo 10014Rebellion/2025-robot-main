@@ -33,17 +33,17 @@ public class ClawConstants {
     // with motor shaft)  // TODO: Configure me!
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
-    public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
+    public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
     static {
-      kWristConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
+      kClawConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
 
       // kWristConfig
       //     .softLimit
       //     .forwardSoftLimit(kForwardSoftLimit)
       //     .reverseSoftLimit(kReverseSoftLimit);
 
-      kWristConfig
+      kClawConfig
           .absoluteEncoder
           .positionConversionFactor(kPositionConversionFactor)
           .velocityConversionFactor(kVelocityConversionFactor)
@@ -89,6 +89,11 @@ public class ClawConstants {
             * 360.0; // (Drum Circumference * Final Gear Ratio) / One Encoder Revolution (if its 1:1
     // with motor shaft)  // TODO: Configure me!
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+
+    public static double kS = 0.0;
+    public static double kG = 0.0;
+    public static double kV = 0.0;
+    public static double kA = 0.0;
 
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 

@@ -19,6 +19,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorPID;
+import frc.robot.subsystems.potentiometer.Potentiometer;
+import frc.robot.subsystems.telemetry.Telemetry;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -36,6 +39,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Claw claw;
   private final Elevator elevator;
+  private final Potentiometer potentiometer;
+  private final Telemetry telemetry;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -50,6 +55,8 @@ public class RobotContainer {
   public RobotContainer() {
     claw = new Claw();
     elevator = new Elevator();
+    potentiometer = new Potentiometer();
+    telemetry = new Telemetry();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -129,13 +136,13 @@ public class RobotContainer {
 
     controller
         .rightTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotor(3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotor(0)));
+        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
 
     controller
         .leftTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotor(-3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotor(0)));
+        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
 
     controller
         .x()
@@ -145,6 +152,11 @@ public class RobotContainer {
     controller
         .b()
         .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+
+    controller
+        .y()
+        .onTrue(new ElevatorPID(5, elevator))
         .onFalse(new InstantCommand(() -> claw.setClaw(0)));
   }
 

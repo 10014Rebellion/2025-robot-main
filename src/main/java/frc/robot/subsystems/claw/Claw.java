@@ -6,6 +6,8 @@ package frc.robot.subsystems.claw;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
@@ -31,11 +33,22 @@ public class Claw extends SubsystemBase {
     this.mWristSparkMax = new SparkMax(Wrist.kMotorID, Wrist.kMotorType);
     this.mWristController = mWristSparkMax.getClosedLoopController();
     this.mWristEncoder = mWristSparkMax.getAbsoluteEncoder();
+
+    mWristSparkMax.configure(
+        Wrist.kWristConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    mLeftClawSparkMax.configure(
+        ClawConstants.Claw.kClawConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
+    mRightClawSparkMax.configure(
+        ClawConstants.Claw.kClawConfig.inverted(true),
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
   }
 
   public void setClaw(double pVoltage) {
     mLeftClawSparkMax.setVoltage(filterVoltage(pVoltage));
-    mRightClawSparkMax.setVoltage(filterVoltage(-pVoltage));
+    mRightClawSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   public void setMotor(double pVoltage) {
@@ -44,6 +57,10 @@ public class Claw extends SubsystemBase {
 
   private double filterVoltage(double pVoltage) {
     return (MathUtil.clamp(pVoltage, -12.0, 12.0));
+  }
+
+  public double getEncoderMeasurement() {
+    return mWristEncoder.getPosition();
   }
 
   // private double filterToLimits(double pInput) {

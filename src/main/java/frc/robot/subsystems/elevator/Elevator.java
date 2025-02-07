@@ -26,7 +26,7 @@ public class Elevator extends SubsystemBase {
     mElevatorController = mElevatorSparkMax.getClosedLoopController();
 
     mElevatorSparkMax.configure(
-        ElevatorConstants.kElevatorConfig,
+        ElevatorConstants.kElevatorConfig.inverted(true),
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
@@ -34,20 +34,32 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Target Velocity", 0);
   }
 
-  public void setMotor(double pVoltage) {
-    mElevatorSparkMax.setVoltage(-filterVoltage(pVoltage));
+  public void setMotorVoltage(double pVoltage) {
+    mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
-    return (MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
   }
 
-  // private double filterToLimits(double pInput) {
-  //   return (pInput > 0 && mEncoder.getPosition() >= ElevatorConstants.kForwardSoftLimit)
-  //           || (pInput < 0 && mEncoder.getPosition() <= ElevatorConstants.kReverseSoftLimit)
-  //       ? 0.0
-  //       : pInput;
-  // }
+  public double getEncoderMeasurement() {
+    return mEncoder.getPosition();
+  }
+
+  private double filterToLimits(double pInput) {
+    return (pInput > 0 && mEncoder.getPosition() >= ElevatorConstants.kForwardSoftLimit)
+            || (pInput < 0 && mEncoder.getPosition() <= ElevatorConstants.kReverseSoftLimit)
+        ? 0.0
+        : pInput;
+  }
+
+  private void stopIfLimit() {
+    double motorOutput = getMotorOutput();
+    if ((motorOutput > 0 && mEncoder.getPosition() >= ElevatorConstants.kForwardSoftLimit)
+        || (motorOutput < 0 && mEncoder.getPosition() <= ElevatorConstants.kReverseSoftLimit)) {
+      setMotorVoltage(0);
+    }
+  }
 
   public void goToSetpoint(double pSetpoint) {
     mElevatorController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
@@ -58,9 +70,16 @@ public class Elevator extends SubsystemBase {
         && (mEncoder.getPosition() <= pSetpoint + ElevatorConstants.kTolerance);
   }
 
+  public double getMotorOutput() {
+    return mElevatorSparkMax.getAppliedOutput();
+  }
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Actual Position", mEncoder.getPosition());
-    SmartDashboard.putNumber("Actual Velocity", mEncoder.getVelocity());
+    stopIfLimit();
+
+    SmartDashboard.putNumber("Elevator Position", mEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
+    SmartDashboard.putNumber("Elevator Output", getMotorOutput());
   }
 }
