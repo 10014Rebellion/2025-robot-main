@@ -126,13 +126,13 @@ public class RobotContainer {
   private void configureTestButtonBindings() {
     controller
         .povUp()
-        .onTrue(new InstantCommand(() -> claw.setMotor(2)))
-        .onFalse(new InstantCommand(() -> claw.setMotor(0)));
+        .whileTrue(new InstantCommand(() -> claw.setMotor(2)))
+        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
 
     controller
         .povDown()
-        .onTrue(new InstantCommand(() -> claw.setMotor(-2)))
-        .onFalse(new InstantCommand(() -> claw.setMotor(0)));
+        .whileTrue(new InstantCommand(() -> claw.setMotor(-2)))
+        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
 
     // controller.rightTrigger().whileTrue(new ElevatorPIDCommand(30.0, elevator));
     // // .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
@@ -142,18 +142,18 @@ public class RobotContainer {
     //     .whileFalse(new ElevatorFFCommand(elevator));
     controller.x().whileTrue(new ElevatorPIDCommand(70.0, elevator));
     controller.y().whileTrue(new ElevatorPIDCommand(60.0, elevator));
-    controller.x().whileTrue(new ElevatorPIDCommand(30.0, elevator));
-    controller.a().whileTrue(new ElevatorPIDCommand(0.0, elevator));
+    controller.b().whileTrue(new ElevatorPIDCommand(30.0, elevator));
+    controller.a().whileTrue(new ElevatorPIDCommand(2.0, elevator));
 
-    // controller
-    //     .x()
-    //     .onTrue(new InstantCommand(() -> claw.setClaw(1)))
-    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    controller
+        .rightBumper()
+        .whileTrue(new InstantCommand(() -> claw.setClaw(2)))
+        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
 
-    // controller
-    //     .b()
-    //     .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
-    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    controller
+        .leftBumper()
+        .whileTrue(new InstantCommand(() -> claw.setClaw(-2)))
+        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
 
     // controller
     //     .y()
