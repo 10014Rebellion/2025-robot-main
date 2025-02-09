@@ -14,11 +14,14 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.TunableNumber;
 
 public class Elevator extends SubsystemBase {
   private final SparkMax mElevatorSparkMax;
   private final SparkClosedLoopController mElevatorController;
   private final RelativeEncoder mEncoder;
+
+  private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
 
   public Elevator() {
     mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
@@ -32,10 +35,23 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putNumber("Target Position", 0);
     SmartDashboard.putNumber("Target Velocity", 0);
+
+    elevatorFF = new TunableNumber("Elevator/Elevator FF");
+    elevatorP = new TunableNumber("Elevator/Elevator P");
+    elevatorI = new TunableNumber("Elevator/Elevator I");
+    elevatorD = new TunableNumber("Elevator/Elevator D");
+
+    elevatorFF.setDefault(ElevatorConstants.kG);
+    elevatorP.setDefault(ElevatorConstants.kP);
+    elevatorI.setDefault(0);
+    elevatorD.setDefault(ElevatorConstants.kD);
   }
 
   public void setMotorVoltage(double pVoltage) {
-    mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
+    double setVoltage = 0.0;
+    if (pVoltage < 0.0) setVoltage = pVoltage * 0.2;
+    else setVoltage = pVoltage;
+    mElevatorSparkMax.setVoltage(filterVoltage(setVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
@@ -74,6 +90,23 @@ public class Elevator extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
+  public void setElevatorFF() {
+    ElevatorConstants.kG = elevatorFF.get();
+  }
+
+  public void setElevatorI() {
+    ElevatorConstants.kI = elevatorI.get();
+  }
+
+  public void setElevatorP() {
+    ElevatorConstants.kP = elevatorP.get();
+    System.out.println(ElevatorConstants.kP);
+  }
+
+  public void setElevatorD() {
+    ElevatorConstants.kD = elevatorD.get();
+  }
+
   @Override
   public void periodic() {
     stopIfLimit();
@@ -81,5 +114,10 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Position", mEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
+    if (elevatorFF.hasChanged()) setElevatorFF();
+    if (elevatorP.hasChanged()) setElevatorP();
+    if (elevatorD.hasChanged()) setElevatorD();
+    if (elevatorI.hasChanged()) setElevatorI();
+    SmartDashboard.putBoolean("Elevator/Changed FF?", (ElevatorConstants.kG != 0.0));
   }
 }

@@ -19,7 +19,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorPID;
+import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -134,30 +134,32 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> claw.setMotor(-2)))
         .onFalse(new InstantCommand(() -> claw.setMotor(0)));
 
-    controller
-        .rightTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
+    // controller.rightTrigger().whileTrue(new ElevatorPIDCommand(30.0, elevator));
+    // // .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
+    // controller
+    //     .leftTrigger()
+    //     .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
+    //     .whileFalse(new ElevatorFFCommand(elevator));
+    controller.x().whileTrue(new ElevatorPIDCommand(70.0, elevator));
+    controller.y().whileTrue(new ElevatorPIDCommand(60.0, elevator));
+    controller.x().whileTrue(new ElevatorPIDCommand(30.0, elevator));
+    controller.a().whileTrue(new ElevatorPIDCommand(0.0, elevator));
 
-    controller
-        .leftTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
+    // controller
+    //     .x()
+    //     .onTrue(new InstantCommand(() -> claw.setClaw(1)))
+    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
 
-    controller
-        .x()
-        .onTrue(new InstantCommand(() -> claw.setClaw(1)))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    // controller
+    //     .b()
+    //     .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
+    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
 
-    controller
-        .b()
-        .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
-
-    controller
-        .y()
-        .onTrue(new ElevatorPID(5, elevator))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    // controller
+    //     .y()
+    //     .onTrue(new ElevatorPID(5, elevator))
+    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    // controller.a().whileTrue(new ElevatorFFCommand(elevator));
   }
 
   private void configureButtonBindings() {

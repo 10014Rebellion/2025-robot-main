@@ -9,14 +9,13 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.potentiometer.Potentiometer;
 
-public class ElevatorPID extends Command {
+public class ElevatorPIDCommand extends Command {
   private final Elevator mClawSubsystem;
   private final double mSetpoint;
   private final ProfiledPIDController mProfiledPIDController;
 
-  public ElevatorPID(double pSetpoint, Elevator pClawSubsystem) {
+  public ElevatorPIDCommand(double pSetpoint, Elevator pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mSetpoint =
         MathUtil.clamp(
@@ -24,33 +23,36 @@ public class ElevatorPID extends Command {
     this.mProfiledPIDController =
         new ProfiledPIDController(
             ElevatorConstants.kP,
-            0.0,
+            ElevatorConstants.kI,
             ElevatorConstants.kD,
             new TrapezoidProfile.Constraints(
                 ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
     this.mProfiledPIDController.setTolerance(ElevatorConstants.kTolerance);
 
     addRequirements(pClawSubsystem);
+    SmartDashboard.putNumber("Elevator/PID Output", 0.0);
   }
 
   @Override
   public void initialize() {
+    mProfiledPIDController.setPID(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
     mProfiledPIDController.reset(getMeasurement());
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
             this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
+    SmartDashboard.putNumber("Elevator/Elevator Setpoint", mSetpoint);
   }
 
   @Override
   public void execute() {
-    double potentiometerReading = Potentiometer.getPotentiometer();
-    mProfiledPIDController.setP(potentiometerReading);
+    // double potentiometerReading = Potentiometer.getPotentiometer();
+    // mProfiledPIDController.setP(potentiometerReading);
 
     double calculatedOutput = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
     mClawSubsystem.setMotorVoltage(calculatedOutput);
-
-    SmartDashboard.putNumber("PID Output", calculatedOutput);
+    System.out.println(calculatedOutput);
+    SmartDashboard.putNumber("Elevator/PID Output", calculatedOutput);
   }
 
   @Override
@@ -64,7 +66,8 @@ public class ElevatorPID extends Command {
 
   @Override
   public boolean isFinished() {
-    return mProfiledPIDController.atSetpoint();
+    // return mProfiledPIDController.atSetpoint();
+    return false;
   }
 
   private double getMeasurement() {

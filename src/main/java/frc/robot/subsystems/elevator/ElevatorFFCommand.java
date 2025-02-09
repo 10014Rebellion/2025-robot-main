@@ -10,31 +10,34 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class ElevatorFFCommand extends Command {
   private final Elevator mElevatorSubsystem;
-  private final ElevatorFeedforward mClawFeedforward;
+  private ElevatorFeedforward mElevatorFeedforward;
 
   public ElevatorFFCommand(Elevator pElevatorSubsystem) {
     this.mElevatorSubsystem = pElevatorSubsystem;
-    this.mClawFeedforward =
-        new ElevatorFeedforward(
-            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+    this.mElevatorFeedforward = new ElevatorFeedforward(0, 0, 0);
+    // ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
     addRequirements(pElevatorSubsystem);
   }
 
   @Override
   public void initialize() {
+    // this.mElevatorFeedforward =
+    //     new ElevatorFeedforward(
+    //         ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV,
+    // ElevatorConstants.kA);
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
-            this.getClass().getSimpleName(), mClawFeedforward.getClass().getSimpleName()));
+            this.getClass().getSimpleName(), mElevatorFeedforward.getClass().getSimpleName()));
   }
 
   @Override
   public void execute() {
-    double calculatedOutput = mClawFeedforward.calculate(0, 0);
+    double calculatedOutput = mElevatorFeedforward.calculate(0, 0);
 
     mElevatorSubsystem.setMotorVoltage(calculatedOutput);
 
-    SmartDashboard.putNumber("WRIST FF CALCULATION", calculatedOutput);
+    SmartDashboard.putNumber("Elevator/ELEVATOR FF CALCULATION", calculatedOutput);
   }
 
   @Override
@@ -42,7 +45,7 @@ public class ElevatorFFCommand extends Command {
     System.out.println(
         String.format(
             "<<< %s - %s is ENDING :C >>>\n",
-            this.getClass().getSimpleName(), mClawFeedforward.getClass().getSimpleName()));
+            this.getClass().getSimpleName(), mElevatorFeedforward.getClass().getSimpleName()));
   }
 
   @Override
