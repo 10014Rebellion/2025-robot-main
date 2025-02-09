@@ -13,11 +13,11 @@ public class ElevatorConstants {
   public static int kCurrentLimit = 80;
   public static double kP = 1.5; // TODO: Configure me!
   public static double kI = 0.0;
-  public static double kD = 0.08; // TODO: Configure me!
-  public static double kVelocityFF = 0.0; // TODO: Configure me!
+  public static double kD = 0.008; // TODO: Configure me!
+  // public static double kVelocityFF = 0.0; // TODO: Configure me!
 
-  public static double kMaxAcceleration = 500;
-  public static double kMaxVelocity = 6000;
+  public static double kMaxAcceleration = 10014;
+  public static double kMaxVelocity = 10014;
   public static double kTolerance = 1;
 
   public static double kForwardSoftLimit = 70;
@@ -29,7 +29,7 @@ public class ElevatorConstants {
   // public static double kGearRatio = 25 / 1;
 
   public static double kS = 0.0;
-  public static double kG = 0.008;
+  public static double kG = 0.0;
   public static double kV = 0.0;
   public static double kA = 0.0;
 
@@ -49,7 +49,7 @@ public class ElevatorConstants {
     kElevatorConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(kP, 0.0, kD, kVelocityFF)
+        .pid(kP, 0.0, kD)
         .outputRange(-1, 1);
 
     kElevatorConfig

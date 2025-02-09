@@ -5,23 +5,25 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.TunableNumber;
 
 public class Elevator extends SubsystemBase {
   private final SparkMax mElevatorSparkMax;
   private final SparkClosedLoopController mElevatorController;
   private final RelativeEncoder mEncoder;
 
-  private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
+  // private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
 
   public Elevator() {
     mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
@@ -36,20 +38,51 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Target Position", 0);
     SmartDashboard.putNumber("Target Velocity", 0);
 
-    elevatorFF = new TunableNumber("Elevator/Elevator FF");
-    elevatorP = new TunableNumber("Elevator/Elevator P");
-    elevatorI = new TunableNumber("Elevator/Elevator I");
-    elevatorD = new TunableNumber("Elevator/Elevator D");
+    // elevatorFF = new TunableNumber("Elevator/Elevator FF");
+    // elevatorP = new TunableNumber("Elevator/Elevator P");
+    // elevatorI = new TunableNumber("Elevator/Elevator I");
+    // elevatorD = new TunableNumber("Elevator/Elevator D");
 
-    elevatorFF.setDefault(ElevatorConstants.kG);
-    elevatorP.setDefault(ElevatorConstants.kP);
-    elevatorI.setDefault(0);
-    elevatorD.setDefault(ElevatorConstants.kD);
+    // elevatorFF.setDefault(ElevatorConstants.kG);
+    // elevatorP.setDefault(ElevatorConstants.kP);
+    // elevatorI.setDefault(0);
+    // elevatorD.setDefault(ElevatorConstants.kD);
   }
 
   public void setMotorVoltage(double pVoltage) {
     // if (pVoltage < 0.0) pVoltage *= 0.2; // Slows down downward movements
     mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
+  }
+
+  public Command stopPID() {
+    return this.runOnce(
+        () -> {
+          mElevatorController.setReference(0, ControlType.kMAXMotionVelocityControl);
+        });
+  }
+
+  public Command goTo(double setpoint) {
+    return this.run(
+        () -> {
+          mElevatorController.setReference(
+              setpoint,
+              ControlType.kMAXMotionPositionControl,
+              ClosedLoopSlot.kSlot0,
+              ElevatorConstants.kG,
+              ArbFFUnits.kVoltage);
+        });
+  }
+
+  public Command holdElevator() {
+    return this.run(
+        () -> {
+          mElevatorController.setReference(
+              getEncoderMeasurement(),
+              ControlType.kMAXMotionPositionControl,
+              ClosedLoopSlot.kSlot0,
+              ElevatorConstants.kG,
+              ArbFFUnits.kVoltage);
+        });
   }
 
   private double filterVoltage(double pVoltage) {
@@ -75,10 +108,6 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public void goToSetpoint(double pSetpoint) {
-    mElevatorController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
-  }
-
   public boolean isAtSetpoint(double pSetpoint) {
     return (mEncoder.getPosition() >= pSetpoint - ElevatorConstants.kTolerance)
         && (mEncoder.getPosition() <= pSetpoint + ElevatorConstants.kTolerance);
@@ -88,14 +117,14 @@ public class Elevator extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
-  public void setElevatorP() {
-    ElevatorConstants.kP = elevatorP.get();
-    System.out.println(ElevatorConstants.kP);
-  }
+  // public void setElevatorP() {
+  //   ElevatorConstants.kP = elevatorP.get();
+  //   System.out.println(ElevatorConstants.kP);
+  // }
 
-  public void setElevatorD() {
-    ElevatorConstants.kD = elevatorD.get();
-  }
+  // public void setElevatorD() {
+  //   ElevatorConstants.kD = elevatorD.get();
+  // }
 
   @Override
   public void periodic() {

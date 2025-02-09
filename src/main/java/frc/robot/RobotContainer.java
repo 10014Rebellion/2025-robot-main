@@ -19,8 +19,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorFFCommand;
-import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -60,7 +58,7 @@ public class RobotContainer {
     telemetry = new Telemetry();
 
     // Enabled Feedforward on Elevator
-    elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
+    // elevator.setDefaultCommand(elevator.holdElevator());
 
     switch (Constants.currentMode) {
       case REAL:
@@ -144,10 +142,10 @@ public class RobotContainer {
     //     .leftTrigger()
     //     .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
     //     .whileFalse(new ElevatorFFCommand(elevator));
-    controller.x().whileTrue(new ElevatorPIDCommand(70.0, elevator));
-    controller.y().whileTrue(new ElevatorPIDCommand(60.0, elevator));
-    controller.b().whileTrue(new ElevatorPIDCommand(30.0, elevator));
-    controller.a().whileTrue(new ElevatorPIDCommand(2.0, elevator));
+    // controller.x().whileTrue(elevator.goTo(90.0));
+    // controller.y().whileTrue(elevator.goTo(60.0));
+    controller.b().onTrue(elevator.goTo(30.0)).onFalse(elevator.holdElevator());
+    controller.a().onTrue(elevator.goTo(0.0)).onFalse(elevator.holdElevator());
 
     controller
         .rightBumper()
