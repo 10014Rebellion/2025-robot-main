@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
+import frc.robot.util.TunableNumber;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,7 +24,8 @@ public class Elevator extends SubsystemBase {
   private final SparkClosedLoopController mElevatorController;
   private final RelativeEncoder mEncoder;
 
-  // private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
+  private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
+  private TunableNumber elevatorVelocity, elevatorAcceleration;
 
   public Elevator() {
     mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
@@ -38,15 +40,21 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Target Position", 0);
     SmartDashboard.putNumber("Target Velocity", 0);
 
-    // elevatorFF = new TunableNumber("Elevator/Elevator FF");
-    // elevatorP = new TunableNumber("Elevator/Elevator P");
-    // elevatorI = new TunableNumber("Elevator/Elevator I");
-    // elevatorD = new TunableNumber("Elevator/Elevator D");
+    elevatorFF = new TunableNumber("Elevator/Elevator FF");
+    elevatorP = new TunableNumber("Elevator/Elevator P");
+    elevatorI = new TunableNumber("Elevator/Elevator I");
+    elevatorD = new TunableNumber("Elevator/Elevator D");
 
-    // elevatorFF.setDefault(ElevatorConstants.kG);
-    // elevatorP.setDefault(ElevatorConstants.kP);
-    // elevatorI.setDefault(0);
-    // elevatorD.setDefault(ElevatorConstants.kD);
+    elevatorVelocity = new TunableNumber("Elevator/Elevator Velocity");
+    elevatorAcceleration = new TunableNumber("Elevator/Elevator Acceleration");
+
+    elevatorFF.setDefault(ElevatorConstants.kG);
+    elevatorP.setDefault(ElevatorConstants.kP);
+    elevatorI.setDefault(0);
+    elevatorD.setDefault(ElevatorConstants.kD);
+
+    elevatorVelocity.setDefault(ElevatorConstants.kMaxVelocity);
+    elevatorAcceleration.setDefault(ElevatorConstants.kMaxAcceleration);
   }
 
   public void setMotorVoltage(double pVoltage) {
@@ -117,14 +125,22 @@ public class Elevator extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
-  // public void setElevatorP() {
-  //   ElevatorConstants.kP = elevatorP.get();
-  //   System.out.println(ElevatorConstants.kP);
-  // }
+  // These just act as ways to tune the PID quickly and easily.
+  public void setElevatorP() {
+    ElevatorConstants.kP = elevatorP.get();
+  }
 
-  // public void setElevatorD() {
-  //   ElevatorConstants.kD = elevatorD.get();
-  // }
+  public void setElevatorD() {
+    ElevatorConstants.kD = elevatorD.get();
+  }
+
+  public void setElevatorVelocity() {
+    ElevatorConstants.kMaxVelocity = elevatorVelocity.get();
+  }
+
+  public void setElevatorAcceleration() {
+    ElevatorConstants.kMaxAcceleration = elevatorAcceleration.get();
+  }
 
   @Override
   public void periodic() {
@@ -134,5 +150,10 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
+
+    if(elevatorP.hasChanged()) setElevatorP();
+    if(elevatorD.hasChanged()) setElevatorD();
+    if(elevatorVelocity.hasChanged()) setElevatorVelocity();
+    if(elevatorAcceleration.hasChanged()) setElevatorAcceleration();
   }
 }
