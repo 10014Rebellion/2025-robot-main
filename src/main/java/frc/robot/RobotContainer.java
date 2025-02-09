@@ -19,6 +19,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -57,6 +58,9 @@ public class RobotContainer {
     elevator = new Elevator();
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
+
+    // Enabled Feedforward on Elevator
+    elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
 
     switch (Constants.currentMode) {
       case REAL:

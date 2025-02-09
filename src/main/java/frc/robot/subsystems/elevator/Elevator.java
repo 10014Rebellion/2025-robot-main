@@ -48,10 +48,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setMotorVoltage(double pVoltage) {
-    double setVoltage = 0.0;
-    if (pVoltage < 0.0) setVoltage = pVoltage * 0.2;
-    else setVoltage = pVoltage;
-    mElevatorSparkMax.setVoltage(filterVoltage(setVoltage));
+    // if (pVoltage < 0.0) pVoltage *= 0.2; // Slows down downward movements
+    mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
@@ -90,14 +88,6 @@ public class Elevator extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
-  public void setElevatorFF() {
-    ElevatorConstants.kG = elevatorFF.get();
-  }
-
-  public void setElevatorI() {
-    ElevatorConstants.kI = elevatorI.get();
-  }
-
   public void setElevatorP() {
     ElevatorConstants.kP = elevatorP.get();
     System.out.println(ElevatorConstants.kP);
@@ -114,10 +104,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Position", mEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
-    if (elevatorFF.hasChanged()) setElevatorFF();
-    if (elevatorP.hasChanged()) setElevatorP();
-    if (elevatorD.hasChanged()) setElevatorD();
-    if (elevatorI.hasChanged()) setElevatorI();
-    SmartDashboard.putBoolean("Elevator/Changed FF?", (ElevatorConstants.kG != 0.0));
+    SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
   }
 }

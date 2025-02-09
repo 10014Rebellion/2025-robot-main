@@ -14,17 +14,17 @@ public class ElevatorFFCommand extends Command {
 
   public ElevatorFFCommand(Elevator pElevatorSubsystem) {
     this.mElevatorSubsystem = pElevatorSubsystem;
-    this.mElevatorFeedforward = new ElevatorFeedforward(0, 0, 0);
-    // ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+    this.mElevatorFeedforward =
+        new ElevatorFeedforward(
+            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
     addRequirements(pElevatorSubsystem);
   }
 
   @Override
   public void initialize() {
-    // this.mElevatorFeedforward =
-    //     new ElevatorFeedforward(
-    //         ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV,
-    // ElevatorConstants.kA);
+    this.mElevatorFeedforward =
+        new ElevatorFeedforward(
+            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
@@ -37,7 +37,7 @@ public class ElevatorFFCommand extends Command {
 
     mElevatorSubsystem.setMotorVoltage(calculatedOutput);
 
-    SmartDashboard.putNumber("Elevator/ELEVATOR FF CALCULATION", calculatedOutput);
+    SmartDashboard.putNumber("Elevator FEEDFORWARD", calculatedOutput);
   }
 
   @Override

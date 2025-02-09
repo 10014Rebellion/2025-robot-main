@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.util.Units;
@@ -28,7 +29,7 @@ public class ElevatorConstants {
   // public static double kGearRatio = 25 / 1;
 
   public static double kS = 0.0;
-  public static double kG = 1.0;
+  public static double kG = 0.008;
   public static double kV = 0.0;
   public static double kA = 0.0;
 
@@ -40,27 +41,22 @@ public class ElevatorConstants {
   static {
     kElevatorConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
 
-    // kElevatorConfig
-    //     .softLimit
-    //     .forwardSoftLimit(kForwardSoftLimit)
-    //     .reverseSoftLimit(kReverseSoftLimit);
-
     kElevatorConfig
         .encoder
         .positionConversionFactor(kPositionConversionFactor)
         .velocityConversionFactor(kVelocityConversionFactor);
 
-    // kElevatorConfig
-    //     .closedLoop
-    //     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    //     .pidf(kP, 0.0, kD, kVelocityFF)
-    //     .outputRange(-1, 1);
+    kElevatorConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pidf(kP, 0.0, kD, kVelocityFF)
+        .outputRange(-1, 1);
 
-    // kElevatorConfig
-    //     .closedLoop
-    //     .maxMotion
-    //     .maxVelocity(kMaxVelocity)
-    //     .maxAcceleration(kMaxAcceleration)
-    //     .allowedClosedLoopError(kTolerance);
+    kElevatorConfig
+        .closedLoop
+        .maxMotion
+        .maxVelocity(kMaxVelocity)
+        .maxAcceleration(kMaxAcceleration)
+        .allowedClosedLoopError(kTolerance);
   }
 }
