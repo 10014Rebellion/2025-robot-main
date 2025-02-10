@@ -36,7 +36,6 @@ public class VisionNew extends SubsystemBase {
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(PhotonPipelineResult result) {
     return photonPoseEstimator.update(result);
   }
-  
 
   @Override
   public void periodic() {
