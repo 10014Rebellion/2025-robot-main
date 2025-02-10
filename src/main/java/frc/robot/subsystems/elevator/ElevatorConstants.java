@@ -4,7 +4,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.util.Units;
+// import edu.wpi.first.math.util.Units;
 
 public class ElevatorConstants {
   public static int kMotorID = 41;
@@ -16,20 +16,20 @@ public class ElevatorConstants {
   public static double kD = 0.08; // TODO: Configure me!
   public static double kVelocityFF = 0.0; // TODO: Configure me!
 
-  public static double kMaxAcceleration = 500;
-  public static double kMaxVelocity = 6000;
+  public static double kMaxAcceleration = 250;
+  public static double kMaxVelocity = 500;
   public static double kTolerance = 1;
 
   public static double kForwardSoftLimit = 70;
   public static double kReverseSoftLimit = 0;
 
-  public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
-  public static double kDrumCircumference = kDrumDiameterM * Math.PI;
+  // public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
+  // public static double kDrumCircumference = kDrumDiameterM * Math.PI;
 
   // public static double kGearRatio = 25 / 1;
 
   public static double kS = 0.0;
-  public static double kG = 0.008;
+  public static double kG = 0.9;
   public static double kV = 0.0;
   public static double kA = 0.0;
 

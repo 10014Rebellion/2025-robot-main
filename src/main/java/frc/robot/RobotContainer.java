@@ -60,7 +60,7 @@ public class RobotContainer {
     telemetry = new Telemetry();
 
     // Enabled Feedforward on Elevator
-    elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
+    // elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
 
     switch (Constants.currentMode) {
       case REAL:
@@ -130,13 +130,13 @@ public class RobotContainer {
   private void configureTestButtonBindings() {
     controller
         .povUp()
-        .whileTrue(new InstantCommand(() -> claw.setMotor(2)))
-        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
+        .whileTrue(new InstantCommand(() -> claw.setWrist(2)))
+        .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
 
     controller
         .povDown()
-        .whileTrue(new InstantCommand(() -> claw.setMotor(-2)))
-        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
+        .whileTrue(new InstantCommand(() -> claw.setWrist(-2)))
+        .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
 
     // controller.rightTrigger().whileTrue(new ElevatorPIDCommand(30.0, elevator));
     // // .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
@@ -144,10 +144,59 @@ public class RobotContainer {
     //     .leftTrigger()
     //     .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
     //     .whileFalse(new ElevatorFFCommand(elevator));
-    controller.x().whileTrue(new ElevatorPIDCommand(70.0, elevator));
-    controller.y().whileTrue(new ElevatorPIDCommand(60.0, elevator));
-    controller.b().whileTrue(new ElevatorPIDCommand(30.0, elevator));
-    controller.a().whileTrue(new ElevatorPIDCommand(2.0, elevator));
+    controller
+        .x()
+        .whileTrue(new ElevatorPIDCommand(70.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    controller
+        .y()
+        .whileTrue(new ElevatorPIDCommand(60.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    controller
+        .b()
+        .whileTrue(new ElevatorPIDCommand(30.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    controller
+        .a()
+        .whileTrue(new ElevatorPIDCommand(0.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    // new ElevatorFFCommand(elevator));
 
     controller
         .rightBumper()

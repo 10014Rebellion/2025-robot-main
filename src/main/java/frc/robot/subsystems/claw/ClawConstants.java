@@ -77,17 +77,13 @@ public class ClawConstants {
     public static double kMaxVelocity = 100;
     public static double kTolerance = 1;
 
-    public static double kForwardSoftLimit = 10014;
-    public static double kReverseSoftLimit = 0;
+    public static double kForwardSoftLimit = 60;
+    public static double kReverseSoftLimit = -45;
+    public static double kGearRatio = 50.0 / 84.0;
 
-    public static double kEncoderOffsetRev = 0.18528; // In revolutions
+    public static double kEncoderOffsetRev = 0.0623246; // In revolutions
 
-    public static double kGearRatio = 1.6 / 1;
-
-    public static double kPositionConversionFactor =
-        kGearRatio
-            * 360.0; // (Drum Circumference * Final Gear Ratio) / One Encoder Revolution (if its 1:1
-    // with motor shaft)  // TODO: Configure me!
+    public static double kPositionConversionFactor = kGearRatio * 360.0;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
     public static double kS = 0.0;

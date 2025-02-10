@@ -20,6 +20,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMax mElevatorSparkMax;
   private final SparkClosedLoopController mElevatorController;
   private final RelativeEncoder mEncoder;
+  private double motorVoltage = 0;
 
   private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
 
@@ -50,6 +51,11 @@ public class Elevator extends SubsystemBase {
   public void setMotorVoltage(double pVoltage) {
     // if (pVoltage < 0.0) pVoltage *= 0.2; // Slows down downward movements
     mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
+  }
+
+  public void stepMotorVoltage(double value) {
+    motorVoltage += value;
+    setMotorVoltage(motorVoltage);
   }
 
   private double filterVoltage(double pVoltage) {
@@ -88,15 +94,6 @@ public class Elevator extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
-  public void setElevatorP() {
-    ElevatorConstants.kP = elevatorP.get();
-    System.out.println(ElevatorConstants.kP);
-  }
-
-  public void setElevatorD() {
-    ElevatorConstants.kD = elevatorD.get();
-  }
-
   @Override
   public void periodic() {
     stopIfLimit();
@@ -105,5 +102,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
+    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage);
   }
 }

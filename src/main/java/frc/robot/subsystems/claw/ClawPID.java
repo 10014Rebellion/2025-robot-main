@@ -41,12 +41,12 @@ public class ClawPID extends Command {
   @Override
   public void execute() {
     double calculatedOutput = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
-    mClawSubsystem.setMotor(calculatedOutput);
+    mClawSubsystem.setWrist(calculatedOutput);
   }
 
   @Override
   public void end(boolean interrupted) {
-    mClawSubsystem.setMotor(0);
+    mClawSubsystem.setWrist(0);
     System.out.println(
         String.format(
             "<<< %s - %s is ENDING :C >>>\n",

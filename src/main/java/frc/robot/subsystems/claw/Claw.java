@@ -51,16 +51,19 @@ public class Claw extends SubsystemBase {
     mRightClawSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
-  public void setMotor(double pVoltage) {
+  public void setWrist(double pVoltage) {
     mWristSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
-    return (MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
   }
 
   public double getEncoderMeasurement() {
-    return mWristEncoder.getPosition();
+    double encoderMeasurement = mWristEncoder.getPosition();
+    if (encoderMeasurement > ClawConstants.Wrist.kPositionConversionFactor / 2.0)
+      encoderMeasurement -= ClawConstants.Wrist.kPositionConversionFactor;
+    return encoderMeasurement;
   }
 
   // private double filterToLimits(double pInput) {
@@ -70,13 +73,33 @@ public class Claw extends SubsystemBase {
   //       : pInput;
   // }
 
+  private double filterToLimits(double pInput) {
+    return (pInput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
+            || (pInput < 0 && getEncoderMeasurement() <= ClawConstants.Wrist.kReverseSoftLimit)
+        ? 0.0
+        : pInput;
+  }
+
+  private void stopIfLimit() {
+    double motorOutput = getMotorOutput();
+    if ((motorOutput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
+        || (motorOutput < 0 && getEncoderMeasurement() <= ClawConstants.Wrist.kReverseSoftLimit)) {
+      setWrist(0);
+    }
+  }
+
+  public double getMotorOutput() {
+    return mWristSparkMax.getAppliedOutput();
+  }
+
   public void goToSetpoint(double pSetpoint) {
     mWristController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Wrist Angle", mWristEncoder.getPosition());
+    stopIfLimit();
+    SmartDashboard.putNumber("Wrist Angle", getEncoderMeasurement());
     SmartDashboard.putNumber("Wrist Voltage", mWristSparkMax.getBusVoltage());
   }
 }

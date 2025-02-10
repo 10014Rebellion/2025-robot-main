@@ -31,7 +31,7 @@ public class ClawFeedforward extends Command {
   public void execute() {
     double calculatedOutput = mClawFeedforward.calculate(0, 0);
 
-    mClawSubsystem.setMotor(calculatedOutput);
+    mClawSubsystem.setWrist(calculatedOutput);
 
     SmartDashboard.putNumber("WRIST FF CALCULATION", calculatedOutput);
   }
