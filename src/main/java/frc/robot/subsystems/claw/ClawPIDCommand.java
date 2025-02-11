@@ -5,17 +5,20 @@
 package frc.robot.subsystems.claw;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
 
-public class ClawPID extends Command {
+public class ClawPIDCommand extends Command {
   private final Claw mClawSubsystem;
   private final double mSetpoint;
   private final ProfiledPIDController mProfiledPIDController;
+  private final ArmFeedforward mClawFeedforward;
 
-  public ClawPID(double pSetpoint, Claw pClawSubsystem) {
+  public ClawPIDCommand(double pSetpoint, Claw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
     this.mProfiledPIDController =
@@ -25,12 +28,18 @@ public class ClawPID extends Command {
             Wrist.kD,
             new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
     this.mProfiledPIDController.setTolerance(Wrist.kTolerance);
+    this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
+
+    SmartDashboard.putNumber("Tuning/Wrist/Output Value", 0.0);
 
     addRequirements(pClawSubsystem);
   }
 
   @Override
   public void initialize() {
+    mProfiledPIDController.setPID(Wrist.kP, 0, Wrist.kD);
+    mProfiledPIDController.setConstraints(
+        new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
     mProfiledPIDController.reset(getMeasurement());
     System.out.println(
         String.format(
@@ -40,8 +49,11 @@ public class ClawPID extends Command {
 
   @Override
   public void execute() {
-    double calculatedOutput = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
+    double calculatedFeedforward = mClawFeedforward.calculate(getMeasurement(), 0.0);
+    double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
+    double calculatedOutput = calculatedProfilePID + calculatedFeedforward;
     mClawSubsystem.setWrist(calculatedOutput);
+    SmartDashboard.putNumber("Tuning/Wrist/Output Value", calculatedOutput);
   }
 
   @Override
@@ -55,7 +67,7 @@ public class ClawPID extends Command {
 
   @Override
   public boolean isFinished() {
-    return mProfiledPIDController.atSetpoint();
+    return false; // mProfiledPIDController.atSetpoint();
   }
 
   private double getMeasurement() {

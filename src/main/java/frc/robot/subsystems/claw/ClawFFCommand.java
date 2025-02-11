@@ -9,11 +9,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
 
-public class ClawFeedforward extends Command {
+public class ClawFFCommand extends Command {
   private final Claw mClawSubsystem;
   private final ArmFeedforward mClawFeedforward;
 
-  public ClawFeedforward(Claw pClawSubsystem) {
+  public ClawFFCommand(Claw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
     addRequirements(pClawSubsystem);
@@ -29,7 +29,7 @@ public class ClawFeedforward extends Command {
 
   @Override
   public void execute() {
-    double calculatedOutput = mClawFeedforward.calculate(0, 0);
+    double calculatedOutput = mClawFeedforward.calculate(getMeasurement(), 0);
 
     mClawSubsystem.setWrist(calculatedOutput);
 
@@ -47,5 +47,9 @@ public class ClawFeedforward extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  private double getMeasurement() {
+    return mClawSubsystem.getEncoderMeasurement();
   }
 }

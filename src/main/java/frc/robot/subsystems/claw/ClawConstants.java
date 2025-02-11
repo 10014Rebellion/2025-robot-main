@@ -16,8 +16,8 @@ public class ClawConstants {
     public static double kD = 0.0; // TODO: Configure me!
     public static double kVelocityFF = 0.0; // TODO: Configure me!
 
-    public static double kMaxAcceleration = 100;
-    public static double kMaxVelocity = 100;
+    public static double kMaxAcceleration = 1000;
+    public static double kMaxVelocity = 10000;
     public static double kTolerance = 1;
 
     public static double kForwardSoftLimit = 10014;
@@ -87,8 +87,8 @@ public class ClawConstants {
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
     public static double kS = 0.0;
-    public static double kG = 0.0;
-    public static double kV = 0.0;
+    public static double kG = 0.21;
+    public static double kV = 2.05;
     public static double kA = 0.0;
 
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();

@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
+import frc.robot.util.TunableNumber;
 
 public class Claw extends SubsystemBase {
   private final SparkMax mWristSparkMax;
@@ -23,6 +24,8 @@ public class Claw extends SubsystemBase {
 
   private final SparkClosedLoopController mWristController;
   private final AbsoluteEncoder mWristEncoder;
+
+  private TunableNumber wristP, wristD, wristG, wristV, wristA;
 
   public Claw() {
     this.mLeftClawSparkMax =
@@ -44,6 +47,16 @@ public class Claw extends SubsystemBase {
         ClawConstants.Claw.kClawConfig.inverted(true),
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
+
+    wristP = new TunableNumber("Tuning/Wrist/kP", Wrist.kP);
+    wristD = new TunableNumber("Tuning/Wrist/kD", Wrist.kD);
+    wristV = new TunableNumber("Tuning/Wrist/kVelocity", Wrist.kV);
+    wristA = new TunableNumber("Tuning/Wrist/kAcceleration", Wrist.kA);
+
+    // wristP.setDefault(0.0);
+    // wristD.setDefault(0.0);
+    // wristV.setDefault(0.0);
+    // wristA.setDefault(0.0);
   }
 
   public void setClaw(double pVoltage) {
@@ -99,7 +112,15 @@ public class Claw extends SubsystemBase {
   @Override
   public void periodic() {
     stopIfLimit();
-    SmartDashboard.putNumber("Wrist Angle", getEncoderMeasurement());
-    SmartDashboard.putNumber("Wrist Voltage", mWristSparkMax.getBusVoltage());
+    SmartDashboard.putNumber("Wrist/Position", getEncoderMeasurement());
+    SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
+
+    if (wristP.hasChanged()) Wrist.kP = wristP.get();
+    // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);
+    if (wristD.hasChanged()) Wrist.kD = wristD.get();
+    if (wristV.hasChanged()) Wrist.kMaxVelocity = wristV.get();
+    if (wristD.hasChanged()) Wrist.kMaxAcceleration = wristA.get();
+    // if(wristG.hasChanged()) Wrist.kG = wristG.get();
+
   }
 }
