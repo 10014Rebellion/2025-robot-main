@@ -6,8 +6,7 @@ package frc.robot.subsystems.claw;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
@@ -15,18 +14,18 @@ import frc.robot.subsystems.claw.ClawConstants.Wrist;
 public class ClawPIDCommand extends Command {
   private final Claw mClawSubsystem;
   private final double mSetpoint;
-  private final ProfiledPIDController mProfiledPIDController;
+  private final PIDController mProfiledPIDController;
   private final ArmFeedforward mClawFeedforward;
 
   public ClawPIDCommand(double pSetpoint, Claw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
-    this.mProfiledPIDController =
-        new ProfiledPIDController(
-            Wrist.kP,
-            0.0,
-            Wrist.kD,
-            new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
+    this.mProfiledPIDController = new PIDController(Wrist.kP, 0.0, Wrist.kD);
+    // new ProfiledPIDController(
+    //     Wrist.kP,
+    //     0.0,
+    //     Wrist.kD,
+    //     new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
     this.mProfiledPIDController.setTolerance(Wrist.kTolerance);
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
@@ -38,9 +37,10 @@ public class ClawPIDCommand extends Command {
   @Override
   public void initialize() {
     mProfiledPIDController.setPID(Wrist.kP, 0, Wrist.kD);
-    mProfiledPIDController.setConstraints(
-        new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
-    mProfiledPIDController.reset(getMeasurement());
+    // mProfiledPIDController.setConstraints(
+    //     new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
+    // mProfiledPIDController.reset(getMeasurement());
+    mProfiledPIDController.reset();
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",

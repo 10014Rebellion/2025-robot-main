@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -160,7 +161,9 @@ public class RobotContainer {
     //     .whileFalse(new ElevatorFFCommand(elevator));
     controller
         .x()
-        .whileTrue(new ElevatorPIDCommand(70.0, elevator))
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(70.0, elevator), new ClawPIDCommand(50.0, claw)))
         .whileFalse(
             new InstantCommand(
                 () -> {
@@ -169,6 +172,7 @@ public class RobotContainer {
                       && !controller.y().getAsBoolean()
                       && !controller.x().getAsBoolean()) {
                     new ElevatorFFCommand(elevator).schedule();
+                    new ClawFFCommand(claw).schedule();
                   }
                 }));
     controller
