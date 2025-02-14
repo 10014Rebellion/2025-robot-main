@@ -15,6 +15,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
+import frc.robot.subsystems.claw.ClawConstants.Wrist.ClawRollerVolt;
 import frc.robot.util.TunableNumber;
 
 public class Claw extends SubsystemBase {
@@ -57,6 +58,10 @@ public class Claw extends SubsystemBase {
     // wristD.setDefault(0.0);
     // wristV.setDefault(0.0);
     // wristA.setDefault(0.0);
+  }
+
+  public void setClaw(ClawRollerVolt pVoltage) {
+    setClaw(pVoltage.get());
   }
 
   public void setClaw(double pVoltage) {
