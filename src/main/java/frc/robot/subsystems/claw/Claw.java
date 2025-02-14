@@ -120,7 +120,5 @@ public class Claw extends SubsystemBase {
     if (wristD.hasChanged()) Wrist.kD = wristD.get();
     if (wristV.hasChanged()) Wrist.kMaxVelocity = wristV.get();
     if (wristD.hasChanged()) Wrist.kMaxAcceleration = wristA.get();
-    // if(wristG.hasChanged()) Wrist.kG = wristG.get();
-
   }
 }

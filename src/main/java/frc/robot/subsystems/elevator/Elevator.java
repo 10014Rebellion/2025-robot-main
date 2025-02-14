@@ -23,6 +23,7 @@ public class Elevator extends SubsystemBase {
   private double motorVoltage = 0;
 
   private TunableNumber elevatorFF, elevatorP, elevatorI, elevatorD;
+  private TunableNumber elevatorTunableSetpoint;
 
   public Elevator() {
     mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
@@ -41,11 +42,13 @@ public class Elevator extends SubsystemBase {
     elevatorP = new TunableNumber("Elevator/Elevator P");
     elevatorI = new TunableNumber("Elevator/Elevator I");
     elevatorD = new TunableNumber("Elevator/Elevator D");
+    elevatorTunableSetpoint = new TunableNumber("Elevator/Setpoint");
 
     elevatorFF.setDefault(ElevatorConstants.kG);
     elevatorP.setDefault(ElevatorConstants.kP);
     elevatorI.setDefault(0);
     elevatorD.setDefault(ElevatorConstants.kD);
+    elevatorTunableSetpoint.setDefault(getEncoderMeasurement());
   }
 
   public void setMotorVoltage(double pVoltage) {
@@ -102,6 +105,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
-    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage);
+    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage); 
   }
 }

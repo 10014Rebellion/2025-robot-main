@@ -10,18 +10,24 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
+import frc.robot.util.TunableNumber;
 
 public class ElevatorPIDCommand extends Command {
   private final Elevator mElevatorSubsystem;
-  private final double mSetpoint;
+  private double mSetpoint;
   private final ProfiledPIDController mProfiledPIDController;
   private final ElevatorFeedforward mElevatorFeedforward;
 
+  public ElevatorPIDCommand(Positions pSetpoint, Elevator pElevatorSubsystem) {
+    this(pSetpoint.getPos(), pElevatorSubsystem);
+  }
+
   public ElevatorPIDCommand(double pSetpoint, Elevator pElevatorSubsystem) {
     this.mElevatorSubsystem = pElevatorSubsystem;
-    this.mSetpoint =
-        MathUtil.clamp(
-            pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
+    this.mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", getMeasurement());
+        // MathUtil.clamp(
+            // pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
     this.mProfiledPIDController =
         new ProfiledPIDController(
             ElevatorConstants.kP,
@@ -45,13 +51,16 @@ public class ElevatorPIDCommand extends Command {
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
             this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
-    SmartDashboard.putNumber("Elevator Setpoint", mSetpoint);
   }
 
   @Override
   public void execute() {
     // double potentiometerReading = Potentiometer.getPotentiometer();
     // mProfiledPIDController.setP(potentiometerReading);
+
+    // mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", mSetpoint);
+  
+
     double calculatedFeedforward = mElevatorFeedforward.calculate(0);
     double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
     double calculatedOutput = calculatedFeedforward + calculatedProfilePID;

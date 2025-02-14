@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import javax.lang.model.element.Element;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -37,6 +39,25 @@ public class ElevatorConstants {
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
+
+  enum Positions {
+    BOTTOM(0),
+    L1(0),
+    L2(0),
+    L3(0),
+    L4(0),
+    BARGE(0);
+
+    public final double position;
+
+    private Positions(double position) {
+      this.position = position;
+    }
+
+    public double getPos() {
+      return this.position;
+    }
+  };
 
   static {
     kElevatorConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
