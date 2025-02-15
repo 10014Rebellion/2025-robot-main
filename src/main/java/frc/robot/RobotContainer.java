@@ -21,6 +21,7 @@ import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -42,6 +43,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -58,6 +60,7 @@ public class RobotContainer {
     elevator = new Elevator();
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
+    intake = new Intake();
 
     // Enabled Feedforward on Elevator
     elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
@@ -151,13 +154,13 @@ public class RobotContainer {
 
     controller
         .rightBumper()
-        .whileTrue(new InstantCommand(() -> claw.setClaw(2)))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
+        .whileTrue(new InstantCommand(() -> intake.setFunnelVoltage(2)))
+        .whileFalse(new InstantCommand(() -> intake.setFunnelVoltage(0)));
 
     controller
         .leftBumper()
-        .whileTrue(new InstantCommand(() -> claw.setClaw(-2)))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
+        .whileTrue(new InstantCommand(() -> intake.setFunnelVoltage(-2)))
+        .whileFalse(new InstantCommand(() -> intake.setFunnelVoltage(0)));
 
     // controller
     //     .y()
