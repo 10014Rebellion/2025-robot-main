@@ -27,6 +27,7 @@ public class Claw extends SubsystemBase {
   private final AbsoluteEncoder mWristEncoder;
 
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
+  private TunableNumber tunablePosition;
 
   public Claw() {
     this.mLeftClawSparkMax =
@@ -53,7 +54,7 @@ public class Claw extends SubsystemBase {
     wristD = new TunableNumber("Tuning/Wrist/kD", Wrist.kD);
     wristV = new TunableNumber("Tuning/Wrist/kVelocity", Wrist.kV);
     wristA = new TunableNumber("Tuning/Wrist/kAcceleration", Wrist.kA);
-
+    tunablePosition = new TunableNumber("Tuning/Wrist/Setpoint", 0);
     // wristP.setDefault(0.0);
     // wristD.setDefault(0.0);
     // wristV.setDefault(0.0);

@@ -94,17 +94,17 @@ public class ClawConstants {
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
     enum ClawRollerVolt {
-      INTAKE_CORAL(-6),
+      INTAKE_CORAL(-1),
       INTAKE_ALGAE(-12),
       OUTTAKE_REEF(12),
       OUTTAKE_BARGE(12);
-  
+
       public final double voltage;
-  
+
       private ClawRollerVolt(double voltage) {
         this.voltage = voltage;
       }
-  
+
       public double get() {
         return this.voltage;
       }

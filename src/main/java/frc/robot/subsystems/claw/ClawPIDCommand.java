@@ -13,13 +13,20 @@ import frc.robot.subsystems.claw.ClawConstants.Wrist;
 
 public class ClawPIDCommand extends Command {
   private final Claw mClawSubsystem;
-  private final double mSetpoint;
+  private double mSetpoint;
   private final PIDController mProfiledPIDController;
   private final ArmFeedforward mClawFeedforward;
+  private final boolean IS_TUNING = false;
 
   public ClawPIDCommand(double pSetpoint, Claw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
-    this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
+
+    if (IS_TUNING) {
+      this.mSetpoint = SmartDashboard.getNumber("TunableNumbers/Tuning/Wrist/Setpoint", 0);
+    } else {
+      this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
+    }
+
     this.mProfiledPIDController = new PIDController(Wrist.kP, 0.0, Wrist.kD);
     // new ProfiledPIDController(
     //     Wrist.kP,
@@ -49,6 +56,11 @@ public class ClawPIDCommand extends Command {
 
   @Override
   public void execute() {
+
+    if (IS_TUNING) {
+      mSetpoint = SmartDashboard.getNumber("TunableNumbers/Tuning/Setpoint", 0);
+    }
+
     double calculatedFeedforward = mClawFeedforward.calculate(getMeasurement(), 0.0);
     double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
     double calculatedOutput = calculatedProfilePID + calculatedFeedforward;

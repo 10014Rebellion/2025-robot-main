@@ -5,14 +5,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ElevatorPivotConstants {
-    public static int kMotorID = 0;
-    public static int kCurrentLimit = 5;
-    public static MotorType kMotorType = MotorType.kBrushless;
-    public static IdleMode kIdleMode = IdleMode.kBrake;
+  public static int kMotorID = 45;
+  public static int kCurrentLimit = 20;
+  public static MotorType kMotorType = MotorType.kBrushed;
+  public static IdleMode kIdleMode = IdleMode.kBrake;
 
-    public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
+  public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
 
-    static {
-        kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
-    }
+  static {
+    kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
+  }
 }

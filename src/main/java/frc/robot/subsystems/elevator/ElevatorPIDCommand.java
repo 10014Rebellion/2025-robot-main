@@ -11,7 +11,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
-import frc.robot.util.TunableNumber;
 
 public class ElevatorPIDCommand extends Command {
   private final Elevator mElevatorSubsystem;
@@ -19,15 +18,22 @@ public class ElevatorPIDCommand extends Command {
   private final ProfiledPIDController mProfiledPIDController;
   private final ElevatorFeedforward mElevatorFeedforward;
 
+  private final boolean IS_TUNING = true;
+
   public ElevatorPIDCommand(Positions pSetpoint, Elevator pElevatorSubsystem) {
     this(pSetpoint.getPos(), pElevatorSubsystem);
   }
 
   public ElevatorPIDCommand(double pSetpoint, Elevator pElevatorSubsystem) {
     this.mElevatorSubsystem = pElevatorSubsystem;
-    this.mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", getMeasurement());
-        // MathUtil.clamp(
-            // pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
+    if (IS_TUNING) {
+      this.mSetpoint = SmartDashboard.getNumber("TunableNumbers/Elevator/Setpoint", 0);
+    } else {
+      this.mSetpoint =
+          MathUtil.clamp(
+              pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
+    }
+
     this.mProfiledPIDController =
         new ProfiledPIDController(
             ElevatorConstants.kP,
@@ -58,8 +64,9 @@ public class ElevatorPIDCommand extends Command {
     // double potentiometerReading = Potentiometer.getPotentiometer();
     // mProfiledPIDController.setP(potentiometerReading);
 
-    // mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", mSetpoint);
-  
+    if (IS_TUNING) {
+      mSetpoint = SmartDashboard.getNumber("TunableNumbers/Elevator/Setpoint", 0);
+    }
 
     double calculatedFeedforward = mElevatorFeedforward.calculate(0);
     double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
@@ -67,6 +74,7 @@ public class ElevatorPIDCommand extends Command {
     mElevatorSubsystem.setMotorVoltage(calculatedOutput);
 
     SmartDashboard.putNumber("Elevator ProfilePID Output", calculatedOutput);
+    SmartDashboard.putNumber("Elevator/Target Pos", mSetpoint);
   }
 
   @Override

@@ -105,6 +105,6 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
-    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage); 
+    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage);
   }
 }
