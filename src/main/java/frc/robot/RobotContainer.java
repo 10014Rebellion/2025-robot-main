@@ -8,10 +8,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.ClawFFCommand;
+import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -63,7 +66,7 @@ public class RobotContainer {
     intake = new Intake();
 
     // Enabled Feedforward on Elevator
-    elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
+    // elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
 
     switch (Constants.currentMode) {
       case REAL:
@@ -131,26 +134,90 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureTestButtonBindings() {
+    // controller
+    //     .povUp()
+    //     .whileTrue(new InstantCommand(() -> claw.setWrist(2)))
+    //     .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
+
+    // controller
+    //     .povDown()
+    //     .whileTrue(new InstantCommand(() -> claw.setWrist(-2)))
+    //     .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
+
     controller
         .povUp()
-        .whileTrue(new InstantCommand(() -> claw.setMotor(2)))
-        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
-
+        .whileTrue(new ClawPIDCommand(50.0, claw))
+        .whileFalse(new ClawFFCommand(claw));
+    controller
+        .povLeft()
+        .whileTrue(new ClawPIDCommand(0.0, claw))
+        .whileFalse(new ClawFFCommand(claw));
     controller
         .povDown()
-        .whileTrue(new InstantCommand(() -> claw.setMotor(-2)))
-        .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
-
+        .whileTrue(new ClawPIDCommand(-40.0, claw))
+        .whileFalse(new ClawFFCommand(claw));
     // controller.rightTrigger().whileTrue(new ElevatorPIDCommand(30.0, elevator));
     // // .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
     // controller
     //     .leftTrigger()
     //     .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
     //     .whileFalse(new ElevatorFFCommand(elevator));
-    controller.x().whileTrue(new ElevatorPIDCommand(70.0, elevator));
-    controller.y().whileTrue(new ElevatorPIDCommand(60.0, elevator));
-    controller.b().whileTrue(new ElevatorPIDCommand(30.0, elevator));
-    controller.a().whileTrue(new ElevatorPIDCommand(2.0, elevator));
+    controller
+        .x()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(70.0, elevator), new ClawPIDCommand(50.0, claw)))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                    new ClawFFCommand(claw).schedule();
+                  }
+                }));
+    controller
+        .y()
+        .whileTrue(new ElevatorPIDCommand(60.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    controller
+        .b()
+        .whileTrue(new ElevatorPIDCommand(30.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    controller
+        .a()
+        .whileTrue(new ElevatorPIDCommand(0.0, elevator))
+        .whileFalse(
+            new InstantCommand(
+                () -> {
+                  if (!controller.a().getAsBoolean()
+                      && !controller.b().getAsBoolean()
+                      && !controller.y().getAsBoolean()
+                      && !controller.x().getAsBoolean()) {
+                    new ElevatorFFCommand(elevator).schedule();
+                  }
+                }));
+    // new ElevatorFFCommand(elevator));
 
     controller
         .rightBumper()

@@ -1,10 +1,12 @@
 package frc.robot.subsystems.elevator;
 
+import javax.lang.model.element.Element;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.math.util.Units;
+// import edu.wpi.first.math.util.Units;
 
 public class ElevatorConstants {
   public static int kMotorID = 41;
@@ -16,20 +18,20 @@ public class ElevatorConstants {
   public static double kD = 0.08; // TODO: Configure me!
   public static double kVelocityFF = 0.0; // TODO: Configure me!
 
-  public static double kMaxAcceleration = 500;
-  public static double kMaxVelocity = 6000;
+  public static double kMaxAcceleration = 250;
+  public static double kMaxVelocity = 500;
   public static double kTolerance = 1;
 
   public static double kForwardSoftLimit = 70;
   public static double kReverseSoftLimit = 0;
 
-  public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
-  public static double kDrumCircumference = kDrumDiameterM * Math.PI;
+  // public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
+  // public static double kDrumCircumference = kDrumDiameterM * Math.PI;
 
   // public static double kGearRatio = 25 / 1;
 
   public static double kS = 0.0;
-  public static double kG = 0.008;
+  public static double kG = 0.9;
   public static double kV = 0.0;
   public static double kA = 0.0;
 
@@ -37,6 +39,25 @@ public class ElevatorConstants {
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
+
+  enum Positions {
+    BOTTOM(0),
+    L1(0),
+    L2(0),
+    L3(0),
+    L4(0),
+    BARGE(0);
+
+    public final double position;
+
+    private Positions(double position) {
+      this.position = position;
+    }
+
+    public double getPos() {
+      return this.position;
+    }
+  };
 
   static {
     kElevatorConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);

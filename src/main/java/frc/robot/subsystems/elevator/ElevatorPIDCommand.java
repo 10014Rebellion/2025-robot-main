@@ -5,21 +5,29 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
+import frc.robot.util.TunableNumber;
 
 public class ElevatorPIDCommand extends Command {
-  private final Elevator mClawSubsystem;
-  private final double mSetpoint;
+  private final Elevator mElevatorSubsystem;
+  private double mSetpoint;
   private final ProfiledPIDController mProfiledPIDController;
+  private final ElevatorFeedforward mElevatorFeedforward;
 
-  public ElevatorPIDCommand(double pSetpoint, Elevator pClawSubsystem) {
-    this.mClawSubsystem = pClawSubsystem;
-    this.mSetpoint =
-        MathUtil.clamp(
-            pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
+  public ElevatorPIDCommand(Positions pSetpoint, Elevator pElevatorSubsystem) {
+    this(pSetpoint.getPos(), pElevatorSubsystem);
+  }
+
+  public ElevatorPIDCommand(double pSetpoint, Elevator pElevatorSubsystem) {
+    this.mElevatorSubsystem = pElevatorSubsystem;
+    this.mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", getMeasurement());
+        // MathUtil.clamp(
+            // pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
     this.mProfiledPIDController =
         new ProfiledPIDController(
             ElevatorConstants.kP,
@@ -27,21 +35,22 @@ public class ElevatorPIDCommand extends Command {
             ElevatorConstants.kD,
             new TrapezoidProfile.Constraints(
                 ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
+    this.mElevatorFeedforward =
+        new ElevatorFeedforward(
+            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
     this.mProfiledPIDController.setTolerance(ElevatorConstants.kTolerance);
 
-    addRequirements(pClawSubsystem);
     SmartDashboard.putNumber("Elevator/PID Output", 0.0);
+    addRequirements(pElevatorSubsystem);
   }
 
   @Override
   public void initialize() {
-    mProfiledPIDController.setPID(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
     mProfiledPIDController.reset(getMeasurement());
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
             this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
-    SmartDashboard.putNumber("Elevator/Elevator Setpoint", mSetpoint);
   }
 
   @Override
@@ -49,15 +58,20 @@ public class ElevatorPIDCommand extends Command {
     // double potentiometerReading = Potentiometer.getPotentiometer();
     // mProfiledPIDController.setP(potentiometerReading);
 
-    double calculatedOutput = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
-    mClawSubsystem.setMotorVoltage(calculatedOutput);
-    System.out.println(calculatedOutput);
-    SmartDashboard.putNumber("Elevator/PID Output", calculatedOutput);
+    // mSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", mSetpoint);
+  
+
+    double calculatedFeedforward = mElevatorFeedforward.calculate(0);
+    double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);
+    double calculatedOutput = calculatedFeedforward + calculatedProfilePID;
+    mElevatorSubsystem.setMotorVoltage(calculatedOutput);
+
+    SmartDashboard.putNumber("Elevator ProfilePID Output", calculatedOutput);
   }
 
   @Override
   public void end(boolean interrupted) {
-    mClawSubsystem.setMotorVoltage(0);
+    mElevatorSubsystem.setMotorVoltage(0);
     System.out.println(
         String.format(
             "<<< %s - %s is ENDING :C >>>\n",
@@ -66,11 +80,11 @@ public class ElevatorPIDCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    // return mProfiledPIDController.atSetpoint();
+    // return mProfiledPIDController.atGoal();
     return false;
   }
 
   private double getMeasurement() {
-    return mClawSubsystem.getEncoderMeasurement();
+    return mElevatorSubsystem.getEncoderMeasurement();
   }
 }

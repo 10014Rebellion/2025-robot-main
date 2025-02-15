@@ -15,6 +15,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
+import frc.robot.subsystems.claw.ClawConstants.Wrist.ClawRollerVolt;
+import frc.robot.util.TunableNumber;
 
 public class Claw extends SubsystemBase {
   private final SparkMax mWristSparkMax;
@@ -23,6 +25,8 @@ public class Claw extends SubsystemBase {
 
   private final SparkClosedLoopController mWristController;
   private final AbsoluteEncoder mWristEncoder;
+
+  private TunableNumber wristP, wristD, wristG, wristV, wristA;
 
   public Claw() {
     this.mLeftClawSparkMax =
@@ -44,6 +48,20 @@ public class Claw extends SubsystemBase {
         ClawConstants.Claw.kClawConfig.inverted(true),
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
+
+    wristP = new TunableNumber("Tuning/Wrist/kP", Wrist.kP);
+    wristD = new TunableNumber("Tuning/Wrist/kD", Wrist.kD);
+    wristV = new TunableNumber("Tuning/Wrist/kVelocity", Wrist.kV);
+    wristA = new TunableNumber("Tuning/Wrist/kAcceleration", Wrist.kA);
+
+    // wristP.setDefault(0.0);
+    // wristD.setDefault(0.0);
+    // wristV.setDefault(0.0);
+    // wristA.setDefault(0.0);
+  }
+
+  public void setClaw(ClawRollerVolt pVoltage) {
+    setClaw(pVoltage.get());
   }
 
   public void setClaw(double pVoltage) {
@@ -51,16 +69,19 @@ public class Claw extends SubsystemBase {
     mRightClawSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
-  public void setMotor(double pVoltage) {
+  public void setWrist(double pVoltage) {
     mWristSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
-    return (MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
   }
 
   public double getEncoderMeasurement() {
-    return mWristEncoder.getPosition();
+    double encoderMeasurement = mWristEncoder.getPosition();
+    if (encoderMeasurement > ClawConstants.Wrist.kPositionConversionFactor / 2.0)
+      encoderMeasurement -= ClawConstants.Wrist.kPositionConversionFactor;
+    return encoderMeasurement;
   }
 
   // private double filterToLimits(double pInput) {
@@ -70,13 +91,39 @@ public class Claw extends SubsystemBase {
   //       : pInput;
   // }
 
+  private double filterToLimits(double pInput) {
+    return (pInput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
+            || (pInput < 0 && getEncoderMeasurement() <= ClawConstants.Wrist.kReverseSoftLimit)
+        ? 0.0
+        : pInput;
+  }
+
+  private void stopIfLimit() {
+    double motorOutput = getMotorOutput();
+    if ((motorOutput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
+        || (motorOutput < 0 && getEncoderMeasurement() <= ClawConstants.Wrist.kReverseSoftLimit)) {
+      setWrist(0);
+    }
+  }
+
+  public double getMotorOutput() {
+    return mWristSparkMax.getAppliedOutput();
+  }
+
   public void goToSetpoint(double pSetpoint) {
     mWristController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Wrist Angle", mWristEncoder.getPosition());
-    SmartDashboard.putNumber("Wrist Voltage", mWristSparkMax.getBusVoltage());
+    stopIfLimit();
+    SmartDashboard.putNumber("Wrist/Position", getEncoderMeasurement());
+    SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
+
+    if (wristP.hasChanged()) Wrist.kP = wristP.get();
+    // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);
+    if (wristD.hasChanged()) Wrist.kD = wristD.get();
+    if (wristV.hasChanged()) Wrist.kMaxVelocity = wristV.get();
+    if (wristD.hasChanged()) Wrist.kMaxAcceleration = wristA.get();
   }
 }

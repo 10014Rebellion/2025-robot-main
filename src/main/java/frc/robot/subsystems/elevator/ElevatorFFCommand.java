@@ -33,7 +33,7 @@ public class ElevatorFFCommand extends Command {
 
   @Override
   public void execute() {
-    double calculatedOutput = mElevatorFeedforward.calculate(0, 0);
+    double calculatedOutput = mElevatorFeedforward.calculate(0);
 
     mElevatorSubsystem.setMotorVoltage(calculatedOutput);
 
