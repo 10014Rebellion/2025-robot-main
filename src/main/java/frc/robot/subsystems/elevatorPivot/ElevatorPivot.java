@@ -1,5 +1,6 @@
 package frc.robot.subsystems.elevatorPivot;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
@@ -10,11 +11,13 @@ import frc.robot.util.TunableNumber;
 
 public class ElevatorPivot extends SubsystemBase {
   private final SparkMax mPivotMotor;
+  private final AbsoluteEncoder mPivotEncoder;
   private final TunableNumber mTunableVoltage;
 
   public ElevatorPivot() {
     this.mPivotMotor =
         new SparkMax(ElevatorPivotConstants.kMotorID, ElevatorPivotConstants.kMotorType);
+    this.mPivotEncoder = mPivotMotor.getAbsoluteEncoder();
     mPivotMotor.configure(
         ElevatorPivotConstants.kPivotConfig,
         ResetMode.kResetSafeParameters,
@@ -37,6 +40,9 @@ public class ElevatorPivot extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Pivot Voltage", mPivotMotor.getBusVoltage());
+    SmartDashboard.putNumber("Pivot/Voltage", mPivotMotor.getBusVoltage());
+    SmartDashboard.putNumber(
+        "Pivot/Position",
+        mPivotEncoder.getPosition() * ElevatorPivotConstants.kPositionConversionFactor);
   }
 }

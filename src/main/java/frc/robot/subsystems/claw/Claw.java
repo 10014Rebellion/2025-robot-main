@@ -24,7 +24,7 @@ public class Claw extends SubsystemBase {
   private final SparkFlex mRightClawSparkMax;
 
   private final SparkClosedLoopController mWristController;
-  private final AbsoluteEncoder mWristEncoder;
+  private AbsoluteEncoder mWristEncoder;
 
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
   private TunableNumber tunablePosition;
@@ -50,11 +50,11 @@ public class Claw extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
-    wristP = new TunableNumber("Tuning/Wrist/kP", Wrist.kP);
-    wristD = new TunableNumber("Tuning/Wrist/kD", Wrist.kD);
-    wristV = new TunableNumber("Tuning/Wrist/kVelocity", Wrist.kV);
-    wristA = new TunableNumber("Tuning/Wrist/kAcceleration", Wrist.kA);
-    tunablePosition = new TunableNumber("Tuning/Wrist/Setpoint", 0);
+    wristP = new TunableNumber("Wrist/kP", Wrist.kP);
+    wristD = new TunableNumber("Wrist/kD", Wrist.kD);
+    wristV = new TunableNumber("Wrist/kVelocity", Wrist.kV);
+    wristA = new TunableNumber("Wrist/kAcceleration", Wrist.kA);
+    tunablePosition = new TunableNumber("Wrist/Tunable Setpoint", 0);
     // wristP.setDefault(0.0);
     // wristD.setDefault(0.0);
     // wristV.setDefault(0.0);

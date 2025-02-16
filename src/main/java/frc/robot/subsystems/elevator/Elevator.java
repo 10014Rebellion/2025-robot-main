@@ -42,7 +42,7 @@ public class Elevator extends SubsystemBase {
     elevatorP = new TunableNumber("Elevator/Elevator P");
     elevatorI = new TunableNumber("Elevator/Elevator I");
     elevatorD = new TunableNumber("Elevator/Elevator D");
-    elevatorTunableSetpoint = new TunableNumber("Elevator/Setpoint");
+    elevatorTunableSetpoint = new TunableNumber("Elevator/Tunable Setpoint");
 
     elevatorFF.setDefault(ElevatorConstants.kG);
     elevatorP.setDefault(ElevatorConstants.kP);
@@ -101,10 +101,10 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     stopIfLimit();
 
-    SmartDashboard.putNumber("Elevator Position", mEncoder.getPosition());
-    SmartDashboard.putNumber("Elevator Velocity", mEncoder.getVelocity());
-    SmartDashboard.putNumber("Elevator Output", getMotorOutput());
-    SmartDashboard.putNumber("Elevator Voltage", mElevatorSparkMax.getBusVoltage());
-    SmartDashboard.putNumber("Stepped Elevator Voltage", motorVoltage);
+    SmartDashboard.putNumber("Elevator/Position", mEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
+    SmartDashboard.putNumber("Elevator/Output", getMotorOutput());
+    SmartDashboard.putNumber("Elevator/Voltage", mElevatorSparkMax.getBusVoltage());
+    SmartDashboard.putNumber("Elevator/Stepped Voltage", motorVoltage);
   }
 }

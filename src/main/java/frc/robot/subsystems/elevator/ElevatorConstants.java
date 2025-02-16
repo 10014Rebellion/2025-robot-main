@@ -20,7 +20,7 @@ public class ElevatorConstants {
   public static double kMaxVelocity = 500;
   public static double kTolerance = 1;
 
-  public static double kForwardSoftLimit = 70;
+  public static double kForwardSoftLimit = 80;
   public static double kReverseSoftLimit = 0;
 
   // public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
@@ -38,12 +38,15 @@ public class ElevatorConstants {
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
 
-  enum Positions {
+  public enum Positions {
     BOTTOM(0),
+    PREINTAKE(20),
+    POSTINTAKE(14),
     L1(0),
-    L2(0),
-    L3(0),
-    L4(0),
+    L2(25),
+    L3(50),
+    L4(70),
+    SCORE(20),
     BARGE(0);
 
     public final double position;

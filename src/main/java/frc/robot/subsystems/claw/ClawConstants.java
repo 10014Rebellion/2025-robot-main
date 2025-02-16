@@ -77,8 +77,8 @@ public class ClawConstants {
     public static double kMaxVelocity = 100;
     public static double kTolerance = 1;
 
-    public static double kForwardSoftLimit = 60;
-    public static double kReverseSoftLimit = -45;
+    public static double kForwardSoftLimit = 70;
+    public static double kReverseSoftLimit = -58;
     public static double kGearRatio = 50.0 / 84.0;
 
     public static double kEncoderOffsetRev = 0.0623246; // In revolutions
@@ -93,11 +93,11 @@ public class ClawConstants {
 
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
-    enum ClawRollerVolt {
-      INTAKE_CORAL(-1),
-      INTAKE_ALGAE(-12),
-      OUTTAKE_REEF(12),
-      OUTTAKE_BARGE(12);
+    public enum ClawRollerVolt {
+      INTAKE_CORAL(1),
+      INTAKE_ALGAE(1),
+      OUTTAKE_REEF(-4),
+      OUTTAKE_BARGE(-12);
 
       public final double voltage;
 
@@ -107,6 +107,27 @@ public class ClawConstants {
 
       public double get() {
         return this.voltage;
+      }
+    };
+
+    public enum Positions {
+      BOTTOM(0),
+      INTAKE(-50),
+      L1(0),
+      L2(50),
+      L3(50),
+      L4(65),
+      SCORE(25),
+      BARGE(0);
+
+      public final double position;
+
+      private Positions(double position) {
+        this.position = position;
+      }
+
+      public double getPos() {
+        return this.position;
       }
     };
 

@@ -11,6 +11,21 @@ public class ElevatorPivotConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
 
   public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
+  public static final double kPositionConversionFactor = 360;
+
+  enum Positions {
+    NORMAL(14),
+    CLIMB(40);
+    public final double position;
+
+    private Positions(double position) {
+      this.position = position;
+    }
+
+    public double getPos() {
+      return this.position;
+    }
+  };
 
   static {
     kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);

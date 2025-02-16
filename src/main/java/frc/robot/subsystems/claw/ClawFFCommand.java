@@ -12,10 +12,12 @@ import frc.robot.subsystems.claw.ClawConstants.Wrist;
 public class ClawFFCommand extends Command {
   private final Claw mClawSubsystem;
   private final ArmFeedforward mClawFeedforward;
+  private double pivotPosition;
 
   public ClawFFCommand(Claw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
+    this.pivotPosition = SmartDashboard.getNumber("Pivot/Position", 0.0);
     addRequirements(pClawSubsystem);
   }
 
@@ -29,11 +31,11 @@ public class ClawFFCommand extends Command {
 
   @Override
   public void execute() {
-    double calculatedOutput = mClawFeedforward.calculate(getMeasurement(), 0);
+    double calculatedOutput = mClawFeedforward.calculate(getMeasurement() + pivotPosition, 0);
 
     mClawSubsystem.setWrist(calculatedOutput);
 
-    SmartDashboard.putNumber("WRIST FF CALCULATION", calculatedOutput);
+    SmartDashboard.putNumber("Wrist/FF Calculation", calculatedOutput);
   }
 
   @Override
