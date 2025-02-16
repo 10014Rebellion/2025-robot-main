@@ -115,4 +115,9 @@ public class Module {
   public double getFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
   }
+
+  // public void runSetpoint(SwerveModuleState state) {
+  //   io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+  //   io.setTurnPosition(state.angle);
+  // }
 }

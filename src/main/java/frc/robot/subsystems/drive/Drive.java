@@ -309,32 +309,35 @@ public class Drive extends SubsystemBase {
                 null, // No specific logging callback needed
                 null, // No specific test state change callback
                 null, // No additional update logic needed
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())
-            ),
+                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
-                (voltage) -> applySysIdRotationVoltage(voltage.in(Volts)), // Apply torque-based rotation voltage
+                (voltage) ->
+                    applySysIdRotationVoltage(
+                        voltage.in(Volts)), // Apply torque-based rotation voltage
                 (log) -> getAngularVelocity(),
-                this
-            )
-        )
+                this))
         .quasistatic(SysIdRoutine.Direction.kForward) // Using kForward but for rotation
         .andThen(new InstantCommand(this::stop));
-}
-
+  }
 
   private void applySysIdRotationVoltage(double voltage) {
     // Apply voltage in opposite directions to create torque (rotation)
-    modules[0].runCharacterization(voltage);  // Front Left (Positive)
-    modules[1].runCharacterization(-voltage); // Front Right (Negative)
-    modules[2].runCharacterization(voltage);  // Back Left (Positive)
-    modules[3].runCharacterization(-voltage); // Back Right (Negative)
+    SwerveModuleState[] rotationStates =
+        new SwerveModuleState[] {
+          new SwerveModuleState(voltage, new Rotation2d(-Math.PI / 4)), // Front Left (Positive)
+          new SwerveModuleState(-voltage, new Rotation2d(Math.PI / 4)), // Front Right (Negative)
+          new SwerveModuleState(voltage, new Rotation2d(Math.PI / 4)), // Back Left (Positive)
+          new SwerveModuleState(-voltage, new Rotation2d(-Math.PI / 4)), // Back Right (Negative)
+        };
+
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSetpoint(rotationStates[i]);
+    }
   }
 
   private double getAngularVelocity() {
     return gyroInputs.yawVelocityRadPerSec; // Ensure gyro measures yaw rate
   }
-
-
 
   // private double getAngularVelocity() {
   //   return getChassisSpeeds().omegaRadiansPerSecond; // Angular velocity from kinematics

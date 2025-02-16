@@ -114,7 +114,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     // configureButtonBindings();
-    configureButtonBindings();
+    configureTuningButtonBindings();
   }
 
   private void configureTuningButtonBindings() {
