@@ -3,13 +3,12 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import choreo.trajectory.SwerveSample;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
-
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -42,48 +41,36 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-
 public class Drive extends SubsystemBase {
-  private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
-    new SysIdRoutine.Config(
-        null, // No specific logging callback needed
-        null, // No specific test state change callback
-        null, // No additional update logic needed
-        (state) -> Logger.recordOutput("Drive/SysIdState", state.toString()) // Logging state changes
-    ),
-    new SysIdRoutine.Mechanism(
-        (voltage) -> applySysIdVoltage(voltage.in(Volts)),  // Apply voltage
-        (log) -> getAngularVelocity(), // Corrected method reference
-        this
-    )
-);
-
-  private final PIDController xController = new PIDController(
-      PathGenConstants.kPControlX, PathGenConstants.kIControlX, PathGenConstants.kDControlX);
-  private final PIDController yController = new PIDController(
-      PathGenConstants.kPControlY, PathGenConstants.kIControlY, PathGenConstants.kDControlY);
-  private final PIDController headingController = new PIDController(
-      PathGenConstants.kPHeading, PathGenConstants.kIHeading, PathGenConstants.kDHeading);
+  private final PIDController xController =\
+      new PIDController(
+          PathGenConstants.kPControlX, PathGenConstants.kIControlX, PathGenConstants.kDControlX);
+  private final PIDController yController =
+      new PIDController(
+          PathGenConstants.kPControlY, PathGenConstants.kIControlY, PathGenConstants.kDControlY);
+  private final PIDController headingController =
+      new PIDController(
+          PathGenConstants.kPHeading, PathGenConstants.kIHeading, PathGenConstants.kDHeading);
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
-  private final Alert gyroDisconnectedAlert = new Alert("Disconnected gyro, using kinematics as fallback.",
-      AlertType.kError);
+  private final Alert gyroDisconnectedAlert =
+      new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition(),
-          new SwerveModulePosition()
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator = new SwerveDrivePoseEstimator(kinematics, rawGyroRotation,
-      lastModulePositions, new Pose2d());
+  private SwerveDrivePoseEstimator poseEstimator =
+      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public Drive(
       GyroIO gyroIO,
@@ -126,14 +113,15 @@ public class Drive extends SubsystemBase {
         });
 
     // Configure SysId
-    sysId = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null,
-            null,
-            null,
-            (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
-        new SysIdRoutine.Mechanism(
-            (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     // Configure Rotation PID
     headingController.enableContinuousInput(-Math.PI, Math.PI);
@@ -144,10 +132,12 @@ public class Drive extends SubsystemBase {
     Pose2d pose = getPose();
 
     // Generate the next speeds for the robot
-    ChassisSpeeds speeds = new ChassisSpeeds(
-        sample.vx + xController.calculate(pose.getX(), sample.x),
-        sample.vy + yController.calculate(pose.getY(), sample.y),
-        sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
+    ChassisSpeeds speeds =
+        new ChassisSpeeds(
+            sample.vx + xController.calculate(pose.getX(), sample.x),
+            sample.vy + yController.calculate(pose.getY(), sample.y),
+            sample.omega
+                + headingController.calculate(pose.getRotation().getRadians(), sample.heading));
 
     // Apply the generated speeds
     driveFieldRelative(speeds);
@@ -156,12 +146,13 @@ public class Drive extends SubsystemBase {
   public void driveFieldRelative(ChassisSpeeds fieldRelativeSpeeds) {
     // Convert field-relative speeds to robot-relative speeds using the current gyro
     // angle
-    ChassisSpeeds robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        fieldRelativeSpeeds.vxMetersPerSecond,
-        fieldRelativeSpeeds.vyMetersPerSecond,
-        fieldRelativeSpeeds.omegaRadiansPerSecond,
-        getRotation() // This retrieves the current rotation from odometry
-    );
+    ChassisSpeeds robotRelativeSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            fieldRelativeSpeeds.vxMetersPerSecond,
+            fieldRelativeSpeeds.vyMetersPerSecond,
+            fieldRelativeSpeeds.omegaRadiansPerSecond,
+            getRotation() // This retrieves the current rotation from odometry
+            );
 
     // Call runVelocity with the transformed speeds
     runVelocity(robotRelativeSpeeds);
@@ -191,7 +182,8 @@ public class Drive extends SubsystemBase {
     }
 
     // Update odometry
-    double[] sampleTimestamps = modules[0].getOdometryTimestamps(); // All signals are sampled together
+    double[] sampleTimestamps =
+        modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
     for (int i = 0; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
@@ -199,10 +191,11 @@ public class Drive extends SubsystemBase {
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
         modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
-        moduleDeltas[moduleIndex] = new SwerveModulePosition(
-            modulePositions[moduleIndex].distanceMeters
-                - lastModulePositions[moduleIndex].distanceMeters,
-            modulePositions[moduleIndex].angle);
+        moduleDeltas[moduleIndex] =
+            new SwerveModulePosition(
+                modulePositions[moduleIndex].distanceMeters
+                    - lastModulePositions[moduleIndex].distanceMeters,
+                modulePositions[moduleIndex].angle);
         lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
       }
 
@@ -261,10 +254,8 @@ public class Drive extends SubsystemBase {
   }
 
   /**
-   * Stops the drive and turns the modules to an X arrangement to resist movement.
-   * The modules will
-   * return to their normal orientations the next time a nonzero velocity is
-   * requested.
+   * Stops the drive and turns the modules to an X arrangement to resist movement. The modules will
+   * return to their normal orientations the next time a nonzero velocity is requested.
    */
   public void stopWithX() {
     Rotation2d[] headings = new Rotation2d[4];
@@ -287,10 +278,7 @@ public class Drive extends SubsystemBase {
     return run(() -> runCharacterization(0.0)).withTimeout(1.0).andThen(sysId.dynamic(direction));
   }
 
-  /**
-   * Returns the module states (turn angles and drive velocities) for all of the
-   * modules.
-   */
+  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
@@ -300,10 +288,7 @@ public class Drive extends SubsystemBase {
     return states;
   }
 
-  /**
-   * Returns the module positions (turn angles and drive positions) for all of the
-   * modules.
-   */
+  /** Returns the module positions (turn angles and drive positions) for all of the modules. */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] states = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
@@ -320,30 +305,40 @@ public class Drive extends SubsystemBase {
 
   public Command measureMomentOfInertia() {
     return new SysIdRoutine(
-      new SysIdRoutine.Config(
-          null, // No specific logging callback needed
-          null, // No specific test state change callback
-          null, // No additional update logic needed
-          (state) -> Logger.recordOutput("Drive/SysIdState", state.toString()) // Logging state changes
-      ),
-      new SysIdRoutine.Mechanism(
-          (voltage) -> applySysIdVoltage(voltage.in(Volts)),  
-          (log) -> getAngularVelocity(), 
-          this
-      )
-    ).quasistatic(SysIdRoutine.Direction.kForward)
-     .andThen(new InstantCommand(this::stop));
+            new SysIdRoutine.Config(
+                null, // No specific logging callback needed
+                null, // No specific test state change callback
+                null, // No additional update logic needed
+                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())
+            ),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> applySysIdRotationVoltage(voltage.in(Volts)), // Apply torque-based rotation voltage
+                (log) -> getAngularVelocity(),
+                this
+            )
+        )
+        .quasistatic(SysIdRoutine.Direction.kForward) // Using kForward but for rotation
+        .andThen(new InstantCommand(this::stop));
 }
 
-private void applySysIdVoltage(double voltage) {
-  for (Module module : modules) {
-      module.runCharacterization(voltage);
+
+  private void applySysIdRotationVoltage(double voltage) {
+    // Apply voltage in opposite directions to create torque (rotation)
+    modules[0].runCharacterization(voltage);  // Front Left (Positive)
+    modules[1].runCharacterization(-voltage); // Front Right (Negative)
+    modules[2].runCharacterization(voltage);  // Back Left (Positive)
+    modules[3].runCharacterization(-voltage); // Back Right (Negative)
   }
-}
 
-private double getAngularVelocity() {
-  return getChassisSpeeds().omegaRadiansPerSecond; // Angular velocity from kinematics
-}
+  private double getAngularVelocity() {
+    return gyroInputs.yawVelocityRadPerSec; // Ensure gyro measures yaw rate
+  }
+
+
+
+  // private double getAngularVelocity() {
+  //   return getChassisSpeeds().omegaRadiansPerSecond; // Angular velocity from kinematics
+  // }
 
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {

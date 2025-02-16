@@ -114,12 +114,11 @@ public class RobotContainer {
 
     // Configure the button bindings
     // configureButtonBindings();
-    configureTestButtonBindings();
+    configureButtonBindings();
   }
 
   private void configureTuningButtonBindings() {
-    controller.a()
-        .onTrue(drive.measureMomentOfInertia());
+    controller.a().onTrue(drive.measureMomentOfInertia());
   }
 
   /**
