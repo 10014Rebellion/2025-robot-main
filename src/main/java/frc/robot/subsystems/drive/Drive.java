@@ -42,7 +42,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private final PIDController xController =\
+  private final PIDController xController =
       new PIDController(
           PathGenConstants.kPControlX, PathGenConstants.kIControlX, PathGenConstants.kDControlX);
   private final PIDController yController =
