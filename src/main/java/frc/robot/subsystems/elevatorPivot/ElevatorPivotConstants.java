@@ -12,6 +12,12 @@ public class ElevatorPivotConstants {
 
   public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
   public static final double kPositionConversionFactor = 360;
+  public static final double kForwardSoftLimit = 50;
+  public static final double kReverseSoftLimit = 0;
+
+  public static final double kP = 1;
+  public static final double kD = 0;
+  public static final double kTolerance = 0.5;
 
   enum Positions {
     NORMAL(14),

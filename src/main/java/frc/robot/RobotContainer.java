@@ -8,14 +8,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.claw.Claw;
-import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawFFCommand;
-import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -23,11 +19,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorFFCommand;
+import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
-import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -49,12 +42,9 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
-  private final Intake intake;
-  private final ElevatorPivot elevatorPivot;
 
   // Controller
-  private final CommandXboxController pilot = new CommandXboxController(0);
-  private final CommandXboxController copilot = new CommandXboxController(1);
+  private final CommandXboxController controller = new CommandXboxController(0);
 
   // Field Oriented
   private boolean mSwerveFieldOriented = true;
@@ -68,11 +58,6 @@ public class RobotContainer {
     elevator = new Elevator();
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
-    intake = new Intake();
-    elevatorPivot = new ElevatorPivot();
-
-    // Enabled Feedforward on Elevator
-    // elevator.setDefaultCommand(new ElevatorFFCommand(elevator));
 
     switch (Constants.currentMode) {
       case REAL:
@@ -130,7 +115,11 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    // configureTestButtonBindings();
+    // configureTuningButtonBindings();
+  }
+
+  private void configureTuningButtonBindings() {
+    // controller.a().onTrue(drive.measureMomentOfInertia());
   }
 
   /**
@@ -140,116 +129,31 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureTestButtonBindings() {
-    pilot
-        .povUp()
-        .whileTrue(new InstantCommand(() -> claw.setWrist(2)))
-        .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
 
-    pilot
-        .povDown()
-        .whileTrue(new InstantCommand(() -> claw.setWrist(-2)))
-        .whileFalse(new InstantCommand(() -> claw.setWrist(0)));
+    controller
+        .rightTrigger()
+        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
 
-    // controller
-    //     .povUp()
-    //     .whileTrue(new ClawPIDCommand(50.0, claw))
-    //     .whileFalse(new ClawFFCommand(claw));
-    // controller
-    //     .povLeft()
-    //     .whileTrue(new ClawPIDCommand(0.0, claw))
-    //     .whileFalse(new ClawFFCommand(claw));
-    // controller
-    //     .povDown()
-    //     .whileTrue(new ClawPIDCommand(-40.0, claw))
-    //     .whileFalse(new ClawFFCommand(claw));
+    controller
+        .leftTrigger()
+        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
+        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
 
-    // controller
-    //     .povUp()
-    //     .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltageTunable()))
-    //     .whileFalse(new InstantCommand(() -> elevatorPivot.setVoltage(0)));
+    controller
+        .x()
+        .onTrue(new InstantCommand(() -> claw.setClaw(1)))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
 
-    // controller.rightTrigger().whileTrue(new ElevatorPIDCommand(30.0, elevator));
-    // // .whileFalse(new InstantCommand(() -> claw.setMotor(0)));
-    // controller
-    //     .leftTrigger()
-    //     .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
-    //     .whileFalse(new ElevatorFFCommand(elevator));
+    controller
+        .b()
+        .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
 
-    // ELEVATOR START
-    /*
-        controller
-            .x()
-            .whileTrue(
-                new ParallelCommandGroup(
-                    new ElevatorPIDCommand(70.0, elevator), new ClawPIDCommand(50.0, claw)))
-            .whileFalse(
-                new InstantCommand(
-                    () -> {
-                      if (!controller.a().getAsBoolean()
-                          && !controller.b().getAsBoolean()
-                          && !controller.y().getAsBoolean()
-                          && !controller.x().getAsBoolean()) {
-                        new ElevatorFFCommand(elevator).schedule();
-                        new ClawFFCommand(claw).schedule();
-                      }
-                    }));
-        controller
-            .y()
-            .whileTrue(new ElevatorPIDCommand(60.0, elevator))
-            .whileFalse(
-                new InstantCommand(
-                    () -> {
-                      if (!controller.a().getAsBoolean()
-                          && !controller.b().getAsBoolean()
-                          && !controller.y().getAsBoolean()
-                          && !controller.x().getAsBoolean()) {
-                        new ElevatorFFCommand(elevator).schedule();
-                      }
-                    }));
-        controller
-            .b()
-            .whileTrue(new ElevatorPIDCommand(30.0, elevator))
-            .whileFalse(
-                new InstantCommand(
-                    () -> {
-                      if (!controller.a().getAsBoolean()
-                          && !controller.b().getAsBoolean()
-                          && !controller.y().getAsBoolean()
-                          && !controller.x().getAsBoolean()) {
-                        new ElevatorFFCommand(elevator).schedule();
-                      }
-                    }));
-        controller
-            .a()
-            .whileTrue(new ElevatorPIDCommand(0.0, elevator))
-            .whileFalse(
-                new InstantCommand(
-                    () -> {
-                      if (!controller.a().getAsBoolean()
-                          && !controller.b().getAsBoolean()
-                          && !controller.y().getAsBoolean()
-                          && !controller.x().getAsBoolean()) {
-                        new ElevatorFFCommand(elevator).schedule();
-                      }
-                    }));
-        // new ElevatorFFCommand(elevator));
-    */
-
-    pilot
-        .rightBumper()
-        .whileTrue(new InstantCommand(() -> intake.setFunnelVoltage(2)))
-        .whileFalse(new InstantCommand(() -> intake.setFunnelVoltage(0)));
-
-    pilot
-        .leftBumper()
-        .whileTrue(new InstantCommand(() -> intake.setFunnelVoltage(-2)))
-        .whileFalse(new InstantCommand(() -> intake.setFunnelVoltage(0)));
-
-    // controller
-    //     .y()
-    //     .onTrue(new ElevatorPID(5, elevator))
-    //     .onFalse(new InstantCommand(() -> claw.setClaw(0)));
-    // controller.a().whileTrue(new ElevatorFFCommand(elevator));
+    controller
+        .y()
+        .onTrue(new ElevatorPIDCommand(Positions.BOTTOM, elevator))
+        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
   }
 
   private void configureButtonBindings() {
@@ -257,30 +161,29 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> pilot.getLeftY() * kDriveSwerveMultipler,
-            () -> pilot.getLeftX() * kDriveSwerveMultipler,
-            () -> -pilot.getRightX() * kRotationSwerveMultipler,
+            () -> controller.getLeftY() * kDriveSwerveMultipler,
+            () -> controller.getLeftX() * kDriveSwerveMultipler,
+            () -> -controller.getRightX() * kRotationSwerveMultipler,
             () -> mSwerveFieldOriented));
 
-    pilot.y().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+    controller.y().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
     // Lock to 0° when A button is held
-    pilot
+    controller
         .a()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
-                () -> pilot.getLeftY() * kDriveSwerveMultipler,
-                () -> pilot.getLeftX() * kDriveSwerveMultipler,
+                () -> controller.getLeftY() * kDriveSwerveMultipler,
+                () -> controller.getLeftX() * kDriveSwerveMultipler,
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when X button is pressed
-    // (I'm used to it on the X button)
-    pilot
-        .x()
+    // Reset gyro to 0° when B button is pressed
+    controller
+        .b()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -288,74 +191,6 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
-    copilot
-        .a()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(true, 0.0, elevator), new ClawPIDCommand(true, 0.0, claw)))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    copilot
-        .y()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    // copilot
-    //     .a()
-    //     .onTrue(
-    //         new ParallelCommandGroup(
-    //             new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, elevator),
-    //             new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, claw)))
-    //     .onFalse(
-    //         new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    copilot
-        .b()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.PREINTAKE, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-
-    copilot
-        .x()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw),
-                new InstantCommand(
-                    () -> claw.setClaw(ClawConstants.Wrist.ClawRollerVolt.INTAKE_CORAL)),
-                new InstantCommand(() -> intake.setFunnelVoltage(-1))))
-        .onFalse(
-            new ParallelCommandGroup(
-                new ElevatorFFCommand(elevator),
-                new ClawFFCommand(claw),
-                new InstantCommand(() -> claw.setClaw(0.0)),
-                new InstantCommand(() -> intake.setFunnelVoltage(0))));
-
-    copilot
-        .povDown()
-        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(-6)))
-        .whileFalse(new InstantCommand(() -> elevatorPivot.setVoltage(0)));
-    copilot
-        .povUp()
-        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(6)))
-        .whileFalse(new InstantCommand(() -> elevatorPivot.setVoltage(0)));
-
-    copilot
-        .leftTrigger()
-        .whileTrue(
-            new InstantCommand(() -> claw.setClaw(ClawConstants.Wrist.ClawRollerVolt.INTAKE_ALGAE)))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0.0)));
-    copilot
-        .rightTrigger()
-        .whileTrue(
-            new InstantCommand(() -> claw.setClaw(ClawConstants.Wrist.ClawRollerVolt.OUTTAKE_REEF)))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0.0)));
   }
 
   /**
