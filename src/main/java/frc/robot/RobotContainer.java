@@ -23,6 +23,11 @@ import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.PoseCamera;
+import java.util.ArrayList;
+import java.util.List;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -42,6 +47,9 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
+
+  private final List<PoseCamera> cameras;
+  private final Vision visionProcessor;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -93,6 +101,19 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
+
+    cameras = new ArrayList<PoseCamera>();
+    VisionConstants.cameraPositions.forEach(
+        (cameraName, cameraTransform) -> {
+          cameras.add(
+              new PoseCamera(
+                  cameraName,
+                  cameraTransform,
+                  VisionConstants.kPoseStrategy,
+                  VisionConstants.kFallbackPoseStrategy,
+                  VisionConstants.kAprilTagFieldLayout));
+        });
+    visionProcessor = new Vision(cameras, drive::getRotation, drive::getModulePositions);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
