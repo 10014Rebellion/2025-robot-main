@@ -40,8 +40,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  */
 public class RobotContainer {
   // Axes Multipler
-  private final double kDriveSwerveMultipler = 0.5;
-  private final double kRotationSwerveMultipler = 0.6;
+  private final double kDriveSwerveMultipler = 1.0;
+  private final double kRotationSwerveMultipler = 1.0;
 
   // Subsystems
   private final Drive drive;
@@ -304,6 +304,22 @@ public class RobotContainer {
                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    copilot
+        .povRight()
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    copilot
+        .povLeft()
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
     // copilot
     //     .a()
     //     .onTrue(
@@ -339,11 +355,11 @@ public class RobotContainer {
 
     copilot
         .povDown()
-        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(-6)))
+        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(-12)))
         .whileFalse(new InstantCommand(() -> elevatorPivot.setVoltage(0)));
     copilot
         .povUp()
-        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(6)))
+        .whileTrue(new InstantCommand(() -> elevatorPivot.setVoltage(12)))
         .whileFalse(new InstantCommand(() -> elevatorPivot.setVoltage(0)));
 
     copilot
