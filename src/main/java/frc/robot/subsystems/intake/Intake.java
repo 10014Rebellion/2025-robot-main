@@ -29,6 +29,6 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Funnel Voltage", mFunnelMotor.getBusVoltage());
+    SmartDashboard.putNumber("Intake/Funnel/Current", mFunnelMotor.getOutputCurrent());
   }
 }
