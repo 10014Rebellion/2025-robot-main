@@ -7,10 +7,10 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake extends SubsystemBase {
+public class Funnel extends SubsystemBase {
   private final SparkFlex mFunnelMotor;
 
-  public Intake() {
+  public Funnel() {
     this.mFunnelMotor =
         new SparkFlex(IntakeConstants.Funnel.kMotorID, IntakeConstants.Funnel.kMotorType);
     mFunnelMotor.configure(

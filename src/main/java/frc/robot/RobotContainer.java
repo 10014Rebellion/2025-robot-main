@@ -26,6 +26,8 @@ import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
+import frc.robot.subsystems.intake.Funnel;
+import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -48,10 +50,13 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
+  private final OTBIntake intake;
+  private final Funnel funnel;
 
   // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandGenericHID copilot = new CommandGenericHID(1);
+  private final CommandXboxController testCopilot = new CommandXboxController(1);
 
   // Field Oriented
   private boolean mSwerveFieldOriented = true;
@@ -65,6 +70,9 @@ public class RobotContainer {
     elevator = new Elevator();
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
+    intake = new OTBIntake();
+    funnel = new Funnel();
+
 
     switch (Constants.currentMode) {
       case REAL:
@@ -137,30 +145,22 @@ public class RobotContainer {
    */
   private void configureTestButtonBindings() {
 
-    controller
-        .rightTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
+    testCopilot.povUp()
+        .onTrue(new InstantCommand(() -> intake.setRightPivot(3)))
+        .onFalse(new InstantCommand(() -> intake.setRightPivot(0)));
+        
+    testCopilot.povDown()
+        .onTrue(new InstantCommand(() -> intake.setRightPivot(-3)))
+        .onFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
-    controller
-        .leftTrigger()
-        .onTrue(new InstantCommand(() -> elevator.setMotorVoltage(-3)))
-        .onFalse(new InstantCommand(() -> elevator.setMotorVoltage(0)));
+    testCopilot.rightBumper()
+        .onTrue(new InstantCommand(() -> intake.setRightRoller(12)))
+        .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
-    controller
-        .x()
-        .onTrue(new InstantCommand(() -> claw.setClaw(1)))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
-
-    controller
-        .b()
-        .onTrue(new InstantCommand(() -> claw.setClaw(-1)))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
-
-    controller
-        .y()
-        .onTrue(new ElevatorPIDCommand(Positions.BOTTOM, elevator))
-        .onFalse(new InstantCommand(() -> claw.setClaw(0)));
+    testCopilot.leftBumper()
+        .onTrue(new InstantCommand(() -> intake.setRightRoller(-12)))
+        .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
+    
   }
 
   private void configureButtonBindings() {
