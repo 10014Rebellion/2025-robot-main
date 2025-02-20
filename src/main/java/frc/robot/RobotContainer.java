@@ -9,10 +9,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -20,6 +24,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.potentiometer.Potentiometer;
@@ -44,8 +49,9 @@ public class RobotContainer {
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
 
-  // Controller
+  // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandGenericHID copilot = new CommandGenericHID(1);
 
   // Field Oriented
   private boolean mSwerveFieldOriented = true;
@@ -182,12 +188,6 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    copilotController.a().onTrue(
-        new ParallelCommandGroup(
-            
-        )
-        new ElevatorPIDCommand(Positions.L4, elevator)
-    )
     // Reset gyro to 0° when B button is pressed
     controller
         .b()
@@ -198,6 +198,44 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    copilot.button(ControllerConstants.kL4Button)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)
+            )
+        );
+    copilot.button(ControllerConstants.kL3Button)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)
+            )
+        );
+    copilot.button(ControllerConstants.kL2Button)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)
+            )
+        );
+    copilot.button(ControllerConstants.kL1Button)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L1, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, claw)
+            )
+        );
+    
+    // This one probably needs a lot more work
+    copilot.button(ControllerConstants.kIntakeCoralButton)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)
+            )
+        );
   }
 
   /**
