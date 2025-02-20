@@ -9,7 +9,7 @@ public class IntakeConstants {
     public static int kMotorID = 55;
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kCoast;
-    public static int kCurrentLimit = 40;
+    public static int kCurrentLimit = 60;
 
     public static final SparkMaxConfig kFunnelConfig = new SparkMaxConfig();
 
@@ -28,8 +28,8 @@ public class IntakeConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kPivotIdleMode = IdleMode.kBrake;
     public static IdleMode kRollerIdleMode = IdleMode.kCoast;
-    public static int kRollerCurrentLimit = 40;
-    public static int kPivotCurrentLimit = 40;
+    public static int kRollerCurrentLimit = 80;
+    public static int kPivotCurrentLimit = 60;
 
     public static double kPositionConversionFactor = 360;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60;
@@ -51,11 +51,11 @@ public class IntakeConstants {
       STOWED(0),
       INTAKING(40);
       public final double position;
-  
+
       private Positions(double position) {
         this.position = position;
       }
-  
+
       public double getPos() {
         return this.position;
       }

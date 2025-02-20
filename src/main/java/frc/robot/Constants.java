@@ -38,6 +38,5 @@ public final class Constants {
     public static int kClimbUp = 6; // TO DO: Configure me!
     public static int kClimbDown = 7; // TO DO: Configure me!
     public static int kAutoClimb = 8; // TO DO: Configure me!
-
   }
 }

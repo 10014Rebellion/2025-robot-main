@@ -6,10 +6,7 @@ import com.revrobotics.spark.SparkFlex;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.IntakeConstants.OTBIntakeConstants;
 import frc.robot.util.TunableNumber;
 
@@ -23,14 +20,12 @@ public class OTBIntake extends SubsystemBase {
 
   public OTBIntake() {
     this.mRightPivotMotor =
-        new SparkFlex(
-          OTBIntakeConstants.kRightPivotID, OTBIntakeConstants.kMotorType);
+        new SparkFlex(OTBIntakeConstants.kRightPivotID, OTBIntakeConstants.kMotorType);
     this.mRightRollerMotor =
-        new SparkFlex(
-          OTBIntakeConstants.kRightRollerID, OTBIntakeConstants.kMotorType);
+        new SparkFlex(OTBIntakeConstants.kRightRollerID, OTBIntakeConstants.kMotorType);
 
     mRightPivotMotor.configure(
-      OTBIntakeConstants.kRightPivotConfig,
+        OTBIntakeConstants.kRightPivotConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
@@ -40,8 +35,8 @@ public class OTBIntake extends SubsystemBase {
         PersistMode.kNoPersistParameters);
 
     mRightPivotEncoder = new DutyCycleEncoder(OTBIntakeConstants.kEncoderDIOPort);
-    mRightPivotEncoder.setDutyCycleRange(0,1);
-    
+    mRightPivotEncoder.setDutyCycleRange(0, 1);
+
     kP = new TunableNumber("Intake/kP", OTBIntakeConstants.kP);
     kD = new TunableNumber("Intake/kD", OTBIntakeConstants.kD);
     tunableSetpoint = new TunableNumber("Intake/Tunable Setpoint", 0);
@@ -50,7 +45,7 @@ public class OTBIntake extends SubsystemBase {
     // normally
     // mRightPivotEncoder = ;
 
-  } 
+  }
 
   public void setRightRoller(double pVoltage) {
     mRightRollerMotor.setVoltage(filterVoltage(pVoltage));
@@ -61,7 +56,7 @@ public class OTBIntake extends SubsystemBase {
   }
 
   private double filterVoltage(double pVoltage) {
-    //return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
+    // return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
     return MathUtil.clamp(pVoltage, -12.0, 12.0);
   }
 
@@ -85,7 +80,7 @@ public class OTBIntake extends SubsystemBase {
   }
 
   public double getEncoderMeasurement() {
-    //TO DO: tweak this so it actually works at all
+    // TO DO: tweak this so it actually works at all
     return mRightPivotEncoder.get();
   }
 
