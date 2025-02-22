@@ -38,6 +38,9 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  public double mDriveSpeedMultiplier = kHighSpeedTrans;
+  public double mRotationSpeedMultiplier = kHighSpeedRot;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -167,6 +170,11 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+  }
+
+  public void setSpeedMultipliers(double pDriveSpeed, double pRotationSpeed) {
+    this.mDriveSpeedMultiplier = pDriveSpeed;
+    this.mRotationSpeedMultiplier = pRotationSpeed;
   }
 
   /**
