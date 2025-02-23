@@ -12,6 +12,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
@@ -28,6 +30,8 @@ public class Claw extends SubsystemBase {
 
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
   private TunableNumber tunablePosition;
+
+  private AnalogInput mUltrasonic;
 
   public Claw() {
     this.mLeftClawSparkMax =
@@ -49,6 +53,7 @@ public class Claw extends SubsystemBase {
         ClawConstants.Claw.kClawConfig.inverted(true),
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
+    mUltrasonic = new AnalogInput(0);
 
     wristP = new TunableNumber("Wrist/kP", Wrist.kP);
     wristD = new TunableNumber("Wrist/kD", Wrist.kD);
@@ -115,11 +120,18 @@ public class Claw extends SubsystemBase {
     mWristController.setReference(pSetpoint, ControlType.kMAXMotionPositionControl);
   }
 
+  public double getUltrasonicDistance() {
+    double voltage_scale_factor = 5 / RobotController.getVoltage5V();
+    double currentDistanceCM = mUltrasonic.getValue() * voltage_scale_factor * 0.125;
+    return currentDistanceCM;
+  }
+
   @Override
   public void periodic() {
     stopIfLimit();
     SmartDashboard.putNumber("Wrist/Position", getEncoderMeasurement());
     SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
+    SmartDashboard.putNumber("Wrist/Ultrasonic", getUltrasonicDistance());
 
     if (wristP.hasChanged()) Wrist.kP = wristP.get();
     // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);
