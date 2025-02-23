@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ExtendOuttake;
 import frc.robot.commands.GoToIntake;
+import frc.robot.commands.GoToPose;
 import frc.robot.commands.ShootAlgae;
 import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.claw.Claw;
@@ -54,6 +55,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Claw claw;
+  //   private final Vision vision;
   private final Elevator elevator;
   private final ElevatorPivot pivot;
   private final Potentiometer potentiometer;
@@ -66,6 +68,8 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandGenericHID copilot = new CommandGenericHID(1);
   private final CommandXboxController testCopilot = new CommandXboxController(1);
+
+  private final Pose2d targetPose = new Pose2d(1, 0.5, new Rotation2d(45));
 
   // Field Oriented
   private boolean mSwerveFieldOriented = true;
@@ -142,7 +146,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     // configureTuningButtonBindings();
-    configureTestButtonBindings();
+    // configureTestButtonBindings();
   }
 
   private void configureTuningButtonBindings() {
@@ -275,13 +279,17 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftY(),
-            () -> controller.getLeftX(),
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
             () -> -controller.getRightX(),
             () -> mSwerveFieldOriented));
 
-    // controller.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented =
-    // !mSwerveFieldOriented));
+    controller.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+
+    controller.rightTrigger().whileTrue(new GoToPose(() -> targetPose, drive));
+    controller
+        .leftTrigger()
+        .whileTrue(new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), drive));
 
     // Lock to 0° when A button is held
     // controller
@@ -289,14 +297,14 @@ public class RobotContainer {
     //     .whileTrue(
     //         DriveCommands.joystickDriveAtAngle(
     //             drive,
-    //             () -> controller.getLeftY() * kDriveSwerveMultipler,
-    //             () -> controller.getLeftX() * kDriveSwerveMultipler,
+    //             () -> controller.getLeftY(),
+    //             () -> controller.getLeftX(),
     //             () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0° when X button is pressed
     controller
         .x()
         .onTrue(

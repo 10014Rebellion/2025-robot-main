@@ -110,6 +110,10 @@ public class DriveConstants {
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
+  public static final double freeSpeed = 5.33;
+  public static final double maxLinearSpeed = freeSpeed;
+  public static final double maxAngularSpeed = freeSpeed / driveBaseRadius;
+
   // PathPlanner configuration
   public static final double robotMassKg = 74.088; // TODO: CONFIGURE ME
   public static final double robotMOI = 6.883; // TODO: CONFIGURE ME
