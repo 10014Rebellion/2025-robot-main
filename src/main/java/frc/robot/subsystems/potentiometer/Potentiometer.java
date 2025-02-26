@@ -7,7 +7,7 @@ package frc.robot.subsystems.potentiometer;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 
 public class Potentiometer {
-  private static AnalogPotentiometer mPotentiometer = new AnalogPotentiometer(0);
+  private static AnalogPotentiometer mPotentiometer = new AnalogPotentiometer(1);
 
   public static double getPotentiometer() {
     return mPotentiometer.get();

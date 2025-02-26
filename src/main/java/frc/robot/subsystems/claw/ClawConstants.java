@@ -35,6 +35,23 @@ public class ClawConstants {
 
     public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
+    public enum ClawRollerVolt {
+      INTAKE_CORAL(1),
+      INTAKE_ALGAE(1),
+      OUTTAKE_REEF(-4),
+      OUTTAKE_BARGE(-12);
+
+      public final double voltage;
+
+      private ClawRollerVolt(double voltage) {
+        this.voltage = voltage;
+      }
+
+      public double get() {
+        return this.voltage;
+      }
+    };
+
     static {
       kClawConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
 
@@ -78,7 +95,7 @@ public class ClawConstants {
     public static double kTolerance = 1;
 
     public static double kForwardSoftLimit = 70;
-    public static double kReverseSoftLimit = -58;
+    public static double kReverseSoftLimit = -62;
     public static double kGearRatio = 50.0 / 84.0;
 
     public static double kEncoderOffsetRev = 0.0623246; // In revolutions
@@ -93,26 +110,9 @@ public class ClawConstants {
 
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
-    public enum ClawRollerVolt {
-      INTAKE_CORAL(1),
-      INTAKE_ALGAE(1),
-      OUTTAKE_REEF(-4),
-      OUTTAKE_BARGE(-12);
-
-      public final double voltage;
-
-      private ClawRollerVolt(double voltage) {
-        this.voltage = voltage;
-      }
-
-      public double get() {
-        return this.voltage;
-      }
-    };
-
     public enum Positions {
       BOTTOM(0),
-      INTAKE(-50),
+      INTAKE(-65),
       L1(0),
       L2(50),
       L3(50),

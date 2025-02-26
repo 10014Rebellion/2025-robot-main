@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,12 +12,15 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ExtendOuttake;
+import frc.robot.commands.GoToIntake;
+import frc.robot.commands.GoToPose;
+import frc.robot.commands.ShootAlgae;
 import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawConstants.Wrist.ClawRollerVolt;
+import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
@@ -33,6 +35,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
+import frc.robot.subsystems.intake.Funnel;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -52,17 +55,21 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Claw claw;
+  //   private final Vision vision;
   private final Elevator elevator;
   private final ElevatorPivot pivot;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
   private final OTBIntake intake;
+  private final Funnel funnel;
   private final LEDInterface LEDs;
 
   // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandGenericHID copilot = new CommandGenericHID(1);
   private final CommandXboxController testCopilot = new CommandXboxController(1);
+
+  private final Pose2d targetPose = new Pose2d(1, 0.5, new Rotation2d(45));
 
   // Field Oriented
   private boolean mSwerveFieldOriented = true;
@@ -77,6 +84,7 @@ public class RobotContainer {
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
     intake = new OTBIntake();
+    funnel = new Funnel();
     pivot = new ElevatorPivot();
 
     LEDs = new LEDInterface();
@@ -138,7 +146,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     // configureTuningButtonBindings();
-    configureTestButtonBindings();
+    // configureTestButtonBindings();
   }
 
   private void configureTuningButtonBindings() {
@@ -152,7 +160,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureTestButtonBindings() {
-
     controller
         .povUp()
         .whileTrue(new InstantCommand(() -> intake.setRightPivot(4)))
@@ -165,7 +172,7 @@ public class RobotContainer {
 
     controller
         .rightBumper()
-        .onTrue(new InstantCommand(() -> intake.setRightRoller(6)))
+        .onTrue(new InstantCommand(() -> intake.setRightRoller(12)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
     controller
@@ -174,38 +181,16 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
     controller
         .rightTrigger()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.setFunnel(2)),
-                new InstantCommand(
-                    () -> intake.setIndexer(SmartDashboard.getNumber("Intake/Indexer Volts", 1))),
-                new InstantCommand(
-                    () ->
-                        intake.setRightRoller(SmartDashboard.getNumber("Intake/Intake Volts", 1)))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.setFunnel(0)),
-                new InstantCommand(() -> intake.setIndexer(0)),
-                new InstantCommand(() -> intake.setRightRoller(0))));
+        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(2)))
+        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
     controller
         .leftTrigger()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.setFunnel(-3)),
-                new InstantCommand(() -> intake.setIndexer(-3)),
-                new InstantCommand(() -> intake.setRightRoller(-6))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> intake.setFunnel(0)),
-                new InstantCommand(() -> intake.setIndexer(0)),
-                new InstantCommand(() -> intake.setRightRoller(0))));
+        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(-5)))
+        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
 
     testCopilot
         .x()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(Positions.PREINTAKE, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)))
+        .whileTrue(new GoToIntake(elevator, claw))
         .whileFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
     testCopilot
@@ -214,12 +199,14 @@ public class RobotContainer {
             new ParallelCommandGroup(
                 new ElevatorPIDCommand(Positions.POSTINTAKE, elevator),
                 new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw),
-                new InstantCommand(() -> claw.setClaw(ClawRollerVolt.INTAKE_CORAL))))
+                new InstantCommand(() -> claw.setClaw(ClawRollerVolt.INTAKE_CORAL)),
+                new InstantCommand(() -> funnel.setFunnelVoltage(-5))))
         .whileFalse(
             new ParallelCommandGroup(
                 new ElevatorFFCommand(elevator),
                 new ClawFFCommand(claw),
-                new InstantCommand(() -> claw.setClaw(0))));
+                new InstantCommand(() -> claw.setClaw(0)),
+                new InstantCommand(() -> funnel.setFunnelVoltage(0))));
     testCopilot
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(-1)))
@@ -229,29 +216,62 @@ public class RobotContainer {
         .whileTrue(new InstantCommand(() -> claw.setClaw(1)))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
     testCopilot
-        .y()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    testCopilot
-        .a()
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+        .rightBumper()
+        .whileTrue(new ShootAlgae(claw))
+        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
     testCopilot
         .povUp()
+        .onTrue(
+            new ExtendOuttake(
+                elevator,
+                claw,
+                drive,
+                ElevatorConstants.Positions.L4,
+                ClawConstants.Wrist.Positions.L4))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    testCopilot
+        .povLeft()
+        .onTrue(
+            new ExtendOuttake(
+                elevator,
+                claw,
+                drive,
+                ElevatorConstants.Positions.L3,
+                ClawConstants.Wrist.Positions.L3))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    testCopilot
+        .povRight()
+        .onTrue(
+            new ExtendOuttake(
+                elevator,
+                claw,
+                drive,
+                ElevatorConstants.Positions.L2,
+                ClawConstants.Wrist.Positions.L2))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    testCopilot
+        .povRight()
+        .onTrue(
+            new ExtendOuttake(
+                elevator,
+                claw,
+                drive,
+                ElevatorConstants.Positions.L1,
+                ClawConstants.Wrist.Positions.L1))
+        .onFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    controller
+        .povRight()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
-    testCopilot
-        .povDown()
+    controller
+        .povLeft()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(-12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
+    controller.b().whileTrue(new ElevatorPIDCommand(true, 0, elevator));
   }
 
   private void configureButtonBindings() {
@@ -259,12 +279,17 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> controller.getLeftY() * kDriveSwerveMultipler,
-            () -> controller.getLeftX() * kDriveSwerveMultipler,
-            () -> -controller.getRightX() * kRotationSwerveMultipler,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX(),
             () -> mSwerveFieldOriented));
 
     controller.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+
+    controller.rightTrigger().whileTrue(new GoToPose(() -> targetPose, drive));
+    controller
+        .leftTrigger()
+        .whileTrue(new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), drive));
 
     // Lock to 0° when A button is held
     // controller
@@ -272,14 +297,14 @@ public class RobotContainer {
     //     .whileTrue(
     //         DriveCommands.joystickDriveAtAngle(
     //             drive,
-    //             () -> controller.getLeftY() * kDriveSwerveMultipler,
-    //             () -> controller.getLeftX() * kDriveSwerveMultipler,
+    //             () -> controller.getLeftY(),
+    //             () -> controller.getLeftX(),
     //             () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0° when X button is pressed
     controller
         .x()
         .onTrue(
@@ -291,40 +316,40 @@ public class RobotContainer {
                 .ignoringDisable(true));
   }
 
-  public void configureCopilotBindings() {
-    copilot
-        .button(ControllerConstants.kL4Button)
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)));
-    copilot
-        .button(ControllerConstants.kL3Button)
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)));
-    copilot
-        .button(ControllerConstants.kL2Button)
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)));
-    copilot
-        .button(ControllerConstants.kL1Button)
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L1, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, claw)));
+  //   public void configureCopilotBindings() {
+  //     copilot
+  //         .button(ControllerConstants.kL4Button)
+  //         .onTrue(
+  //             new ParallelCommandGroup(
+  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
+  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)));
+  //     copilot
+  //         .button(ControllerConstants.kL3Button)
+  //         .onTrue(
+  //             new ParallelCommandGroup(
+  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
+  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)));
+  //     copilot
+  //         .button(ControllerConstants.kL2Button)
+  //         .onTrue(
+  //             new ParallelCommandGroup(
+  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
+  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)));
+  //     copilot
+  //         .button(ControllerConstants.kL1Button)
+  //         .onTrue(
+  //             new ParallelCommandGroup(
+  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L1, elevator),
+  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, claw)));
 
-    // This one probably needs a lot more work
-    copilot
-        .button(ControllerConstants.kIntakeCoralButton)
-        .onTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
-  }
+  //     // This one probably needs a lot more work
+  //     copilot
+  //         .button(ControllerConstants.kIntakeCoralButton)
+  //         .onTrue(
+  //             new ParallelCommandGroup(
+  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
+  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
+  //   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

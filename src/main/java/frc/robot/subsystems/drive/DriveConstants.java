@@ -22,6 +22,11 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DriveConstants {
+  public static final double kHighSpeedTrans = 0.5;
+  public static final double kHighSpeedRot = 0.4;
+  public static final double kLowSpeedTrans = .05;
+  public static final double kLowSPeedRot = .05;
+
   public static final double maxSpeedMetersPerSec = 4.8;
   public static final double odometryFrequency = 100.0; // Hz
   public static final double trackWidth = Units.inchesToMeters(25);
@@ -104,6 +109,10 @@ public class DriveConstants {
   public static final double turnSimD = 0.0;
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
+
+  public static final double freeSpeed = 5.33;
+  public static final double maxLinearSpeed = freeSpeed;
+  public static final double maxAngularSpeed = freeSpeed / driveBaseRadius;
 
   // PathPlanner configuration
   public static final double robotMassKg = 74.088; // TODO: CONFIGURE ME

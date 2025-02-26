@@ -17,9 +17,9 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
   private final List<PoseCamera> mCameraList;
-  private final Supplier<Rotation2d> m_gyroRotation;
-  private final Supplier<SwerveModulePosition[]> m_swerveModulePositions;
-  private final SwerveDrivePoseEstimator m_poseEstimator;
+  private final Supplier<Rotation2d> mGyroRotation;
+  private final Supplier<SwerveModulePosition[]> mSwerveModulePositions;
+  private final SwerveDrivePoseEstimator mPoseEstimator;
   private List<PhotonPipelineResult> results;
 
   public Vision(
@@ -27,29 +27,29 @@ public class Vision extends SubsystemBase {
       Supplier<Rotation2d> gyroRotation,
       Supplier<SwerveModulePosition[]> swerveModulePositions) {
     mCameraList = cameraList;
-    m_gyroRotation = gyroRotation;
-    m_swerveModulePositions = swerveModulePositions;
-    m_poseEstimator =
+    mGyroRotation = gyroRotation;
+    mSwerveModulePositions = swerveModulePositions;
+    mPoseEstimator =
         new SwerveDrivePoseEstimator(
             DriveConstants.kSwerveDriveKinematics,
-            m_gyroRotation.get(),
-            m_swerveModulePositions.get(),
+            mGyroRotation.get(),
+            mSwerveModulePositions.get(),
             new Pose2d());
     Logger.recordOutput("Robot/Pose/Current", new Pose2d());
   }
 
   @Override
   public void periodic() {
-    UpdatePose();
-    UpdateTelemetry();
+    updatePose();
+    updateTelemetry();
   }
 
   public Pose2d getPose() {
-    return m_poseEstimator.getEstimatedPosition();
+    return mPoseEstimator.getEstimatedPosition();
   }
 
-  private void UpdatePose() {
-    m_poseEstimator.update(m_gyroRotation.get(), m_swerveModulePositions.get());
+  private void updatePose() {
+    mPoseEstimator.update(mGyroRotation.get(), mSwerveModulePositions.get());
     for (PoseCamera camera : mCameraList) {
       results = camera.getCameraResults();
       if (results.size() > 0) {
@@ -60,7 +60,7 @@ public class Vision extends SubsystemBase {
                   Pose2d pose = estimatedRobotPose.estimatedPose.toPose2d();
                   if (isPoseOnField(pose)) {
                     if (estimatedRobotPose.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR) {
-                      m_poseEstimator.addVisionMeasurement(
+                      mPoseEstimator.addVisionMeasurement(
                           pose,
                           estimatedRobotPose.timestampSeconds,
                           VisionConstants.kVisionMultiTagStandardDeviations);
@@ -70,7 +70,7 @@ public class Vision extends SubsystemBase {
                             target.getPoseAmbiguity(),
                             0.0,
                             VisionConstants.kVisionMaxPoseAmbiguity)) {
-                          m_poseEstimator.addVisionMeasurement(
+                          mPoseEstimator.addVisionMeasurement(
                               pose,
                               estimatedRobotPose.timestampSeconds,
                               VisionConstants.kVisionSingleTagStandardDeviations);
@@ -101,8 +101,8 @@ public class Vision extends SubsystemBase {
     return false;
   }
 
-  public void UpdateTelemetry() {
-    Logger.recordOutput("Robot/Pose/Current", m_poseEstimator.getEstimatedPosition());
+  public void updateTelemetry() {
+    Logger.recordOutput("Robot/Pose/Current", mPoseEstimator.getEstimatedPosition());
     // for (PoseCamera camera : mCameraList) {
     //   Logger.recordOutput("Vision/Pose/" + camera.getCameraName(),
     // camera.getCameraPoseEstimate());
