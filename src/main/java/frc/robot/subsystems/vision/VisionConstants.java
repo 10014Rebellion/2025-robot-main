@@ -16,65 +16,101 @@ import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
-  public static String cam1Name = "";
-  public static String cam2Name = "";
-  public static String cam3Name = "";
-  public static String cam4Name = "";
 
+  // Camera names (update if necessary)
+  public static final String FRONT_LEFT_CAM = "FrontLeft-OV9281";
+  public static final String FRONT_RIGHT_CAM = "FrontRight-OV9281";
+  public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
+  public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
+
+  // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
   public static final PoseStrategy kFallbackPoseStrategy = PoseStrategy.LOWEST_AMBIGUITY;
+
+  // Vision measurement standard deviations
   public static final Matrix<N3, N1> kVisionSingleTagStandardDeviations = VecBuilder.fill(1, 1, 2);
   public static final Matrix<N3, N1> kVisionMultiTagStandardDeviations =
       VecBuilder.fill(0.5, 0.5, 1);
+
+  // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
+  // Load the official 2025 AprilTag field layout
   public static final AprilTagFieldLayout kAprilTagFieldLayout =
       AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
 
+  /**
+   * Map of camera positions relative to the robot's center.
+   *
+   * <p>- **Translation3d (X, Y, Z)**: - X: Forward (+) / Backward (-) relative to the center of the
+   * bot - Y: Left (+) / Right (-) relative to the center of the bot - Z: Up (+) / Down (-) relative
+   * to the ground, most likely wont be inside the ground
+   *
+   * <p>- **Rotation3d (Roll, Pitch, Yaw)**: - Roll (X-axis rotation): Side tilt (it will prolly be
+   * 0 unless we do some crazy stuff) - Pitch (Y-axis rotation): Camera looking up/down (Negative =
+   * up, yeah ik its weird, blame WPILIB not me) - Yaw (Z-axis rotation): Camera turning left/right.
+   * Imagine a birds eye view of the bot, 0deg is north, 90 is west, -90 is east, and 180 is south
+   */
   public static final Map<String, Transform3d> cameraPositions =
       Map.ofEntries(
-          // Note: idk which way is which, very possible everything is "as expected" aside from
-          // Pitch
-          // Pitch is inverted so up is negative
-          // Also camera positions are very much up in the air right now hence the zeros (2/9/2025)
+
+          // Front Left Camera (Mounted near FL swerve module)
           entry(
-              "FrontLeft",
+              FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(15.5),
-                      Units.inchesToMeters(12),
-                      Units.inchesToMeters(11.5)),
+                      Units.inchesToMeters(14.416), // X: inches forward
+                      Units.inchesToMeters(10.576), // Y: inches left
+                      Units.inchesToMeters(9.144) // Z: inches above ground
+                      ),
                   new Rotation3d(
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(-40),
-                      Units.degreesToRadians(-30)))),
+                      Units.degreesToRadians(0), // Roll: No side tilt
+                      Units.degreesToRadians(0), // Pitch: No upward tilt
+                      Units.degreesToRadians(-45) // Yaw: (angled inward)
+                      ))),
+
+          // Front Right Camera (Mounted near FR swerve module)
           entry(
-              "FrontRight",
+              FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(15.5),
-                      Units.inchesToMeters(-12),
-                      Units.inchesToMeters(11.5)),
+                      Units.inchesToMeters(14.416), // X: inches forward
+                      Units.inchesToMeters(-10.576), // Y: inches right (negative)
+                      Units.inchesToMeters(9.144) // Z: inches above ground
+                      ),
                   new Rotation3d(
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(-40),
-                      Units.degreesToRadians(30)))),
+                      Units.degreesToRadians(0), // Roll: No side tilt
+                      Units.degreesToRadians(0), // Pitch: No upward tilt
+                      Units.degreesToRadians(45) // Yaw: (angled inward)
+                      ))),
+
+          // Rear Left Camera (Mounted near BL swerve module, positions TBD)
           entry(
-              "RearLeft",
+              BACK_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                      Units.inchesToMeters(0), // X: TBD
+                      Units.inchesToMeters(0), // Y: TBD
+                      Units.inchesToMeters(0) // Z: TBD
+                      ),
                   new Rotation3d(
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(0)))),
+                      Units.degreesToRadians(0), // Roll: No side tilt
+                      Units.degreesToRadians(0), // Pitch: No upwards tilt
+                      Units.degreesToRadians(0) // Yaw: TBD
+                      ))),
+
+          // Rear Right Camera (Mounted near BR swerve module, positions TBD)
           entry(
-              "RearRight",
+              BACK_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(0)),
+                      Units.inchesToMeters(0), // X: TBD
+                      Units.inchesToMeters(0), // Y: TBD
+                      Units.inchesToMeters(0) // Z: TBD
+                      ),
                   new Rotation3d(
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(0),
-                      Units.degreesToRadians(0)))));
+                      Units.degreesToRadians(0), // Roll: No side tilt
+                      Units.degreesToRadians(0), // Pitch: No upwards tilt
+                      Units.degreesToRadians(0) // Yaw: TBD
+                      ))));
 }

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.MiscUtils;
 import frc.robot.util.PoseCamera;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -16,17 +17,40 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
-  private final List<PoseCamera> mCameraList;
+  private List<PoseCamera> mCameraList;
   private final Supplier<Rotation2d> mGyroRotation;
   private final Supplier<SwerveModulePosition[]> mSwerveModulePositions;
   private final SwerveDrivePoseEstimator mPoseEstimator;
   private List<PhotonPipelineResult> results;
 
+  private void initCameraList() {
+    List<PoseCamera> poseCameras = new ArrayList<>();
+
+    String[] cameraNames =
+        new String[] {
+          VisionConstants.FRONT_LEFT_CAM,
+          VisionConstants.FRONT_RIGHT_CAM,
+          VisionConstants.BACK_LEFT_CAM,
+          VisionConstants.BACK_RIGHT_CAM
+        };
+
+    for (String name : cameraNames) {
+      poseCameras.add(
+          new PoseCamera(
+              name,
+              VisionConstants.cameraPositions.get(name),
+              VisionConstants.kPoseStrategy,
+              VisionConstants.kFallbackPoseStrategy,
+              VisionConstants.kAprilTagFieldLayout));
+    }
+
+    mCameraList = poseCameras;
+  }
+
   public Vision(
-      List<PoseCamera> cameraList,
-      Supplier<Rotation2d> gyroRotation,
-      Supplier<SwerveModulePosition[]> swerveModulePositions) {
-    mCameraList = cameraList;
+      Supplier<Rotation2d> gyroRotation, Supplier<SwerveModulePosition[]> swerveModulePositions) {
+
+    initCameraList();
     mGyroRotation = gyroRotation;
     mSwerveModulePositions = swerveModulePositions;
     mPoseEstimator =
@@ -35,6 +59,7 @@ public class Vision extends SubsystemBase {
             mGyroRotation.get(),
             mSwerveModulePositions.get(),
             new Pose2d());
+
     Logger.recordOutput("Robot/Pose/Current", new Pose2d());
   }
 

@@ -35,10 +35,10 @@ import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
-import frc.robot.subsystems.intake.Funnel;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
+import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -55,13 +55,12 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Claw claw;
-  //   private final Vision vision;
+  private final Vision vision;
   private final Elevator elevator;
   private final ElevatorPivot pivot;
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
   private final OTBIntake intake;
-  private final Funnel funnel;
   private final LEDInterface LEDs;
 
   // Controllers
@@ -84,7 +83,6 @@ public class RobotContainer {
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
     intake = new OTBIntake();
-    funnel = new Funnel();
     pivot = new ElevatorPivot();
 
     LEDs = new LEDInterface();
@@ -123,6 +121,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
+
+    vision = new Vision(() -> drive.getRotation(), () -> drive.getModulePositions());
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -179,14 +179,6 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(new InstantCommand(() -> intake.setRightRoller(-6)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
-    controller
-        .rightTrigger()
-        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(2)))
-        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
-    controller
-        .leftTrigger()
-        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(-5)))
-        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
 
     testCopilot
         .x()
@@ -199,14 +191,12 @@ public class RobotContainer {
             new ParallelCommandGroup(
                 new ElevatorPIDCommand(Positions.POSTINTAKE, elevator),
                 new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw),
-                new InstantCommand(() -> claw.setClaw(ClawRollerVolt.INTAKE_CORAL)),
-                new InstantCommand(() -> funnel.setFunnelVoltage(-5))))
+                new InstantCommand(() -> claw.setClaw(ClawRollerVolt.INTAKE_CORAL))))
         .whileFalse(
             new ParallelCommandGroup(
                 new ElevatorFFCommand(elevator),
                 new ClawFFCommand(claw),
-                new InstantCommand(() -> claw.setClaw(0)),
-                new InstantCommand(() -> funnel.setFunnelVoltage(0))));
+                new InstantCommand(() -> claw.setClaw(0))));
     testCopilot
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(-1)))
