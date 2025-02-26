@@ -71,14 +71,17 @@ public class GoToPose extends Command {
 
   private double driveErrorAbs = 0.0;
   private double thetaErrorAbs = 0.0;
+  private final Supplier<Pose2d> mCurrentPoseSupplier;
 
   private final ProfiledPIDController driveController =
       new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
   private final ProfiledPIDController thetaController =
       new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
 
-  public GoToPose(Supplier<Pose2d> pTargetPose, Drive pDriveSubsystem) {
+  public GoToPose(
+      Supplier<Pose2d> pTargetPose, Supplier<Pose2d> pCurrentPoseSupplier, Drive pDriveSubsystem) {
     this.mTargetPose = pTargetPose;
+    this.mCurrentPoseSupplier = pCurrentPoseSupplier;
     this.mDriveSubsystem = pDriveSubsystem;
     this.robot = () -> pDriveSubsystem.getPose();
 
@@ -90,7 +93,7 @@ public class GoToPose extends Command {
   @Override
   public void initialize() {
 
-    Pose2d currentPose = robot.get();
+    Pose2d currentPose = mCurrentPoseSupplier.get();
     ChassisSpeeds fieldVelocity = mDriveSubsystem.getFieldVelocity();
     Translation2d linearFieldVelocity =
         new Translation2d(fieldVelocity.vxMetersPerSecond, fieldVelocity.vyMetersPerSecond);
@@ -142,7 +145,7 @@ public class GoToPose extends Command {
     }
 
     // Get current pose and target pose
-    Pose2d currentPose = robot.get();
+    Pose2d currentPose = mCurrentPoseSupplier.get();
     Pose2d targetPose = mTargetPose.get();
 
     // Calculate drive speed

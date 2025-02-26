@@ -276,10 +276,19 @@ public class RobotContainer {
 
     controller.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
-    controller.rightTrigger().whileTrue(new GoToPose(() -> targetPose, drive));
+    controller
+        .rightTrigger()
+        .whileTrue(new GoToPose(() -> targetPose, () -> drive.getPose(), drive));
     controller
         .leftTrigger()
-        .whileTrue(new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), drive));
+        .whileTrue(
+            new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), () -> drive.getPose(), drive));
+
+    controller
+        .leftBumper()
+        .whileTrue(
+            new GoToPose(
+                () -> vision.getPoseInFrontOfAprilTag(7, 0.15), () -> vision.getPose(), drive));
 
     // Lock to 0° when A button is held
     // controller

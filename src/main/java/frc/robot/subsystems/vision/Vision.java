@@ -2,7 +2,9 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -59,14 +61,32 @@ public class Vision extends SubsystemBase {
             mGyroRotation.get(),
             mSwerveModulePositions.get(),
             new Pose2d());
-
-    Logger.recordOutput("Robot/Pose/Current", new Pose2d());
   }
 
   @Override
   public void periodic() {
     updatePose();
     updateTelemetry();
+  }
+
+  public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceMeters) {
+    Pose2d tagPose =
+        VisionConstants.kAprilTagFieldLayout.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
+
+    if (tagPose == null) {
+      updatePose();
+      return mPoseEstimator.getEstimatedPosition();
+    }
+
+    // Calculate position in front of the tag
+    Translation2d tagTranslation = tagPose.getTranslation();
+    Rotation2d tagRotation = tagPose.getRotation();
+
+    // Move "pDistanceMeters" in the direction the tag is facing
+    Translation2d frontOfTag =
+        tagTranslation.plus(new Translation2d(-pDistanceMeters, 0).rotateBy(tagRotation));
+
+    return new Pose2d(frontOfTag, tagRotation);
   }
 
   public Pose2d getPose() {
