@@ -13,6 +13,8 @@ import frc.robot.util.TunableNumber;
 public class OTBIntake extends SubsystemBase {
   private SparkFlex mRightPivotMotor;
   private SparkFlex mRightRollerMotor;
+  private SparkFlex mFunnelMotor;
+  private SparkFlex mIndexerMotor;
 
   private TunableNumber kP, kD, tunableSetpoint;
 
@@ -23,6 +25,10 @@ public class OTBIntake extends SubsystemBase {
         new SparkFlex(OTBIntakeConstants.kRightPivotID, OTBIntakeConstants.kMotorType);
     this.mRightRollerMotor =
         new SparkFlex(OTBIntakeConstants.kRightRollerID, OTBIntakeConstants.kMotorType);
+    this.mFunnelMotor =
+        new SparkFlex(IntakeConstants.Funnel.kFunnelID, IntakeConstants.Funnel.kMotorType);
+    this.mIndexerMotor =
+        new SparkFlex(IntakeConstants.Funnel.kIndexerID, IntakeConstants.Funnel.kMotorType);
 
     mRightPivotMotor.configure(
         OTBIntakeConstants.kRightPivotConfig,
@@ -34,12 +40,24 @@ public class OTBIntake extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
+    mFunnelMotor.configure(
+        IntakeConstants.Funnel.kFunnelConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
+
+    mIndexerMotor.configure(
+        IntakeConstants.Funnel.kIndexerConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
+
     mRightPivotEncoder = new DutyCycleEncoder(OTBIntakeConstants.kEncoderDIOPort);
     mRightPivotEncoder.setDutyCycleRange(0, 1);
 
     kP = new TunableNumber("Intake/kP", OTBIntakeConstants.kP);
     kD = new TunableNumber("Intake/kD", OTBIntakeConstants.kD);
     tunableSetpoint = new TunableNumber("Intake/Tunable Setpoint", 0);
+    SmartDashboard.putNumber("Intake/Indexer Volts", 1);
+    SmartDashboard.putNumber("Intake/Intake Volts", 1);
     // Note: it will have an encoder, just not right this second.
     // This is because the pivot motor is a sparkflex here, not a sparkmax, so it cant be called
     // normally
@@ -53,6 +71,14 @@ public class OTBIntake extends SubsystemBase {
 
   public void setRightPivot(double pVoltage) {
     mRightPivotMotor.setVoltage(filterVoltage(pVoltage));
+  }
+
+  public void setFunnel(double pVoltage) {
+    mFunnelMotor.setVoltage(filterVoltage(pVoltage));
+  }
+
+  public void setIndexer(double pVoltage) {
+    mIndexerMotor.setVoltage(pVoltage);
   }
 
   private double filterVoltage(double pVoltage) {

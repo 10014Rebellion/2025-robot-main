@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,7 +33,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
-import frc.robot.subsystems.intake.Funnel;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -57,7 +57,6 @@ public class RobotContainer {
   private final Potentiometer potentiometer;
   private final Telemetry telemetry;
   private final OTBIntake intake;
-  private final Funnel funnel;
   private final LEDInterface LEDs;
 
   // Controllers
@@ -78,7 +77,6 @@ public class RobotContainer {
     potentiometer = new Potentiometer();
     telemetry = new Telemetry();
     intake = new OTBIntake();
-    funnel = new Funnel();
     pivot = new ElevatorPivot();
 
     LEDs = new LEDInterface();
@@ -176,12 +174,31 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
     controller
         .rightTrigger()
-        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(3)))
-        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.setFunnel(2)),
+                new InstantCommand(
+                    () -> intake.setIndexer(SmartDashboard.getNumber("Intake/Indexer Volts", 1))),
+                new InstantCommand(
+                    () ->
+                        intake.setRightRoller(SmartDashboard.getNumber("Intake/Intake Volts", 1)))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.setFunnel(0)),
+                new InstantCommand(() -> intake.setIndexer(0)),
+                new InstantCommand(() -> intake.setRightRoller(0))));
     controller
         .leftTrigger()
-        .whileTrue(new InstantCommand(() -> funnel.setFunnelVoltage(-3)))
-        .whileFalse(new InstantCommand(() -> funnel.setFunnelVoltage(0)));
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.setFunnel(-3)),
+                new InstantCommand(() -> intake.setIndexer(-3)),
+                new InstantCommand(() -> intake.setRightRoller(-6))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> intake.setFunnel(0)),
+                new InstantCommand(() -> intake.setIndexer(0)),
+                new InstantCommand(() -> intake.setRightRoller(0))));
 
     testCopilot
         .x()
