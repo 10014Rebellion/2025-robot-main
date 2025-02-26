@@ -6,6 +6,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.MiscUtils;
@@ -17,6 +20,8 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import java.util.Optional;
 
 public class Vision extends SubsystemBase {
   private List<PoseCamera> mCameraList;
@@ -87,6 +92,59 @@ public class Vision extends SubsystemBase {
         tagTranslation.plus(new Translation2d(-pDistanceMeters, 0).rotateBy(tagRotation));
 
     return new Pose2d(frontOfTag, tagRotation);
+  }
+
+  public Pose2d getClosestReefTag() {
+    Optional<Alliance> currentAlliance = DriverStation.getAlliance();
+    // Check if we have an alliance
+    if (currentAlliance.isPresent()) {
+      int closestTag = 0;
+      // If alliance is blue, we're gonna loop through and find the closest blue reef tag
+      if (currentAlliance.get() == Alliance.Blue) {
+        // Blue reef tags are from ID 17 to ID 22
+        double closestDist = 10000;
+        for (int ID = 17; ID <= 22; ID++) {
+          // Check the distance between our current position and the tag position
+          Pose2d tagPose = VisionConstants.kAprilTagFieldLayout.getTagPose(ID).map(Pose3d::toPose2d).orElse(null);
+          double currentDist = tagPose.getTranslation().getDistance(getPose().getTranslation());
+          if (currentDist < closestDist) {
+            // If the current distance is less than closest, set closest tag to that tag 
+            closestDist = currentDist;
+            closestTag = ID;
+          }
+        }
+        SmartDashboard.putNumber("Vision/Closest Tag ID", closestTag);
+        // If we (somehow) dont find anything, ignore the values
+        if (closestTag == 0) {
+          return getPose();
+        }
+        return VisionConstants.kAprilTagFieldLayout.getTagPose(closestTag).map(Pose3d::toPose2d).orElse(getPose());
+      }
+
+      // If alliance is red, we're gonna loop through and find the closest red reef tag
+      if (currentAlliance.get() == Alliance.Red) {
+        double closestDist = 10000;
+        // Red reef tags are from ID 6 to ID 11
+        for (int ID = 6; ID <= 11; ID++) {
+          // Check the distance between our current position and the tag position
+          Pose2d tagPose = VisionConstants.kAprilTagFieldLayout.getTagPose(ID).map(Pose3d::toPose2d).orElse(null);
+          double currentDist = tagPose.getTranslation().getDistance(getPose().getTranslation());
+          if (currentDist < closestDist) {
+            // If the current distance is less than closest, set closest tag to that tag 
+            closestDist = currentDist;
+            closestTag = ID;
+          }
+        }
+        SmartDashboard.putNumber("Vision/Closest Tag ID", closestTag);
+        // If we (somehow) dont find anything, ignore the values
+        if (closestTag == 0) {
+          return getPose();
+        }
+        return VisionConstants.kAprilTagFieldLayout.getTagPose(closestTag).map(Pose3d::toPose2d).orElse(getPose());
+      }
+    }
+
+    return getPose();
   }
 
   public Pose2d getPose() {
