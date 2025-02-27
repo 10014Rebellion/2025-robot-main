@@ -116,29 +116,43 @@ public class Vision extends SubsystemBase {
 
   private void updatePose() {
     mPoseEstimator.update(mGyroRotation.get(), mSwerveModulePositions.get());
+    // Loops through cameras
     for (PoseCamera camera : mCameraList) {
+      // Gets a given camera's results, then checks if the camera is seeing anything
       results = camera.getCameraResults();
       if (results.size() > 0) {
-        camera
-            .getEstimatedRobotPose(results.get(0))
+        // Gets first result and checks if it exists
+        // Note: it doesn't matter that it doesn't loop through the results
+        // because we're using multitag processing
+        camera.getEstimatedRobotPose(results.get(0))
             .ifPresent(
+              // Lambda expression (help someone else i dont get these)
                 estimatedRobotPose -> {
+                  // First, sets our reference pose to the estimated pose
                   Pose2d pose = estimatedRobotPose.estimatedPose.toPose2d();
+                  // Checks if that pose is on field
                   if (isPoseOnField(pose)) {
+                    // Now, if we have enough tags to use mult-tag, we use it
                     if (estimatedRobotPose.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR) {
+                      // Multi-tag measurements are pretty much always good, 
+                      // so it simply adds the multi-tag measurement to the pose estimator
                       mPoseEstimator.addVisionMeasurement(
                           pose,
                           estimatedRobotPose.timestampSeconds,
                           VisionConstants.kVisionMultiTagStandardDeviations);
-                    } else {
+                    } 
+                    // If we aren't using multi-tag (for whatever reason)
+                    // we go here.
+                    else {
+                      // Now, we use the tags and loop through them
                       for (PhotonTrackedTarget target : estimatedRobotPose.targetsUsed) {
-                        if (MiscUtils.isValueInRange(
-                            target.getPoseAmbiguity(),
-                            0.0,
-                            VisionConstants.kVisionMaxPoseAmbiguity)) {
+                        // Next, we check if the value is "good" / within our allowed range
+                        if (MiscUtils.isValueInRange(target.getPoseAmbiguity(),
+                            0.0, VisionConstants.kVisionMaxPoseAmbiguity)) {
+                          // Since we're not using multi-tag, we're just gonna add the value
+                          // and then leave the loop.
                           mPoseEstimator.addVisionMeasurement(
-                              pose,
-                              estimatedRobotPose.timestampSeconds,
+                              pose, estimatedRobotPose.timestampSeconds,
                               VisionConstants.kVisionSingleTagStandardDeviations);
                           break;
                         }
