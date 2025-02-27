@@ -39,6 +39,7 @@ import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -285,20 +286,38 @@ public class RobotContainer {
             new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), () -> drive.getPose(), drive));
 
     controller
-        .leftBumper()
+        .povUp()
         .whileTrue(
             new GoToPose(
-                () -> vision.getPoseInFrontOfAprilTag(7, 0.15), () -> vision.getPose(), drive));
+                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.CENTER),
+                () -> vision.getPose(),
+                drive));
+
+    controller
+        .povLeft()
+        .whileTrue(
+            new GoToPose(
+                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.LEFT),
+                () -> vision.getPose(),
+                drive));
+
+    controller
+        .povRight()
+        .whileTrue(
+            new GoToPose(
+                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.RIGHT),
+                () -> vision.getPose(),
+                drive));
 
     // Lock to 0° when A button is held
     // controller
-    //     .a()
-    //     .whileTrue(
-    //         DriveCommands.joystickDriveAtAngle(
-    //             drive,
-    //             () -> controller.getLeftY(),
-    //             () -> controller.getLeftX(),
-    //             () -> new Rotation2d()));
+    // .a()
+    // .whileTrue(
+    // DriveCommands.joystickDriveAtAngle(
+    // drive,
+    // () -> controller.getLeftY(),
+    // () -> controller.getLeftX(),
+    // () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -315,40 +334,40 @@ public class RobotContainer {
                 .ignoringDisable(true));
   }
 
-  //   public void configureCopilotBindings() {
-  //     copilot
-  //         .button(ControllerConstants.kL4Button)
-  //         .onTrue(
-  //             new ParallelCommandGroup(
-  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
-  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)));
-  //     copilot
-  //         .button(ControllerConstants.kL3Button)
-  //         .onTrue(
-  //             new ParallelCommandGroup(
-  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
-  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)));
-  //     copilot
-  //         .button(ControllerConstants.kL2Button)
-  //         .onTrue(
-  //             new ParallelCommandGroup(
-  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
-  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)));
-  //     copilot
-  //         .button(ControllerConstants.kL1Button)
-  //         .onTrue(
-  //             new ParallelCommandGroup(
-  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.L1, elevator),
-  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, claw)));
+  // public void configureCopilotBindings() {
+  // copilot
+  // .button(ControllerConstants.kL4Button)
+  // .onTrue(
+  // new ParallelCommandGroup(
+  // new ElevatorPIDCommand(ElevatorConstants.Positions.L4, elevator),
+  // new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, claw)));
+  // copilot
+  // .button(ControllerConstants.kL3Button)
+  // .onTrue(
+  // new ParallelCommandGroup(
+  // new ElevatorPIDCommand(ElevatorConstants.Positions.L3, elevator),
+  // new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, claw)));
+  // copilot
+  // .button(ControllerConstants.kL2Button)
+  // .onTrue(
+  // new ParallelCommandGroup(
+  // new ElevatorPIDCommand(ElevatorConstants.Positions.L2, elevator),
+  // new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, claw)));
+  // copilot
+  // .button(ControllerConstants.kL1Button)
+  // .onTrue(
+  // new ParallelCommandGroup(
+  // new ElevatorPIDCommand(ElevatorConstants.Positions.L1, elevator),
+  // new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, claw)));
 
-  //     // This one probably needs a lot more work
-  //     copilot
-  //         .button(ControllerConstants.kIntakeCoralButton)
-  //         .onTrue(
-  //             new ParallelCommandGroup(
-  //                 new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
-  //                 new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
-  //   }
+  // // This one probably needs a lot more work
+  // copilot
+  // .button(ControllerConstants.kIntakeCoralButton)
+  // .onTrue(
+  // new ParallelCommandGroup(
+  // new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, elevator),
+  // new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
+  // }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

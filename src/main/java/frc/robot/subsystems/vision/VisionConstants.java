@@ -17,11 +17,31 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
 
+  public static final double kDistBetweenBranchesCenter = 0.33;
+
+  public enum PoseOffsets {
+    LEFT(kDistBetweenBranchesCenter / 2.0),
+    CENTER(0),
+    RIGHT(-kDistBetweenBranchesCenter / 2.0);
+
+    public final double offset;
+
+    private PoseOffsets(double offset) {
+      this.offset = offset;
+    }
+
+    public double getOffsetM() {
+      return this.offset;
+    }
+  };
+
   // Camera names (update if necessary)
   public static final String FRONT_LEFT_CAM = "FrontLeft-OV9281";
   public static final String FRONT_RIGHT_CAM = "FrontRight-OV9281";
   public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
   public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
+
+  public static final double kRobotYLength = Units.inchesToMeters(37.0);
 
   // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
