@@ -17,7 +17,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
 
-  public static final double kDistBetweenBranchesCenter = 0.33;
+  public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13);
 
   public enum PoseOffsets {
     LEFT(kDistBetweenBranchesCenter / 2.0),

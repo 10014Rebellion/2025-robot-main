@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.ButtonBoardConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ExtendOuttake;
 import frc.robot.commands.GoToIntake;
@@ -301,6 +302,31 @@ public class RobotContainer {
                 .ignoringDisable(true));
   }
 
+  public void configureCopilotBindings() {
+    operatorButtonboard.button(ButtonBoardConstants.kScoreL4)
+        .onTrue(new InstantCommand(() -> 
+        ButtonBoardConstants.currentLevel = ButtonBoardConstants.heightPositions.L4));
+
+    operatorButtonboard.button(ButtonBoardConstants.kScoreL3)
+        .onTrue(new InstantCommand(() -> 
+        ButtonBoardConstants.currentLevel = ButtonBoardConstants.heightPositions.L3));
+
+    operatorButtonboard.button(ButtonBoardConstants.kScoreL2)
+        .onTrue(new InstantCommand(() -> 
+        ButtonBoardConstants.currentLevel = ButtonBoardConstants.heightPositions.L2));
+
+    operatorButtonboard.button(ButtonBoardConstants.kScoreL1)
+        .onTrue(new InstantCommand(() -> 
+        ButtonBoardConstants.currentLevel = ButtonBoardConstants.heightPositions.L1));
+
+    operatorButtonboard.button(ButtonBoardConstants.kLeftSide)
+        .onTrue(new InstantCommand(() ->
+        ButtonBoardConstants.currentSide = VisionConstants.PoseOffsets.LEFT));
+        
+    operatorButtonboard.button(ButtonBoardConstants.kRightSide)
+        .onTrue(new InstantCommand(() ->
+        ButtonBoardConstants.currentSide = VisionConstants.PoseOffsets.RIGHT));
+  }
   // public void configureCopilotBindings() {
   // copilot
   // .button(ControllerConstants.kL4Button)
