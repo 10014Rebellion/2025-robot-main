@@ -65,9 +65,9 @@ public class RobotContainer {
   private final LEDInterface LEDs;
 
   // Controllers
-  private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandGenericHID copilot = new CommandGenericHID(1);
-  private final CommandXboxController testCopilot = new CommandXboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(0);
+  private final CommandGenericHID operatorButtonboard = new CommandGenericHID(1);
 
   private final Pose2d targetPose = new Pose2d(1, 0.5, new Rotation2d(45));
 
@@ -146,47 +146,31 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    // configureTuningButtonBindings();
-    // configureTestButtonBindings();
   }
 
-  private void configureTuningButtonBindings() {
-    // controller.a().onTrue(drive.measureMomentOfInertia());
-  }
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureTestButtonBindings() {
-    controller
-        .povUp()
+    driverController.povUp()
         .whileTrue(new InstantCommand(() -> intake.setRightPivot(4)))
         .whileFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
-    controller
-        .povDown()
+    driverController.povDown()
         .whileTrue(new InstantCommand(() -> intake.setRightPivot(-2)))
         .whileFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
-    controller
-        .rightBumper()
+    driverController.rightBumper()
         .onTrue(new InstantCommand(() -> intake.setRightRoller(12)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
-    controller
-        .leftBumper()
+    driverController.leftBumper()
         .onTrue(new InstantCommand(() -> intake.setRightRoller(-6)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
-    testCopilot
+    operatorController
         .x()
         .whileTrue(new GoToIntake(elevator, claw))
         .whileFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    testCopilot
+    operatorController
         .b()
         .whileTrue(
             new ParallelCommandGroup(
@@ -198,19 +182,19 @@ public class RobotContainer {
                 new ElevatorFFCommand(elevator),
                 new ClawFFCommand(claw),
                 new InstantCommand(() -> claw.setClaw(0))));
-    testCopilot
+    operatorController
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(-1)))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    testCopilot
+    operatorController
         .leftTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(1)))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    testCopilot
+    operatorController
         .rightBumper()
         .whileTrue(new ShootAlgae(claw))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    testCopilot
+    operatorController
         .povUp()
         .onTrue(
             new ExtendOuttake(
@@ -221,7 +205,7 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L4))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    testCopilot
+    operatorController
         .povLeft()
         .onTrue(
             new ExtendOuttake(
@@ -232,7 +216,7 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L3))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    testCopilot
+    operatorController
         .povRight()
         .onTrue(
             new ExtendOuttake(
@@ -243,7 +227,7 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L2))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    testCopilot
+    operatorController
         .povRight()
         .onTrue(
             new ExtendOuttake(
@@ -254,77 +238,60 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L1))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    controller
-        .povRight()
+    driverController.povRight()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
-    controller
-        .povLeft()
+    driverController.povLeft()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(-12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
-    controller.b().whileTrue(new ElevatorPIDCommand(true, 0, elevator));
+    driverController.b().whileTrue(new ElevatorPIDCommand(true, 0, elevator));
   }
 
   private void configureButtonBindings() {
+    // operatorButtonboard.button(ButtonBoardConstants.Button1)
+    //     .onTrue(new InstantCommand())
+    //     .onFalse(new InstantCommand());
+    
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX(),
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
-    controller.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+    driverController.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
-    controller
-        .rightTrigger()
+    driverController.rightTrigger()
         .whileTrue(new GoToPose(() -> targetPose, () -> drive.getPose(), drive));
-    controller
-        .leftTrigger()
+    driverController.leftTrigger()
         .whileTrue(
             new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), () -> drive.getPose(), drive));
 
-    controller
-        .povUp()
+    driverController.povUp()
         .whileTrue(
             new GoToPose(
                 () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.CENTER),
                 () -> vision.getPose(),
                 drive));
 
-    controller
-        .povLeft()
+    driverController.povLeft()
         .whileTrue(
             new GoToPose(
                 () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.LEFT),
                 () -> vision.getPose(),
                 drive));
 
-    controller
-        .povRight()
+    driverController.povRight()
         .whileTrue(
             new GoToPose(
                 () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.RIGHT),
                 () -> vision.getPose(),
                 drive));
 
-    // Lock to 0° when A button is held
-    // controller
-    // .a()
-    // .whileTrue(
-    // DriveCommands.joystickDriveAtAngle(
-    // drive,
-    // () -> controller.getLeftY(),
-    // () -> controller.getLeftX(),
-    // () -> new Rotation2d()));
-
-    // Switch to X pattern when X button is pressed
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
     // Reset gyro to 0° when X button is pressed
-    controller
-        .x()
+    driverController.x()
         .onTrue(
             Commands.runOnce(
                     () ->
