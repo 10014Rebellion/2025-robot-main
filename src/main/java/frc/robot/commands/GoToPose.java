@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -113,11 +115,17 @@ public class GoToPose extends Command {
     thetaController.reset(
         currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond);
     lastSetpointTranslation = currentPose.getTranslation();
+    System.out.println(
+        String.format(
+            "<<< %s - %s is STARTING :D >>>\n",
+            this.getClass().getSimpleName(), driveController.getClass().getSimpleName()));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // StateDaddy.currentDrive = StateEnums.Drive.Current.MOVING_TO_SETPOINT;
+
     running = true;
 
     // Update from tunable numbers
@@ -203,8 +211,12 @@ public class GoToPose extends Command {
     // Log data
     Logger.recordOutput("DriveToPose/DistanceMeasured", currentDistance);
     Logger.recordOutput("DriveToPose/DistanceSetpoint", driveController.getSetpoint().position);
+    Logger.recordOutput("DriveToPose/DistanceError", driveErrorAbs);
+    SmartDashboard.putNumber("Drive/DriveError", driveErrorAbs);
     Logger.recordOutput("DriveToPose/ThetaMeasured", currentPose.getRotation().getRadians());
     Logger.recordOutput("DriveToPose/ThetaSetpoint", thetaController.getSetpoint().position);
+    Logger.recordOutput("DriveToPose/DistanceError", thetaErrorAbs);
+    SmartDashboard.putNumber("Drive/ThetaError", thetaErrorAbs);
     Logger.recordOutput(
         "DriveToPose/Setpoint",
         new Pose2d[] {
@@ -219,10 +231,21 @@ public class GoToPose extends Command {
   @Override
   public void end(boolean interrupted) {
     mDriveSubsystem.stop();
+    // StateDaddy.currentDrive = StateEnums.Drive.Current.MANUAL;
     running = false;
     // Clear logs
     Logger.recordOutput("DriveToPose/Setpoint", new Pose2d[] {});
     Logger.recordOutput("DriveToPose/Goal", new Pose2d[] {});
+    System.out.println(
+        String.format(
+            "<<< %s - %s is ENDING :( >>>\n",
+            this.getClass().getSimpleName(), driveController.getClass().getSimpleName()));
+  }
+
+  @Override
+  public boolean isFinished() {
+
+    return withinTolerance(0.05, new Rotation2d(Units.degreesToRadians(5)));
   }
 
   public boolean atGoal() {

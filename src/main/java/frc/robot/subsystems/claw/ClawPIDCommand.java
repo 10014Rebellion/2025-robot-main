@@ -15,7 +15,7 @@ import frc.robot.subsystems.claw.ClawConstants.Wrist.Positions;
 public class ClawPIDCommand extends Command {
   private final Claw mClawSubsystem;
   private double mSetpoint;
-  private final PIDController mProfiledPIDController;
+  private final PIDController mPIDController;
   private final ArmFeedforward mClawFeedforward;
   private boolean IS_TUNING = true;
   private double elevatorSetpoint;
@@ -29,13 +29,13 @@ public class ClawPIDCommand extends Command {
     this.mClawSubsystem = pClawSubsystem;
     this.IS_TUNING = isTuning;
 
-    this.mProfiledPIDController = new PIDController(Wrist.kP, 0.0, Wrist.kD);
+    this.mPIDController = new PIDController(Wrist.kP, 0.0, Wrist.kD);
     // new ProfiledPIDController(
     //     Wrist.kP,
     //     0.0,
     //     Wrist.kD,
     //     new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
-    this.mProfiledPIDController.setTolerance(Wrist.kTolerance);
+    this.mPIDController.setTolerance(Wrist.kTolerance);
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
     if (IS_TUNING) {
@@ -43,7 +43,7 @@ public class ClawPIDCommand extends Command {
       System.out.println(
           String.format(
               "<<< %s - %s is in TUNING mode. >>>\n",
-              this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
+              this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
     } else {
       this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
     }
@@ -58,15 +58,15 @@ public class ClawPIDCommand extends Command {
 
   @Override
   public void initialize() {
-    mProfiledPIDController.setPID(Wrist.kP, 0, Wrist.kD);
-    // mProfiledPIDController.setConstraints(
+    mPIDController.setPID(Wrist.kP, 0, Wrist.kD);
+    // mPIDController.setConstraints(
     //     new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
-    // mProfiledPIDController.reset(getMeasurement());
-    mProfiledPIDController.reset();
+    // mPIDController.reset(getMeasurement());
+    mPIDController.reset();
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",
-            this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
+            this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
   }
 
   @Override
@@ -80,7 +80,7 @@ public class ClawPIDCommand extends Command {
       System.out.println(
           String.format(
               "<<< %s - %s is going too far down! >>>\n",
-              this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
+              this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
     }
     System.out.println("Claw setpoint: " + mSetpoint);
     System.out.println(
@@ -90,7 +90,7 @@ public class ClawPIDCommand extends Command {
     double calculatedFeedforward =
         mClawFeedforward.calculate(getMeasurement() + pivotPosition, 0.0);
     double calculatedProfilePID =
-        mProfiledPIDController.calculate(getMeasurement() + pivotPosition, mSetpoint);
+        mPIDController.calculate(getMeasurement() + pivotPosition, mSetpoint);
     double calculatedOutput = calculatedProfilePID + calculatedFeedforward;
     mClawSubsystem.setWrist(calculatedOutput);
     SmartDashboard.putNumber("Wrist/Output Value", calculatedOutput);
@@ -102,12 +102,12 @@ public class ClawPIDCommand extends Command {
     System.out.println(
         String.format(
             "<<< %s - %s is ENDING :C >>>\n",
-            this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
+            this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
   }
 
   @Override
   public boolean isFinished() {
-    return false; // mProfiledPIDController.atSetpoint();
+    return mPIDController.atSetpoint();
   }
 
   private double getMeasurement() {

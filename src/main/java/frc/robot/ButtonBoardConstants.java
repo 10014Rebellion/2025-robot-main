@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class ButtonBoardConstants {
   public static final GenericHID buttonboard = new GenericHID(1);
@@ -17,17 +16,17 @@ public class ButtonBoardConstants {
 
   // Claw Coral Grabbing
   public static final int kClawGrabCoral = 2;
-  
+
   // Coral Scoring
   public static final int kScoreL4 = 6;
   public static final int kScoreL3 = 7;
   public static final int kScoreL2 = 1;
   public static final int kScoreL1 = 11;
-  
+
   // Climbing
-  public static final int kClimbLetGo = 12; 
+  public static final int kClimbLetGo = 12;
   public static final int kClimbPullUp = 8;
-  
+
   // Misc
   public static final int kLEDMisguidance = 10;
 }

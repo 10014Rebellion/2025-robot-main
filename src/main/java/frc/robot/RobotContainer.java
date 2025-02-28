@@ -3,12 +3,12 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -64,6 +64,10 @@ public class RobotContainer {
   private final OTBIntake intake;
   private final LEDInterface LEDs;
 
+  // Saved Operator Settings
+  private StateEnums.Manipulator.Level levelSetpoint = StateEnums.Manipulator.Level.L2;
+  private VisionConstants.PoseOffsets sideScoring = VisionConstants.PoseOffsets.LEFT;
+
   // Controllers
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(0);
@@ -79,6 +83,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // StateDaddy.getInstance(); // Initializes
     claw = new Claw();
     elevator = new Elevator();
     potentiometer = new Potentiometer();
@@ -149,19 +154,23 @@ public class RobotContainer {
   }
 
   private void configureTestButtonBindings() {
-    driverController.povUp()
+    driverController
+        .povUp()
         .whileTrue(new InstantCommand(() -> intake.setRightPivot(4)))
         .whileFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
-    driverController.povDown()
+    driverController
+        .povDown()
         .whileTrue(new InstantCommand(() -> intake.setRightPivot(-2)))
         .whileFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
-    driverController.rightBumper()
+    driverController
+        .rightBumper()
         .onTrue(new InstantCommand(() -> intake.setRightRoller(12)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
-    driverController.leftBumper()
+    driverController
+        .leftBumper()
         .onTrue(new InstantCommand(() -> intake.setRightRoller(-6)))
         .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
 
@@ -238,20 +247,42 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L1))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    driverController.povRight()
+    driverController
+        .povRight()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
-    driverController.povLeft()
+    driverController
+        .povLeft()
         .whileTrue(new InstantCommand(() -> pivot.setVoltage(-12)))
         .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
     driverController.b().whileTrue(new ElevatorPIDCommand(true, 0, elevator));
   }
 
   private void configureButtonBindings() {
-    // operatorButtonboard.button(ButtonBoardConstants.Button1)
-    //     .onTrue(new InstantCommand())
-    //     .onFalse(new InstantCommand());
-    
+    operatorButtonboard
+        .button(ButtonBoardConstants.kIntakeRetract)
+        .onTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.LEFT));
+
+    operatorButtonboard
+        .button(ButtonBoardConstants.kIntakeDeploy)
+        .onTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.RIGHT));
+
+    operatorButtonboard
+        .button(ButtonBoardConstants.kScoreL4)
+        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L4));
+
+    operatorButtonboard
+        .button(ButtonBoardConstants.kScoreL3)
+        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L3));
+
+    operatorButtonboard
+        .button(ButtonBoardConstants.kScoreL2)
+        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L2));
+
+    operatorButtonboard
+        .button(ButtonBoardConstants.kScoreL1)
+        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L1));
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -261,37 +292,69 @@ public class RobotContainer {
             () -> -driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
-    driverController.b().onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+    driverController
+        .b()
+        .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
-    driverController.rightTrigger()
-        .whileTrue(new GoToPose(() -> targetPose, () -> drive.getPose(), drive));
-    driverController.leftTrigger()
+    driverController
+        .leftTrigger()
         .whileTrue(
-            new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), () -> drive.getPose(), drive));
+            new SequentialCommandGroup(
+                new ClawPIDCommand(manipulatorToWrist(levelSetpoint), claw),
+                new ElevatorPIDCommand(manipulatorToElevator(levelSetpoint), elevator),
+                new GoToPose(
+                    () -> vision.getReefScoringPose(7, 0, sideScoring),
+                    () -> vision.getPose(),
+                    drive),
+                new WaitCommand(0.1),
+                new ParallelCommandGroup(
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, claw),
+                    new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, elevator)),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)))
+        .onFalse(
+            new ParallelCommandGroup(new ClawFFCommand(claw), new ElevatorFFCommand(elevator)));
 
-    driverController.povUp()
+    driverController
+        .rightTrigger()
         .whileTrue(
             new GoToPose(
-                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.CENTER),
+                () -> vision.getReefScoringPose(7, 15, sideScoring),
                 () -> vision.getPose(),
                 drive));
+    // driverController.rightTrigger()
+    //         .whileTrue(new GoToPose(() -> targetPose, () -> drive.getPose(), drive));
+    // driverController.leftTrigger()
+    //         .whileTrue(
+    //                 new GoToPose(() -> new Pose2d(0, 0, new Rotation2d(0)), () ->
+    // drive.getPose(), drive));
 
-    driverController.povLeft()
-        .whileTrue(
-            new GoToPose(
-                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.LEFT),
-                () -> vision.getPose(),
-                drive));
+    // driverController.povUp()
+    //         .whileTrue(
+    //                 new GoToPose(
+    //                         () -> vision.getReefScoringPose(7, 10,
+    // VisionConstants.PoseOffsets.CENTER),
+    //                         () -> vision.getPose(),
+    //                         drive));
 
-    driverController.povRight()
-        .whileTrue(
-            new GoToPose(
-                () -> vision.getReefScoringPose(7, 10, VisionConstants.PoseOffsets.RIGHT),
-                () -> vision.getPose(),
-                drive));
+    // driverController.povLeft()
+    //         .whileTrue(
+    //                 new GoToPose(
+    //                         () -> vision.getReefScoringPose(7, 10,
+    // VisionConstants.PoseOffsets.LEFT),
+    //                         () -> vision.getPose(),
+    //                         drive));
+
+    // driverController.povRight()
+    //         .whileTrue(
+    //                 new GoToPose(
+    //                         () -> vision.getReefScoringPose(7, 10,
+    // VisionConstants.PoseOffsets.RIGHT),
+    //                         () -> vision.getPose(),
+    //                         drive));
 
     // Reset gyro to 0° when X button is pressed
-    driverController.x()
+    driverController
+        .x()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -336,6 +399,37 @@ public class RobotContainer {
   // new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
   // }
 
+  private ClawConstants.Wrist.Positions manipulatorToWrist(StateEnums.Manipulator.Level level) {
+    if (level.equals(StateEnums.Manipulator.Level.L4)) {
+      return ClawConstants.Wrist.Positions.L4;
+    }
+
+    if (level.equals(StateEnums.Manipulator.Level.L3)) {
+      return ClawConstants.Wrist.Positions.L3;
+    }
+
+    if (level.equals(StateEnums.Manipulator.Level.L2)) {
+      return ClawConstants.Wrist.Positions.L2;
+    }
+
+    return ClawConstants.Wrist.Positions.L1;
+  }
+
+  private ElevatorConstants.Positions manipulatorToElevator(StateEnums.Manipulator.Level level) {
+    if (level.equals(StateEnums.Manipulator.Level.L4)) {
+      return ElevatorConstants.Positions.L4;
+    }
+
+    if (level.equals(StateEnums.Manipulator.Level.L3)) {
+      return ElevatorConstants.Positions.L3;
+    }
+
+    if (level.equals(StateEnums.Manipulator.Level.L2)) {
+      return ElevatorConstants.Positions.L2;
+    }
+
+    return ElevatorConstants.Positions.L1;
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

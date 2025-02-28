@@ -97,7 +97,7 @@ public class ElevatorPIDCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    mElevatorSubsystem.setMotorVoltage(0);
+    mElevatorSubsystem.setMotorVoltage(mElevatorFeedforward.calculate(0.0));
     System.out.println(
         String.format(
             "<<< %s - %s is ENDING :C >>>\n",
@@ -106,8 +106,7 @@ public class ElevatorPIDCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    // return mProfiledPIDController.atGoal();
-    return false;
+    return mProfiledPIDController.atGoal();
   }
 
   private double getMeasurement() {

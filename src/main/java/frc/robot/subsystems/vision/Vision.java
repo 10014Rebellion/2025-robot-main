@@ -65,6 +65,39 @@ public class Vision extends SubsystemBase {
             new Pose2d());
   }
 
+  public Pose2d getClosestReefTag(boolean isBlueAlliance, double pDistanceMeters) {
+    // Determine valid tag IDs based on alliance
+    int[] validTags =
+        isBlueAlliance ? new int[] {17, 18, 19, 20, 21, 22} : new int[] {6, 7, 8, 9, 10, 11};
+    Pose2d robotPose = mPoseEstimator.getEstimatedPosition();
+    Pose2d closestTagPose = null;
+    double closestDistance = Double.MAX_VALUE;
+    int closestTagId = -1;
+    // Iterate through reef tags and find the closest one
+    for (int tagId : validTags) {
+      Pose2d tagPose =
+          VisionConstants.kAprilTagFieldLayout.getTagPose(tagId).map(Pose3d::toPose2d).orElse(null);
+      if (tagPose != null) {
+        double distance = robotPose.getTranslation().getDistance(tagPose.getTranslation());
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestTagPose = tagPose;
+          closestTagId = tagId;
+        }
+      }
+    }
+    // If no valid tags found, return current pose
+    if (closestTagPose == null) {
+      return robotPose;
+    }
+    // Get the corrected pose in front of the closest reef tag
+    return getPoseInFrontOfAprilTag(closestTagId, pDistanceMeters);
+  }
+
+  // public Pose2d getClosestReefTagPose() {
+
+  // }
+
   @Override
   public void periodic() {
     updatePose();

@@ -18,7 +18,7 @@ public class ElevatorConstants {
 
   public static double kMaxAcceleration = 250;
   public static double kMaxVelocity = 500;
-  public static double kTolerance = 1;
+  public static double kTolerance = 5;
 
   public static double kForwardSoftLimit = 80;
   public static double kReverseSoftLimit = 0;

@@ -35,6 +35,16 @@ public class VisionConstants {
     }
   };
 
+  public static final int[] redReefTagIDs = {17, 18, 19, 20, 21, 22};
+  public static final int redNorthCoralTagID = 2;
+  public static final int redSouthCoralTagID = 1;
+  public static final int redSideProcessor = 3;
+
+  public static final int[] blueReefTagIDs = {6, 7, 8, 9, 10, 11};
+  public static final int blueNorthCoralTagID = 13;
+  public static final int blueSouthCoralTagID = 12;
+  public static final int blueSideProcessor = 16;
+
   // Camera names (update if necessary)
   public static final String FRONT_LEFT_CAM = "FrontLeft-OV9281";
   public static final String FRONT_RIGHT_CAM = "FrontRight-OV9281";
