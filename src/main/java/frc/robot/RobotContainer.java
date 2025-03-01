@@ -16,11 +16,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ExtendOuttake;
 import frc.robot.commands.GoToIntake;
 import frc.robot.commands.GoToPose;
-import frc.robot.commands.ShootAlgae;
 import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
@@ -31,10 +29,11 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
+import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
+import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 import frc.robot.subsystems.telemetry.Telemetry;
@@ -150,13 +149,14 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
+    configureTestButtonBindings();
     configureButtonBindings();
   }
 
   private void configureTestButtonBindings() {
     driverController
         .povUp()
-        .whileTrue(new InstantCommand(() -> intake.setRightPivot(4)))
+        .whileTrue(new InstantCommand(() -> intake.setRightPivot(8)))
         .whileFalse(new InstantCommand(() -> intake.setRightPivot(0)));
 
     driverController
@@ -166,31 +166,39 @@ public class RobotContainer {
 
     driverController
         .rightBumper()
-        .onTrue(new InstantCommand(() -> intake.setRightRoller(12)))
-        .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
+        .whileTrue(
+            new ParallelCommandGroup(
+                new IntakePIDCommand(IntakePositions.INTAKING, intake),
+                new InstantCommand(() -> intake.setFunnel(4)),
+                new InstantCommand(() -> intake.setIndexer(3)),
+                new InstantCommand(() -> intake.setRightRoller(8))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new IntakePIDCommand(IntakePositions.STOWED, intake),
+                new InstantCommand(() -> intake.setFunnel(0)),
+                new InstantCommand(() -> intake.setIndexer(0)),
+                new InstantCommand(() -> intake.setRightRoller(0))));
 
     driverController
         .leftBumper()
-        .onTrue(new InstantCommand(() -> intake.setRightRoller(-6)))
-        .onFalse(new InstantCommand(() -> intake.setRightRoller(0)));
+        .whileTrue(
+            new ParallelCommandGroup(
+                new IntakePIDCommand(IntakePositions.INTAKING, intake),
+                new InstantCommand(() -> intake.setFunnel(-4)),
+                new InstantCommand(() -> intake.setIndexer(-3)),
+                new InstantCommand(() -> intake.setRightRoller(-8))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new IntakePIDCommand(IntakePositions.STOWED, intake),
+                new InstantCommand(() -> intake.setFunnel(0)),
+                new InstantCommand(() -> intake.setIndexer(0)),
+                new InstantCommand(() -> intake.setRightRoller(0))));
 
     operatorController
         .x()
-        .whileTrue(new GoToIntake(elevator, claw))
+        .whileTrue(new GoToIntake(elevator, claw, intake))
         .whileFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    operatorController
-        .b()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(Positions.POSTINTAKE, elevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw),
-                new InstantCommand(() -> claw.setClaw(ClawRollerVolt.INTAKE_CORAL))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new ElevatorFFCommand(elevator),
-                new ClawFFCommand(claw),
-                new InstantCommand(() -> claw.setClaw(0))));
     operatorController
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(-1)))
@@ -199,21 +207,17 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(1)))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    operatorController
-        .rightBumper()
-        .whileTrue(new ShootAlgae(claw))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    operatorController
-        .povUp()
-        .onTrue(
-            new ExtendOuttake(
-                elevator,
-                claw,
-                drive,
-                ElevatorConstants.Positions.L4,
-                ClawConstants.Wrist.Positions.L4))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
+    // operatorController
+    //     .povUp()
+    //     .onTrue(
+    //         new ExtendOuttake(
+    //             elevator,
+    //             claw,
+    //             drive,
+    //             ElevatorConstants.Positions.L4,
+    //             ClawConstants.Wrist.Positions.L4))
+    //     .onFalse(
+    //         new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
     operatorController
         .povLeft()
         .onTrue(
@@ -225,36 +229,7 @@ public class RobotContainer {
                 ClawConstants.Wrist.Positions.L3))
         .onFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    operatorController
-        .povRight()
-        .onTrue(
-            new ExtendOuttake(
-                elevator,
-                claw,
-                drive,
-                ElevatorConstants.Positions.L2,
-                ClawConstants.Wrist.Positions.L2))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    operatorController
-        .povRight()
-        .onTrue(
-            new ExtendOuttake(
-                elevator,
-                claw,
-                drive,
-                ElevatorConstants.Positions.L1,
-                ClawConstants.Wrist.Positions.L1))
-        .onFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
-    driverController
-        .povRight()
-        .whileTrue(new InstantCommand(() -> pivot.setVoltage(12)))
-        .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
-    driverController
-        .povLeft()
-        .whileTrue(new InstantCommand(() -> pivot.setVoltage(-12)))
-        .whileFalse(new InstantCommand(() -> pivot.setVoltage(0)));
+
     driverController.b().whileTrue(new ElevatorPIDCommand(true, 0, elevator));
   }
 

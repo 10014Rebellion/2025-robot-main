@@ -26,12 +26,13 @@ public class IntakeConstants {
     public static int kRightPivotID = 53;
     public static int kLeftRollerID = 52;
     public static int kRightRollerID = 54;
-    public static int kEncoderDIOPort = 3; // TO DO: CONFIGURE ME!
+    public static int kEncoderDIOPort = 0; // TO DO: CONFIGURE ME!
+    public static double kEncoderOffset = 150;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kPivotIdleMode = IdleMode.kBrake;
     public static IdleMode kRollerIdleMode = IdleMode.kCoast;
-    public static int kRollerCurrentLimit = 80;
+    public static int kRollerCurrentLimit = 60;
     public static int kPivotCurrentLimit = 60;
 
     public static double kPositionConversionFactor = 360;
@@ -45,28 +46,19 @@ public class IntakeConstants {
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 
     public static double kTolerance = 1;
-    public static double kP = 0;
+    public static double kP = 0.08;
     public static double kD = 0;
-    public static double kForwardSoftLimit = 180; // TO DO: CONFIGURE ME!
-    public static double kReverseSoftLimit = -180; // TO DO: CONFIGURE ME!
+    public static double kForwardSoftLimit = 100.0; // TO DO: CONFIGURE ME!
+    public static double kReverseSoftLimit = 0.0; // TO DO: CONFIGURE ME!
 
-    enum Positions {
-      STOWED(0),
-      INTAKING(40);
-      public final double position;
-
-      private Positions(double position) {
-        this.position = position;
-      }
-
-      public double getPos() {
-        return this.position;
-      }
-    };
+    public static double kG = 0.1;
 
     static {
       // kLeftPivotConfig.idleMode(kPivotIdleMode).smartCurrentLimit(kCurrentLimit);
-      kRightPivotConfig.idleMode(kPivotIdleMode).smartCurrentLimit(kPivotCurrentLimit);
+      kRightPivotConfig
+          .idleMode(kPivotIdleMode)
+          .smartCurrentLimit(kPivotCurrentLimit)
+          .inverted(false);
       kRollerConfig.idleMode(kRollerIdleMode).smartCurrentLimit(kRollerCurrentLimit);
       // kLeftPivotConfig
       //     .absoluteEncoder
@@ -75,4 +67,18 @@ public class IntakeConstants {
       //     .zeroOffset(kLeftEncoderOffsetRev);
     }
   }
+
+  public enum IntakePositions {
+    STOWED(100.0),
+    INTAKING(5.0);
+    public final double position;
+
+    private IntakePositions(double position) {
+      this.position = position;
+    }
+
+    public double getPos() {
+      return this.position;
+    }
+  };
 }

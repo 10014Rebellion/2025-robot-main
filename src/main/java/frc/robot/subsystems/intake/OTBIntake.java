@@ -58,6 +58,7 @@ public class OTBIntake extends SubsystemBase {
     tunableSetpoint = new TunableNumber("Intake/Tunable Setpoint", 0);
     SmartDashboard.putNumber("Intake/Indexer Volts", 1);
     SmartDashboard.putNumber("Intake/Intake Volts", 1);
+    SmartDashboard.putNumber("Intake/kG", IntakeConstants.OTBIntakeConstants.kG);
     // Note: it will have an encoder, just not right this second.
     // This is because the pivot motor is a sparkflex here, not a sparkmax, so it cant be called
     // normally
@@ -70,7 +71,9 @@ public class OTBIntake extends SubsystemBase {
   }
 
   public void setRightPivot(double pVoltage) {
-    mRightPivotMotor.setVoltage(filterVoltage(pVoltage));
+    if (pVoltage < 1) {
+      mRightPivotMotor.setVoltage(filterVoltage(pVoltage * 0.5));
+    } else mRightPivotMotor.setVoltage(filterVoltage(pVoltage));
   }
 
   public void setFunnel(double pVoltage) {
@@ -82,8 +85,8 @@ public class OTBIntake extends SubsystemBase {
   }
 
   private double filterVoltage(double pVoltage) {
-    // return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
     return MathUtil.clamp(pVoltage, -12.0, 12.0);
+    // return MathUtil.clamp(pVoltage, -12.0, 12.0);
   }
 
   private double filterToLimits(double pInput) {
@@ -106,8 +109,12 @@ public class OTBIntake extends SubsystemBase {
   }
 
   public double getEncoderMeasurement() {
-    // TO DO: tweak this so it actually works at all
-    return mRightPivotEncoder.get();
+    double measurement =
+        -(mRightPivotEncoder.get() * 360.0) + IntakeConstants.OTBIntakeConstants.kEncoderOffset;
+    if (measurement >= 180) {
+      return measurement - 360;
+    }
+    return measurement;
   }
 
   @Override
