@@ -142,6 +142,7 @@ public class Claw extends SubsystemBase {
     SmartDashboard.putNumber("Wrist/Position", getEncoderMeasurement());
     SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
     SmartDashboard.putNumber("Wrist/Ultrasonic", getUltrasonicDistance());
+    SmartDashboard.putNumber("Claw/Position", getClaw());
 
     if (wristP.hasChanged()) Wrist.kP = wristP.get();
     // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);

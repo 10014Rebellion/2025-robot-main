@@ -20,6 +20,7 @@ import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
+import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -196,7 +197,7 @@ public class RobotContainer {
 
     operatorController
         .x()
-        .whileTrue(new GoToIntake(elevator, claw, intake))
+        .whileTrue(new ClawIntakeCoralCommand(claw))//new GoToIntake(elevator, claw, intake))
         .whileFalse(
             new ParallelCommandGroup(new ElevatorFFCommand(elevator), new ClawFFCommand(claw)));
     operatorController

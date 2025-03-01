@@ -38,6 +38,7 @@ public class ClawIntakeCoralCommand extends Command {
 
     @Override
     public boolean isFinished() {
+        // if the timer is running and the 
         return (mIntakeTime.get() > 5);
     }
 }
