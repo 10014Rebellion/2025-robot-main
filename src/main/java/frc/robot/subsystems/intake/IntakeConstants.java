@@ -26,7 +26,8 @@ public class IntakeConstants {
     public static int kRightPivotID = 53;
     public static int kLeftRollerID = 52;
     public static int kRightRollerID = 54;
-    public static int kEncoderDIOPort = 0; // TO DO: CONFIGURE ME!
+    
+    public static int kEncoderDIOPort = 0;
     public static double kEncoderOffset = 150;
 
     public static MotorType kMotorType = MotorType.kBrushless;

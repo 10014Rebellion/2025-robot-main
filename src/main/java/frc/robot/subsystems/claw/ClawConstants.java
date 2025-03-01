@@ -9,6 +9,12 @@ public class ClawConstants {
   public static class Claw {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
+    public static int kEncoderDIOPort = 1;
+    public static int kEncoderOffset = 0; // TODO: TUNE
+
+    public static int kEncoderOpenPosition = 0; // TODO: Tune
+
+
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static int kCurrentLimit = 80;

@@ -9,7 +9,6 @@ import frc.robot.subsystems.elevator.ElevatorFFCommand;
 public class RestOuttake extends ParallelCommandGroup {
 
   public RestOuttake(Elevator elevator, Claw claw) {
-
     addCommands(new ElevatorFFCommand(elevator), new ClawFFCommand(claw));
   }
 }

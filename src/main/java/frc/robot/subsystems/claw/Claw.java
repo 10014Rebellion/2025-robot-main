@@ -13,11 +13,13 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.util.TunableNumber;
 
 public class Claw extends SubsystemBase {
@@ -27,6 +29,8 @@ public class Claw extends SubsystemBase {
 
   private final SparkClosedLoopController mWristController;
   private AbsoluteEncoder mWristEncoder;
+
+  private final DutyCycleEncoder mClawEncoder;;
 
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
   private TunableNumber tunablePosition;
@@ -38,6 +42,7 @@ public class Claw extends SubsystemBase {
         new SparkFlex(ClawConstants.Claw.kLeftClawID, ClawConstants.Claw.kMotorType);
     this.mRightClawSparkMax =
         new SparkFlex(ClawConstants.Claw.kRightClawID, ClawConstants.Claw.kMotorType);
+      this.mClawEncoder = new DutyCycleEncoder(ClawConstants.Claw.kEncoderDIOPort);
 
     this.mWristSparkMax = new SparkMax(Wrist.kMotorID, Wrist.kMotorType);
     this.mWristController = mWristSparkMax.getClosedLoopController();
@@ -75,6 +80,18 @@ public class Claw extends SubsystemBase {
     mRightClawSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
+  public double getClaw() {
+    double measurement = (mClawEncoder.get() * 360.0) + ClawConstants.Claw.kEncoderOffset;
+    if (measurement >= 180) {
+      return measurement - 360;
+    }
+    return measurement;
+  }
+
+  public boolean isClawOpen() {
+    return (getClaw() > ClawConstants.Claw.kEncoderOpenPosition);
+  }
+
   public void setWrist(double pVoltage) {
     mWristSparkMax.setVoltage(filterVoltage(pVoltage));
   }
@@ -89,13 +106,6 @@ public class Claw extends SubsystemBase {
       encoderMeasurement -= ClawConstants.Wrist.kPositionConversionFactor;
     return encoderMeasurement;
   }
-
-  // private double filterToLimits(double pInput) {
-  //   return (pInput > 0 && mWristEncoder.getPosition() >= ElevatorConstants.kForwardSoftLimit)
-  //           || (pInput < 0 && mWristEncoder.getPosition() <= ElevatorConstants.kReverseSoftLimit)
-  //       ? 0.0
-  //       : pInput;
-  // }
 
   private double filterToLimits(double pInput) {
     return (pInput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
