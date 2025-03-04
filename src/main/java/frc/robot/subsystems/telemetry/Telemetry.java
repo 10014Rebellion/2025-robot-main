@@ -7,7 +7,7 @@ package frc.robot.subsystems.telemetry;
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.potentiometer.Potentiometer;
+import frc.robot.subsystems.sensors.Potentiometer;
 
 public class Telemetry extends SubsystemBase {
 
