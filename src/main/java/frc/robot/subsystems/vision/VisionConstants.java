@@ -96,7 +96,7 @@ public class VisionConstants {
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(-45) // Yaw: (angled inward)
+                      Units.degreesToRadians(-44) // Yaw: (angled inward)
                       ))),
 
           // Front Right Camera (Mounted near FR swerve module)

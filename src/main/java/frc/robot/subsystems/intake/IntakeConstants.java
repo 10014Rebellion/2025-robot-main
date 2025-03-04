@@ -26,9 +26,10 @@ public class IntakeConstants {
     public static int kRightPivotID = 53;
     public static int kLeftRollerID = 52;
     public static int kRightRollerID = 54;
-    
     public static int kEncoderDIOPort = 0;
-    public static double kEncoderOffset = 150;
+    public static int kSensor1DIOPort = 2;
+    public static int kSensor2DIOPort = 3;
+    public static double kEncoderOffset = 130;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kPivotIdleMode = IdleMode.kBrake;

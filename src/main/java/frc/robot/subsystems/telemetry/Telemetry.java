@@ -4,11 +4,17 @@
 
 package frc.robot.subsystems.telemetry;
 
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.potentiometer.Potentiometer;
 
 public class Telemetry extends SubsystemBase {
+
+  HttpCamera frontRight =
+      new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1182/stream.mjpg");
+  HttpCamera frontLeft =
+      new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1184/stream.mjpg");
 
   public Telemetry() {}
 

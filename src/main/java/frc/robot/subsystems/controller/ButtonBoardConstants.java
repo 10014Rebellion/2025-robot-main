@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems.controller;
 
 import edu.wpi.first.wpilibj.GenericHID;
 

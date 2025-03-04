@@ -16,12 +16,14 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ExtendOuttake;
 import frc.robot.commands.GoToIntake;
 import frc.robot.commands.GoToPose;
+import frc.robot.commands.IntakeCoral;
 import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
+import frc.robot.subsystems.controller.ButtonBoardConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -66,12 +68,10 @@ public class RobotContainer {
 
   // Saved Operator Settings
   private StateEnums.Manipulator.Level levelSetpoint = StateEnums.Manipulator.Level.L2;
+  private int levelSetpointInt = 2;
   private VisionConstants.PoseOffsets sideScoring = VisionConstants.PoseOffsets.LEFT;
 
   // Controllers
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(0);
-  private final CommandGenericHID operatorButtonboard = new CommandGenericHID(1);
 
   private final Pose2d targetPose = new Pose2d(1, 0.5, new Rotation2d(45));
 
@@ -150,7 +150,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
-    configureTestButtonBindings();
+    // configureTestButtonBindings();
     configureButtonBindings();
   }
 
@@ -167,18 +167,30 @@ public class RobotContainer {
 
     driverController
         .rightBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new IntakePIDCommand(IntakePositions.INTAKING, intake),
-                new InstantCommand(() -> intake.setFunnel(4)),
-                new InstantCommand(() -> intake.setIndexer(3)),
-                new InstantCommand(() -> intake.setRightRoller(8))))
+        .whileTrue(new IntakeCoral(elevator, claw, intake))
         .whileFalse(
             new ParallelCommandGroup(
                 new IntakePIDCommand(IntakePositions.STOWED, intake),
                 new InstantCommand(() -> intake.setFunnel(0)),
                 new InstantCommand(() -> intake.setIndexer(0)),
                 new InstantCommand(() -> intake.setRightRoller(0))));
+    driverController
+        .leftTrigger()
+        .whileTrue(
+            new SequentialCommandGroup(
+                new ClawPIDCommand(manipulatorToWrist(levelSetpointInt), claw),
+                new ElevatorPIDCommand(manipulatorToElevator(levelSetpointInt), elevator),
+                new GoToPose(
+                    () -> vision.getReefScoringPose(7, 0, sideScoring),
+                    () -> vision.getPose(),
+                    drive),
+                new WaitCommand(0.1),
+                new ParallelCommandGroup(
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, claw),
+                    new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, elevator)),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)))
+        .onFalse(
+            new ParallelCommandGroup(new ClawFFCommand(claw), new ElevatorFFCommand(elevator)));
 
     driverController
         .leftBumper()
@@ -203,10 +215,6 @@ public class RobotContainer {
     operatorController
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> claw.setClaw(-1)))
-        .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
-    operatorController
-        .leftTrigger()
-        .whileTrue(new InstantCommand(() -> claw.setClaw(1)))
         .whileFalse(new InstantCommand(() -> claw.setClaw(0)));
     // operatorController
     //     .povUp()
@@ -237,27 +245,33 @@ public class RobotContainer {
   private void configureButtonBindings() {
     operatorButtonboard
         .button(ButtonBoardConstants.kIntakeRetract)
-        .onTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.LEFT));
+        .whileTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.LEFT));
 
     operatorButtonboard
         .button(ButtonBoardConstants.kIntakeDeploy)
-        .onTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.RIGHT));
+        .whileTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.RIGHT));
 
     operatorButtonboard
         .button(ButtonBoardConstants.kScoreL4)
-        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L4));
+        .whileTrue(
+            new InstantCommand(
+                () -> levelSetpointInt = 4)); // levelSetpoint = StateEnums.Manipulator.Level.L4));
 
     operatorButtonboard
         .button(ButtonBoardConstants.kScoreL3)
-        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L3));
+        .whileTrue(
+            new InstantCommand(
+                () -> levelSetpointInt = 3)); // levelSetpoint = StateEnums.Manipulator.Level.L3));
 
     operatorButtonboard
         .button(ButtonBoardConstants.kScoreL2)
-        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L2));
+        .whileTrue(
+            new InstantCommand(
+                () -> levelSetpointInt = 2)); // levelSetpoint = StateEnums.Manipulator.Level.L2));
 
     operatorButtonboard
         .button(ButtonBoardConstants.kScoreL1)
-        .onTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L1));
+        .whileTrue(new InstantCommand(() -> levelSetpoint = StateEnums.Manipulator.Level.L1));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -276,8 +290,8 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             new SequentialCommandGroup(
-                new ClawPIDCommand(manipulatorToWrist(levelSetpoint), claw),
-                new ElevatorPIDCommand(manipulatorToElevator(levelSetpoint), elevator),
+                new ClawPIDCommand(manipulatorToWrist(levelSetpointInt), claw),
+                new ElevatorPIDCommand(manipulatorToElevator(levelSetpointInt), elevator),
                 new GoToPose(
                     () -> vision.getReefScoringPose(7, 0, sideScoring),
                     () -> vision.getPose(),
@@ -297,6 +311,15 @@ public class RobotContainer {
                 () -> vision.getReefScoringPose(7, 15, sideScoring),
                 () -> vision.getPose(),
                 drive));
+    driverController
+        .rightBumper()
+        .whileTrue(new IntakeCoral(elevator, claw, intake))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new IntakePIDCommand(IntakePositions.STOWED, intake),
+                new InstantCommand(() -> intake.setFunnel(0)),
+                new InstantCommand(() -> intake.setIndexer(0)),
+                new InstantCommand(() -> intake.setRightRoller(0))));
     // driverController.rightTrigger()
     //         .whileTrue(new GoToPose(() -> targetPose, () -> drive.getPose(), drive));
     // driverController.leftTrigger()
@@ -375,37 +398,6 @@ public class RobotContainer {
   // new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, claw)));
   // }
 
-  private ClawConstants.Wrist.Positions manipulatorToWrist(StateEnums.Manipulator.Level level) {
-    if (level.equals(StateEnums.Manipulator.Level.L4)) {
-      return ClawConstants.Wrist.Positions.L4;
-    }
-
-    if (level.equals(StateEnums.Manipulator.Level.L3)) {
-      return ClawConstants.Wrist.Positions.L3;
-    }
-
-    if (level.equals(StateEnums.Manipulator.Level.L2)) {
-      return ClawConstants.Wrist.Positions.L2;
-    }
-
-    return ClawConstants.Wrist.Positions.L1;
-  }
-
-  private ElevatorConstants.Positions manipulatorToElevator(StateEnums.Manipulator.Level level) {
-    if (level.equals(StateEnums.Manipulator.Level.L4)) {
-      return ElevatorConstants.Positions.L4;
-    }
-
-    if (level.equals(StateEnums.Manipulator.Level.L3)) {
-      return ElevatorConstants.Positions.L3;
-    }
-
-    if (level.equals(StateEnums.Manipulator.Level.L2)) {
-      return ElevatorConstants.Positions.L2;
-    }
-
-    return ElevatorConstants.Positions.L1;
-  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +16,7 @@ public class OTBIntake extends SubsystemBase {
   private SparkFlex mRightRollerMotor;
   private SparkFlex mFunnelMotor;
   private SparkFlex mIndexerMotor;
+  private DigitalInput mCoralSensor1;
 
   private TunableNumber kP, kD, tunableSetpoint;
 
@@ -59,11 +61,8 @@ public class OTBIntake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Indexer Volts", 1);
     SmartDashboard.putNumber("Intake/Intake Volts", 1);
     SmartDashboard.putNumber("Intake/kG", IntakeConstants.OTBIntakeConstants.kG);
-    // Note: it will have an encoder, just not right this second.
-    // This is because the pivot motor is a sparkflex here, not a sparkmax, so it cant be called
-    // normally
-    // mRightPivotEncoder = ;
 
+    mCoralSensor1 = new DigitalInput(OTBIntakeConstants.kSensor1DIOPort);
   }
 
   public void setRightRoller(double pVoltage) {
@@ -117,11 +116,16 @@ public class OTBIntake extends SubsystemBase {
     return measurement;
   }
 
+  public boolean getCoralDetected() {
+    return !mCoralSensor1.get();
+  }
+
   @Override
   public void periodic() {
     // stopIfLimit();
     SmartDashboard.putNumber("Intake/Pivot Position", getEncoderMeasurement());
     SmartDashboard.putNumber("Intake/Pivot Current", mRightPivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Roller Current", mRightRollerMotor.getOutputCurrent());
+    SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetected());
   }
 }

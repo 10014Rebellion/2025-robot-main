@@ -32,10 +32,9 @@ public class Vision extends SubsystemBase {
 
     String[] cameraNames =
         new String[] {
-          VisionConstants.FRONT_LEFT_CAM,
-          VisionConstants.FRONT_RIGHT_CAM,
-          VisionConstants.BACK_LEFT_CAM,
-          VisionConstants.BACK_RIGHT_CAM
+          VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM // ,
+          // VisionConstants.BACK_LEFT_CAM,
+          // VisionConstants.BACK_RIGHT_CAM
         };
 
     for (String name : cameraNames) {
