@@ -91,7 +91,7 @@ public class ClawConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static int kCurrentLimit = 80;
-    public static double kP = 0.08; // TODO: Configure me!
+    public static double kP = 0.09; // TODO: Configure me!
     public static double kD = 0.0; // TODO: Configure me!
     public static double kVelocityFF = 0.0; // TODO: Configure me!
 
@@ -121,8 +121,8 @@ public class ClawConstants {
       L1(0),
       L2(50),
       L3(50),
-      L4(65),
-      SCORE(25),
+      L4(50),
+      SCORE(-10),
       BARGE(0);
 
       public final double position;

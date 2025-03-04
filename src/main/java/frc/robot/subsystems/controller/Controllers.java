@@ -5,7 +5,10 @@
 package frc.robot.subsystems.controller;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -15,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
-import frc.robot.commands.IntakeCoral;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
+import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.function.IntSupplier;
@@ -61,6 +64,10 @@ public class Controllers extends SubsystemBase {
 
     levelSetpointInt = () -> 2;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
+    SmartDashboard.putNumber(
+        "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L2.getPos());
+    SmartDashboard.putNumber(
+        "TunableNumbers/Wrist/Tunable Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
   }
 
   @Override
@@ -84,39 +91,78 @@ public class Controllers extends SubsystemBase {
         .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
 
     driverController
-        .leftTrigger()
+        .rightTrigger()
         .whileTrue(
-            new SequentialCommandGroup(
-                new ClawPIDCommand(manipulatorToWrist(levelSetpointInt), mClaw),
-                new ElevatorPIDCommand(manipulatorToElevator(levelSetpointInt), mElevator),
-                new GoToPose(
-                    () -> mVision.getReefScoringPose(7, 0, sideScoring),
-                    () -> mVision.getPose(),
-                    mDrive),
-                new WaitCommand(0.1),
-                new ParallelCommandGroup(
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)))
+            new ParallelCommandGroup(
+                new InstantCommand(() -> manipulatorToWrist(levelSetpointInt)),
+                new InstantCommand(() -> manipulatorToElevator(levelSetpointInt)),
+                new SequentialCommandGroup(
+                    new ClawPIDCommand(true, ClawConstants.Wrist.Positions.L2.getPos(), mClaw),
+                    new ElevatorPIDCommand(
+                        true, ElevatorConstants.Positions.L2.getPos(), mElevator),
+                    new GoToPose(
+                        () -> mVision.getReefScoringPose(7, 5, sideScoring),
+                        () -> mVision.getPose(),
+                        mDrive),
+                    new WaitCommand(0.1),
+                    new SequentialCommandGroup(
+                        new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
+                        new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
         .onFalse(
             new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
 
     driverController
-        .rightTrigger()
+        .leftTrigger()
         .whileTrue(
-            new GoToPose(
-                () -> mVision.getReefScoringPose(7, 15, sideScoring),
-                () -> mVision.getPose(),
-                mDrive));
+            new ParallelCommandGroup(
+                new InstantCommand(() -> manipulatorToWrist(levelSetpointInt)),
+                new InstantCommand(() -> manipulatorToElevator(levelSetpointInt)),
+                new SequentialCommandGroup(
+                    new ClawPIDCommand(true, ClawConstants.Wrist.Positions.L2.getPos(), mClaw),
+                    new ElevatorPIDCommand(
+                        true, ElevatorConstants.Positions.L2.getPos(), mElevator),
+                    new WaitCommand(0.1),
+                    new SequentialCommandGroup(
+                        new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
+                        new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
+        .onFalse(
+            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
     driverController
         .rightBumper()
-        .whileTrue(new IntakeCoral(mElevator, mClaw, mIntake))
+        .whileTrue(
+            new ParallelCommandGroup(
+                new autoIntakeCoralCommand(mIntake),
+                new SequentialCommandGroup(
+                    new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
         .whileFalse(
             new ParallelCommandGroup(
                 new IntakePIDCommand(IntakePositions.STOWED, mIntake),
                 new InstantCommand(() -> mIntake.setFunnel(0)),
                 new InstantCommand(() -> mIntake.setIndexer(0)),
-                new InstantCommand(() -> mIntake.setRightRoller(0))));
+                new InstantCommand(() -> mIntake.setRightRoller(0)),
+                new InstantCommand(() -> mClaw.setClaw(0))));
+    driverController
+        .b()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw),
+                new InstantCommand(
+                    () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.INTAKE_CORAL))))
+        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
+
+    driverController
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        mDrive.setPose(
+                            new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+                    mDrive)
+                .ignoringDisable(true));
   }
 
   public void initOperatorButtonboard() {
@@ -145,37 +191,36 @@ public class Controllers extends SubsystemBase {
         .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 1));
   }
 
-  private Supplier<ClawConstants.Wrist.Positions> manipulatorToWrist(IntSupplier level) {
+  private void manipulatorToElevator(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
 
     if (curLevel == 4) {
-      return () -> ClawConstants.Wrist.Positions.L4;
-    }
-
-    if (curLevel == 3) {
-      return () -> ClawConstants.Wrist.Positions.L3;
-    }
-
-    if (curLevel == 2) {
-      return () -> ClawConstants.Wrist.Positions.L2;
-    }
-
-    return () -> ClawConstants.Wrist.Positions.L1;
+      SmartDashboard.putNumber(
+          "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L4.getPos());
+    } else if (curLevel == 3) {
+      SmartDashboard.putNumber(
+          "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L3.getPos());
+    } else if (curLevel == 2) {
+      SmartDashboard.putNumber(
+          "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L2.getPos());
+    } else
+      SmartDashboard.putNumber(
+          "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L1.getPos());
   }
 
-  private Supplier<ElevatorConstants.Positions> manipulatorToElevator(IntSupplier level) {
+  private void manipulatorToWrist(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
     if (curLevel == 4) {
-      return () -> ElevatorConstants.Positions.L4;
-    }
-
-    if (curLevel == 3) {
-      return () -> ElevatorConstants.Positions.L3;
-    }
-
-    if (curLevel == 2) {
-      return () -> ElevatorConstants.Positions.L2;
-    }
-    return () -> ElevatorConstants.Positions.L1;
+      SmartDashboard.putNumber(
+          "TunableNumbers/Wrist/Setpoint", ClawConstants.Wrist.Positions.L4.getPos());
+    } else if (curLevel == 3) {
+      SmartDashboard.putNumber(
+          "TunableNumbers/Wrist/Setpoint", ClawConstants.Wrist.Positions.L3.getPos());
+    } else if (curLevel == 2) {
+      SmartDashboard.putNumber(
+          "TunableNumbers/Wrist/Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
+    } else
+      SmartDashboard.putNumber(
+          "TunableNumbers/Wrist/Setpoint", ClawConstants.Wrist.Positions.L1.getPos());
   }
 }

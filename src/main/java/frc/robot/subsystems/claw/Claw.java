@@ -63,7 +63,7 @@ public class Claw extends SubsystemBase {
     wristD = new TunableNumber("Wrist/kD", Wrist.kD);
     wristV = new TunableNumber("Wrist/kVelocity", Wrist.kV);
     wristA = new TunableNumber("Wrist/kAcceleration", Wrist.kA);
-    tunablePosition = new TunableNumber("Wrist/Tunable Setpoint", 0);
+    // tunablePosition = new TunableNumber("Wrist/Tunable Setpoint", 0);
     // wristP.setDefault(0.0);
     // wristD.setDefault(0.0);
     // wristV.setDefault(0.0);

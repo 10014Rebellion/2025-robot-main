@@ -44,7 +44,7 @@ public class ClawPIDCommand extends Command {
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
     if (IS_TUNING) {
-      this.mSetpoint = SmartDashboard.getNumber("TunableNumbers/Tuning/Wrist/Setpoint", 0);
+      this.mSetpoint = SmartDashboard.getNumber("TunableNumbers/Wrist/Setpoint", 0);
       System.out.println(
           String.format(
               "<<< %s - %s is in TUNING mode. >>>\n",
@@ -78,7 +78,7 @@ public class ClawPIDCommand extends Command {
   public void execute() {
     elevatorSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", 0);
     if (IS_TUNING) {
-      mSetpoint = SmartDashboard.getNumber("TunableNumbers/Wrist/Tunable Setpoint", 0);
+      mSetpoint = SmartDashboard.getNumber("TunableNumbers/Wrist/Setpoint", 0);
     }
     if ((elevatorSetpoint <= 5) && (mSetpoint < 10)) {
       mSetpoint = 10;
@@ -89,8 +89,7 @@ public class ClawPIDCommand extends Command {
     }
     System.out.println("Claw setpoint: " + mSetpoint);
     System.out.println(
-        "Claw Tunable Setpoint: "
-            + SmartDashboard.getNumber("TunableNumbers/Wrist/Tunable Setpoint", 0));
+        "Claw Tunable Setpoint: " + SmartDashboard.getNumber("TunableNumbers/Wrist/Setpoint", 0));
     SmartDashboard.putNumber("Wrist/Setpoint", mSetpoint);
     double calculatedFeedforward =
         mClawFeedforward.calculate(getMeasurement() + pivotPosition, 0.0);

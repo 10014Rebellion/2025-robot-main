@@ -2,6 +2,7 @@ package frc.robot.subsystems.LEDs;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -170,7 +171,11 @@ public class LEDInterface extends SubsystemBase {
 
   @Override
   public void periodic() {
-    setColor(60);
+    if (!SmartDashboard.getBoolean("Left Hang Beam", false)
+        && !SmartDashboard.getBoolean("Right Hang Beam", false)) {
+      setColor(60);
+    } else setColor(20);
+
     // rainbowUnicornVomit();
     // transitionRGB();
     led.setData(ledBuffer);

@@ -22,7 +22,9 @@ public class VisionConstants {
   public enum PoseOffsets {
     LEFT(kDistBetweenBranchesCenter / 2.0),
     CENTER(0),
-    RIGHT(-kDistBetweenBranchesCenter / 2.0);
+    RIGHT(-kDistBetweenBranchesCenter / 2.0),
+    L4(15),
+    L3(10);
 
     public final double offset;
 
