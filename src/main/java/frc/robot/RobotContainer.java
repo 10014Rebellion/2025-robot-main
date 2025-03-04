@@ -16,6 +16,7 @@ import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.OTBIntake;
+import frc.robot.subsystems.sensors.Beambreak;
 import frc.robot.subsystems.telemetry.Telemetry;
 import frc.robot.subsystems.vision.Vision;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -36,6 +37,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final ElevatorPivot pivot;
   private final Controllers controllers;
+  private final Beambreak beambreak;
   private final Telemetry telemetry;
   private final OTBIntake intake;
   private final LEDInterface LEDs;
@@ -49,6 +51,7 @@ public class RobotContainer {
     telemetry = new Telemetry();
     intake = new OTBIntake();
     pivot = new ElevatorPivot();
+    beambreak = new Beambreak();
     LEDs = new LEDInterface();
 
     switch (Constants.currentMode) {
