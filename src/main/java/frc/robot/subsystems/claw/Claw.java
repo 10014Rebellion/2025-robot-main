@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.util.TunableNumber;
 
 public class Claw extends SubsystemBase {
@@ -30,8 +29,8 @@ public class Claw extends SubsystemBase {
   private final SparkClosedLoopController mWristController;
   private AbsoluteEncoder mWristEncoder;
 
-  private final DutyCycleEncoder mClawEncoder;;
-
+  private final DutyCycleEncoder mClawEncoder;
+  ;
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
   private TunableNumber tunablePosition;
 
@@ -42,7 +41,7 @@ public class Claw extends SubsystemBase {
         new SparkFlex(ClawConstants.Claw.kLeftClawID, ClawConstants.Claw.kMotorType);
     this.mRightClawSparkMax =
         new SparkFlex(ClawConstants.Claw.kRightClawID, ClawConstants.Claw.kMotorType);
-      this.mClawEncoder = new DutyCycleEncoder(ClawConstants.Claw.kEncoderDIOPort);
+    this.mClawEncoder = new DutyCycleEncoder(ClawConstants.Claw.kEncoderDIOPort);
 
     this.mWristSparkMax = new SparkMax(Wrist.kMotorID, Wrist.kMotorType);
     this.mWristController = mWristSparkMax.getClosedLoopController();

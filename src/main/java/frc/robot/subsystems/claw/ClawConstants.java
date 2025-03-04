@@ -14,7 +14,6 @@ public class ClawConstants {
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
-
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static int kCurrentLimit = 80;

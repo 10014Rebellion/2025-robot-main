@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
 import frc.robot.subsystems.claw.ClawConstants.Wrist.Positions;
+import java.util.function.Supplier;
 
 public class ClawPIDCommand extends Command {
   private final Claw mClawSubsystem;
@@ -23,6 +24,10 @@ public class ClawPIDCommand extends Command {
 
   public ClawPIDCommand(Positions pSetpoint, Claw pClawSubsystem) {
     this(false, pSetpoint.getPos(), pClawSubsystem);
+  }
+
+  public ClawPIDCommand(Supplier<Positions> pSetpointSupplier, Claw pClawSubsystem) {
+    this(false, pSetpointSupplier.get().getPos(), pClawSubsystem);
   }
 
   public ClawPIDCommand(boolean isTuning, double pSetpoint, Claw pClawSubsystem) {

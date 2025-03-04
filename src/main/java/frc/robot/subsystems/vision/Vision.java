@@ -103,9 +103,10 @@ public class Vision extends SubsystemBase {
     updateTelemetry();
   }
 
-  public Pose2d getReefScoringPose(int pTagID, double pDistanceInches, PoseOffsets pOffset) {
+  public Pose2d getReefScoringPose(
+      int pTagID, double pDistanceInches, Supplier<PoseOffsets> pOffset) {
     return getPoseInFrontOfAprilTag(
-        pTagID, Units.inchesToMeters(pDistanceInches), pOffset.getOffsetM());
+        pTagID, Units.inchesToMeters(pDistanceInches), pOffset.get().getOffsetM());
   }
 
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {

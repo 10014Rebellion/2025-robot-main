@@ -11,6 +11,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
+import java.util.function.Supplier;
 
 public class ElevatorPIDCommand extends Command {
   private final Elevator mElevatorSubsystem;
@@ -23,6 +24,10 @@ public class ElevatorPIDCommand extends Command {
 
   public ElevatorPIDCommand(Positions pSetpoint, Elevator pElevatorSubsystem) {
     this(false, pSetpoint.getPos(), pElevatorSubsystem);
+  }
+
+  public ElevatorPIDCommand(Supplier<Positions> pSetpointSupplier, Elevator pElevatorSubsystem) {
+    this(false, pSetpointSupplier.get().getPos(), pElevatorSubsystem);
   }
 
   public ElevatorPIDCommand(boolean isTuning, double pSetpoint, Elevator pElevatorSubsystem) {
