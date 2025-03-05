@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static int kEncoderOffset = 0; // TODO: TUNE
+    public static int kEncoderOffset = 52; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
@@ -54,6 +54,21 @@ public class ClawConstants {
 
       public double get() {
         return this.voltage;
+      }
+    };
+
+    public enum ClawOpenPositions {
+      OPEN(27),
+      HAS_CORAL(22);
+
+      public final double position;
+
+      private ClawOpenPositions(double position) {
+        this.position = position;
+      }
+
+      public double get() {
+        return this.position;
       }
     };
 

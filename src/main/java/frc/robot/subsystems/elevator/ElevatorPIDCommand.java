@@ -83,13 +83,14 @@ public class ElevatorPIDCommand extends Command {
     // itself.
     // The values need to be tweaked
     // THIS IS TEMPORARY ISTG IF THIS IS STILL HERE IN A WEEK (currently 2/15/2025)
-    if (clawSetpoint < 10 && mSetpoint < 5) {
-      mSetpoint = 10;
-      System.out.println(
-          String.format(
-              "<<< %s - %s is going too far down! >>>\n",
-              this.getClass().getSimpleName(), mProfiledPIDController.getClass().getSimpleName()));
-    }
+    // if (clawSetpoint < 10 && mSetpoint < 5) {
+    //   mSetpoint = 10;
+    //   System.out.println(
+    //       String.format(
+    //           "<<< %s - %s is going too far down! >>>\n",
+    //           this.getClass().getSimpleName(),
+    // mProfiledPIDController.getClass().getSimpleName()));
+    // }
 
     double calculatedFeedforward = mElevatorFeedforward.calculate(0);
     double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);

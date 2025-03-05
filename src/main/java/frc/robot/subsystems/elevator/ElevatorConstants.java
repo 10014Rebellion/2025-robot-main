@@ -41,7 +41,7 @@ public class ElevatorConstants {
   public enum Positions {
     BOTTOM(0),
     PREINTAKE(30),
-    POSTINTAKE(20),
+    POSTINTAKE(15),
     L1(0),
     L2(25),
     L3(50),

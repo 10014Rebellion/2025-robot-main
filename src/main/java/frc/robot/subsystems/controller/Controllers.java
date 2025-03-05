@@ -21,6 +21,7 @@ import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
+import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -163,6 +164,22 @@ public class Controllers extends SubsystemBase {
                             new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
                     mDrive)
                 .ignoringDisable(true));
+
+    driverController
+        .y()
+        .whileTrue(
+            new SequentialCommandGroup(
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, mClaw),
+                new ClawIntakeCoralCommand(mClaw)))
+        .whileFalse(new ClawFFCommand(mClaw));
+    // .whileTrue(
+    //     new ParallelCommandGroup(
+    //         new ElevatorPIDCommand(true, 15, mElevator),
+    //         new InstantCommand(
+    //             () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.INTAKE_CORAL))))
+    // .whileFalse(
+    //     new ParallelCommandGroup(
+    //         new ElevatorFFCommand(mElevator), new InstantCommand(() -> mClaw.setClaw(0))));
   }
 
   public void initOperatorButtonboard() {
