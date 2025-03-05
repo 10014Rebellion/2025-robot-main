@@ -7,9 +7,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
+import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.util.MiscUtils;
 import frc.robot.util.PoseCamera;
 import java.util.ArrayList;
@@ -64,7 +68,7 @@ public class Vision extends SubsystemBase {
             new Pose2d());
   }
 
-  public Pose2d getClosestReefTag(boolean isBlueAlliance, double pDistanceMeters) {
+  public int getClosestReefTag(boolean isBlueAlliance) {//, double pDistanceMeters) {
     // Determine valid tag IDs based on alliance
     int[] validTags =
         isBlueAlliance ? new int[] {17, 18, 19, 20, 21, 22} : new int[] {6, 7, 8, 9, 10, 11};
@@ -87,10 +91,16 @@ public class Vision extends SubsystemBase {
     }
     // If no valid tags found, return current pose
     if (closestTagPose == null) {
-      return robotPose;
+      return 0;
     }
     // Get the corrected pose in front of the closest reef tag
-    return getPoseInFrontOfAprilTag(closestTagId, pDistanceMeters);
+    return closestTagId;
+  }
+
+  public Pose2d getClosestReefTag() {
+    boolean isBlueAlliance = DriverStation.getAlliance().get().equals(Alliance.Blue);
+    double linearPoseOffset = SmartDashboard.getNumber("", 0);
+    return mPoseEstimator.getEstimatedPosition();
   }
 
   // public Pose2d getClosestReefTagPose() {
@@ -109,6 +119,13 @@ public class Vision extends SubsystemBase {
         pTagID, Units.inchesToMeters(pDistanceInches), pOffset.get().getOffsetM());
   }
 
+  public Pose2d getClosestReefScoringPose(Supplier<linearPoseOffsets> pDistanceOffset, Supplier<PoseOffsets> pOffset) {
+    return getPoseInFrontOfAprilTag(
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)), 
+        pDistanceOffset.get().getOffsetM(), pOffset.get().getOffsetM());
+  }
+
+  
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }

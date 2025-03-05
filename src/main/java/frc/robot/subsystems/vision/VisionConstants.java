@@ -22,9 +22,7 @@ public class VisionConstants {
   public enum PoseOffsets {
     LEFT(kDistBetweenBranchesCenter / 2.0),
     CENTER(0),
-    RIGHT(-kDistBetweenBranchesCenter / 2.0),
-    L4(15),
-    L3(10);
+    RIGHT(-kDistBetweenBranchesCenter / 2.0);
 
     public final double offset;
 
@@ -36,6 +34,21 @@ public class VisionConstants {
       return this.offset;
     }
   };
+  public enum linearPoseOffsets {
+    L4(15),
+    L3(7),
+    L2(0);
+
+    public final double offset;
+
+    private linearPoseOffsets(double offset) {
+      this.offset = offset;
+    }
+
+    public double getOffsetM() {
+      return this.offset;
+    }
+  }
 
   public static final int[] redReefTagIDs = {17, 18, 19, 20, 21, 22};
   public static final int redNorthCoralTagID = 2;

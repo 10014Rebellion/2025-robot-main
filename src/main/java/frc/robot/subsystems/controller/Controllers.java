@@ -45,6 +45,7 @@ public class Controllers extends SubsystemBase {
 
   private IntSupplier levelSetpointInt;
   private Supplier<VisionConstants.PoseOffsets> sideScoring;
+  private Supplier<VisionConstants.linearPoseOffsets> distanceScoring;
   private boolean mSwerveFieldOriented = true;
 
   // private final double kDriveSwerveMultipler = 0.5;
@@ -66,6 +67,7 @@ public class Controllers extends SubsystemBase {
 
     levelSetpointInt = () -> 2;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
+    distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
     SmartDashboard.putNumber(
         "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L2.getPos());
     SmartDashboard.putNumber(
@@ -77,6 +79,7 @@ public class Controllers extends SubsystemBase {
     SmartDashboard.putNumber("Chosen Level", levelSetpointInt.getAsInt());
     SmartDashboard.putBoolean(
         "Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
+    SmartDashboard.putNumber("Distance Offset", distanceScoring.get().getOffsetM());
   }
 
   public void initDriverController() {
@@ -103,7 +106,7 @@ public class Controllers extends SubsystemBase {
                     new ElevatorPIDCommand(
                         true, ElevatorConstants.Positions.L2.getPos(), mElevator),
                     new GoToPose(
-                        () -> mVision.getReefScoringPose(7, 5, sideScoring),
+                        () -> mVision.getClosestReefScoringPose(distanceScoring, sideScoring),
                         () -> mVision.getPose(),
                         mDrive),
                     new WaitCommand(0.1),
@@ -207,19 +210,31 @@ public class Controllers extends SubsystemBase {
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL4)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 4));
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> levelSetpointInt = () -> 4),
+                new InstantCommand(() -> distanceScoring = () -> VisionConstants.linearPoseOffsets.L4)
+            ));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL3)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 3));
+        .whileTrue(new ParallelCommandGroup(
+            new InstantCommand(() -> levelSetpointInt = () -> 3),
+            new InstantCommand(() -> distanceScoring = () -> VisionConstants.linearPoseOffsets.L3)
+        ));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL2)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 2));
+        .whileTrue(new ParallelCommandGroup(
+            new InstantCommand(() -> levelSetpointInt = () -> 2),
+            new InstantCommand(() -> distanceScoring = () -> VisionConstants.linearPoseOffsets.L2)
+        ));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL1)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 1));
+        .whileTrue(new ParallelCommandGroup(
+            new InstantCommand(() -> levelSetpointInt = () -> 2),
+            new InstantCommand(() -> distanceScoring = () -> VisionConstants.linearPoseOffsets.L2)));
 
     operatorButtonboard
         .axisGreaterThan(1, 0.5)
@@ -234,7 +249,8 @@ public class Controllers extends SubsystemBase {
 
   private void manipulatorToElevator(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
-
+    // this is atrocious please redo this to work with suppliers ;-;
+    // That's week 4 tho not just yet (3/4/2025)
     if (curLevel == 4) {
       SmartDashboard.putNumber(
           "TunableNumbers/Elevator/Tunable Setpoint", ElevatorConstants.Positions.L4.getPos());

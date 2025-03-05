@@ -91,7 +91,6 @@ public class GoToPose extends Command {
 
     addRequirements(pDriveSubsystem);
   }
-
   @Override
   public void initialize() {
 
