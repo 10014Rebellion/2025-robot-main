@@ -138,7 +138,7 @@ public class ClawConstants {
       L2(50),
       L3(50),
       L4(50),
-      SCORE(-10),
+      SCORE(-30),
       BARGE(0);
 
       public final double position;
