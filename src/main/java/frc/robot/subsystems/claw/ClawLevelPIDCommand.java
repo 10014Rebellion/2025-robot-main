@@ -1,11 +1,12 @@
 package frc.robot.subsystems.claw;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
+import frc.robot.subsystems.claw.ClawConstants.Wrist.Positions;
+import java.util.function.Supplier;
 
 public class ClawLevelPIDCommand extends Command {
   private final Claw mClawSubsystem;
@@ -22,10 +23,9 @@ public class ClawLevelPIDCommand extends Command {
     this.mPIDController.setTolerance(Wrist.kTolerance);
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
 
-    double pSetpoint =
-        SmartDashboard.getNumber(
-            "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
+    double pSetpoint = SmartDashboard.getNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
     this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
+
 
     this.elevatorSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", 0);
     this.pivotPosition = SmartDashboard.getNumber("Pivot/Position", 0.0);
@@ -38,9 +38,6 @@ public class ClawLevelPIDCommand extends Command {
   @Override
   public void initialize() {
     mPIDController.setPID(Wrist.kP, 0, Wrist.kD);
-    // mPIDController.setConstraints(
-    //     new TrapezoidProfile.Constraints(Wrist.kMaxVelocity, Wrist.kMaxAcceleration));
-    // mPIDController.reset(getMeasurement());
     mPIDController.reset();
     System.out.println(
         String.format(
@@ -50,10 +47,8 @@ public class ClawLevelPIDCommand extends Command {
 
   @Override
   public void execute() {
-    mSetpoint =
-        SmartDashboard.getNumber(
-            "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
-    elevatorSetpoint = SmartDashboard.getNumber("Elevator/Setpoint", 0);
+    mSetpoint = SmartDashboard.getNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
+    elevatorSetpoint = SmartDashboard.getNumber("Levels/Elevator Setpoint", 0);
     if ((elevatorSetpoint <= 5) && (mSetpoint < 10)) {
       mSetpoint = 10;
       System.out.println(
@@ -62,10 +57,8 @@ public class ClawLevelPIDCommand extends Command {
               this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
     }
     SmartDashboard.putNumber("Wrist/Setpoint", mSetpoint);
-    double calculatedFeedforward =
-        mClawFeedforward.calculate(getMeasurement() + pivotPosition, 0.0);
-    double calculatedProfilePID =
-        mPIDController.calculate(getMeasurement() + pivotPosition, mSetpoint);
+    double calculatedFeedforward = mClawFeedforward.calculate(getMeasurement() + pivotPosition, 0.0);
+    double calculatedProfilePID = mPIDController.calculate(getMeasurement() + pivotPosition, mSetpoint);
     double calculatedOutput = calculatedProfilePID + calculatedFeedforward;
     mClawSubsystem.setWrist(calculatedOutput);
     SmartDashboard.putNumber("Wrist/Output Value", calculatedOutput);
