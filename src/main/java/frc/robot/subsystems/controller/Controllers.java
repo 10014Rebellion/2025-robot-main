@@ -24,22 +24,22 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
-import frc.robot.subsystems.elevator.ElevatorPIDCommand;
+import frc.robot.subsystems.elevator.NewElevatorPIDCommand;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class Controllers extends SubsystemBase {
   private final CommandXboxController driverController = new CommandXboxController(0);
-  // private final CommandXboxController operatorController = new CommandXboxController(1);
+  // private final CommandXboxController operatorController = new
+  // CommandXboxController(1);
   private final CommandGenericHID operatorButtonboard = new CommandGenericHID(2);
 
-  private IntSupplier levelSetpointInt;
-  private Supplier<VisionConstants.PoseOffsets> sideScoring;
+  private int levelSetpointInt;
+  private VisionConstants.PoseOffsets sideScoring;
   private boolean mSwerveFieldOriented = true;
 
   // private final double kDriveSwerveMultipler = 0.5;
@@ -59,15 +59,15 @@ public class Controllers extends SubsystemBase {
     this.mIntake = pIntake;
     this.mClaw = pClaw;
 
-    levelSetpointInt = () -> 2;
-    sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
+    levelSetpointInt = 2;
+    sideScoring = VisionConstants.PoseOffsets.LEFT;
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Chosen Level", levelSetpointInt.getAsInt());
+    SmartDashboard.putNumber("Chosen Level", levelSetpointInt);
     SmartDashboard.putBoolean(
-        "Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
+        "Left Side Chosen", sideScoring.equals(VisionConstants.PoseOffsets.LEFT));
   }
 
   public void initDriverController() {
@@ -88,15 +88,15 @@ public class Controllers extends SubsystemBase {
         .whileTrue(
             new SequentialCommandGroup(
                 new ClawPIDCommand(manipulatorToWrist(levelSetpointInt), mClaw),
-                new ElevatorPIDCommand(manipulatorToElevator(levelSetpointInt), mElevator),
+                new NewElevatorPIDCommand(manipulatorToElevator(levelSetpointInt), mElevator),
                 new GoToPose(
-                    () -> mVision.getReefScoringPose(7, 0, sideScoring),
+                    () -> mVision.getReefScoringPose(7, 0, sideScoring.getOffsetM()),
                     () -> mVision.getPose(),
                     mDrive),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(
                     new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
+                    new NewElevatorPIDCommand(() -> ElevatorConstants.Positions.SCORE, mElevator)),
                 new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)))
         .onFalse(
             new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
@@ -105,7 +105,7 @@ public class Controllers extends SubsystemBase {
         .rightTrigger()
         .whileTrue(
             new GoToPose(
-                () -> mVision.getReefScoringPose(7, 15, sideScoring),
+                () -> mVision.getReefScoringPose(7, 15, sideScoring.getOffsetM()),
                 () -> mVision.getPose(),
                 mDrive));
     driverController
@@ -122,31 +122,31 @@ public class Controllers extends SubsystemBase {
   public void initOperatorButtonboard() {
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetLeftPose)
-        .whileTrue(new InstantCommand(() -> sideScoring = () -> VisionConstants.PoseOffsets.LEFT));
+        .whileTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.LEFT));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetRightPose)
-        .whileTrue(new InstantCommand(() -> sideScoring = () -> VisionConstants.PoseOffsets.RIGHT));
+        .whileTrue(new InstantCommand(() -> sideScoring = VisionConstants.PoseOffsets.RIGHT));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL4)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 4));
+        .whileTrue(new InstantCommand(() -> levelSetpointInt = 4));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL3)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 3));
+        .whileTrue(new InstantCommand(() -> levelSetpointInt = 3));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL2)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 2));
+        .whileTrue(new InstantCommand(() -> levelSetpointInt = 2));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL1)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 1));
+        .whileTrue(new InstantCommand(() -> levelSetpointInt = 1));
   }
 
-  private Supplier<ClawConstants.Wrist.Positions> manipulatorToWrist(IntSupplier level) {
-    int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
+  private Supplier<ClawConstants.Wrist.Positions> manipulatorToWrist(int level) {
+    int curLevel = MathUtil.clamp(level, 0, 4);
 
     if (curLevel == 4) {
       return () -> ClawConstants.Wrist.Positions.L4;
@@ -163,8 +163,8 @@ public class Controllers extends SubsystemBase {
     return () -> ClawConstants.Wrist.Positions.L1;
   }
 
-  private Supplier<ElevatorConstants.Positions> manipulatorToElevator(IntSupplier level) {
-    int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
+  private Supplier<ElevatorConstants.Positions> manipulatorToElevator(int level) {
+    int curLevel = MathUtil.clamp(level, 0, 4);
     if (curLevel == 4) {
       return () -> ElevatorConstants.Positions.L4;
     }
