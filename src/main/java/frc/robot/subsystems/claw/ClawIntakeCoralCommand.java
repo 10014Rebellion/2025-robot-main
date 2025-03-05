@@ -24,11 +24,6 @@ public class ClawIntakeCoralCommand extends Command {
   @Override
   public void execute() {
     mClawSubsystem.setClaw(mIntakeVolts);
-
-    // if the timer is not running and the claw is open, start the timer
-    if (mClawSubsystem.isClawOpen() && !mIntakeTime.isRunning()) {
-      mIntakeTime.start();
-    }
   }
 
   @Override
@@ -39,6 +34,6 @@ public class ClawIntakeCoralCommand extends Command {
   @Override
   public boolean isFinished() {
     // if the timer is running and the
-    return (mIntakeTime.get() > 5);
+    return (mIntakeTime.get() > 2);
   }
 }

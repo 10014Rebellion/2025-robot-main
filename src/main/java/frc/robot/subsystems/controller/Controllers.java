@@ -189,6 +189,16 @@ public class Controllers extends SubsystemBase {
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL1)
         .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 1));
+
+    operatorButtonboard
+        .axisGreaterThan(1, 0.5)
+        .whileTrue(new InstantCommand(() -> mElevator.setMotorVoltage(3)))
+        .whileFalse(new ElevatorFFCommand(mElevator));
+
+    operatorButtonboard
+        .axisLessThan(1, -0.50)
+        .whileTrue(new InstantCommand(() -> System.out.println("MOVING ELEVATOR DOWN")))
+        .whileFalse(new ElevatorFFCommand(mElevator));
   }
 
   private void manipulatorToElevator(IntSupplier level) {
