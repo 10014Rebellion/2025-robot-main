@@ -44,7 +44,7 @@ public class ClawConstants {
     public enum ClawRollerVolt {
       INTAKE_CORAL(1),
       INTAKE_ALGAE(1),
-      OUTTAKE_REEF(-4),
+      OUTTAKE_REEF(-0.5),
       OUTTAKE_BARGE(-12);
 
       public final double voltage;
@@ -134,12 +134,12 @@ public class ClawConstants {
     public enum Positions {
       BOTTOM(0),
       INTAKE(-65),
-      L1(0),
+      L1(40),
       L2(50),
       L3(50),
       L4(50),
       SCORE(-30),
-      BARGE(0);
+      BARGE(0); // TO DO: redo these values
 
       public final double position;
 

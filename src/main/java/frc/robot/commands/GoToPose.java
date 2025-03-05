@@ -128,6 +128,7 @@ public class GoToPose extends Command {
     running = true;
 
     // Update from tunable numbers
+    // wtf is this aint no way
     if (driveMaxVelocity.hasChanged(hashCode())
         || driveMaxVelocitySlow.hasChanged(hashCode())
         || driveMaxAcceleration.hasChanged(hashCode())
@@ -201,7 +202,7 @@ public class GoToPose extends Command {
     thetaVelocity =
         MathUtil.interpolate(
             thetaVelocity, omegaFF.getAsDouble() * DriveConstants.maxAngularSpeed, thetaS);
-
+    
     // Command speeds
     mDriveSubsystem.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(
