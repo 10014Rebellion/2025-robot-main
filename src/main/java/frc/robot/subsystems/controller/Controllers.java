@@ -110,16 +110,16 @@ public class Controllers extends SubsystemBase {
                         () -> mVision.getPose(),
                         mDrive),
                     new WaitCommand(0.1),
-                    // note: i made the coral eject now idk if this will work (im testing after school)
+                    // note: i made the coral eject now idk if this will work (im testing after
+                    // school)
                     new ParallelCommandGroup(
                         new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
                         new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator),
-                        new InstantCommand(() -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_REEF))
-                    ),
+                        new InstantCommand(
+                            () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_REEF))),
                     new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
-        .onFalse(new ParallelCommandGroup(
-            new ClawFFCommand(mClaw), 
-            new ElevatorFFCommand(mElevator)));
+        .onFalse(
+            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
 
     driverController
         .leftTrigger()
@@ -236,7 +236,7 @@ public class Controllers extends SubsystemBase {
         .axisLessThan(1, -0.50)
         .whileTrue(new InstantCommand(() -> mElevator.setMotorVoltage(-2)))
         .whileFalse(new ElevatorFFCommand(mElevator));
-    
+
     operatorButtonboard
         .axisGreaterThan(0, 0.5)
         .whileTrue(new InstantCommand(() -> mClaw.setWrist(2)))
@@ -253,54 +253,35 @@ public class Controllers extends SubsystemBase {
     // this is atrocious please redo this to work with suppliers ;-;
     // That's week 4 tho not just yet (3/4/2025)
     if (curLevel == 4) {
-      SmartDashboard.putNumber(
-          "Levels/Elevator Setpoint", ElevatorConstants.Positions.L4.getPos());
-    } 
-    else if (curLevel == 3) {
-      SmartDashboard.putNumber(
-          "Levels/Elevator Setpoint", ElevatorConstants.Positions.L3.getPos());
-    } 
-    else if (curLevel == 2) {
-      SmartDashboard.putNumber(
-          "Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
-    } 
-    else
-      SmartDashboard.putNumber(
-          "Levels/Elevator Setpoint", ElevatorConstants.Positions.L1.getPos());
+      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L4.getPos());
+    } else if (curLevel == 3) {
+      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L3.getPos());
+    } else if (curLevel == 2) {
+      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
+    } else
+      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L1.getPos());
   }
 
   private void levelToWrist(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
     if (curLevel == 4) {
-      SmartDashboard.putNumber(
-        "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L4.getPos());
-    } 
-    else if (curLevel == 3) {
-      SmartDashboard.putNumber(
-        "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L3.getPos());
-    } 
-    else if (curLevel == 2) {
-      SmartDashboard.putNumber(
-        "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
-    } 
-    else
-      SmartDashboard.putNumber(
-        "Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L1.getPos());
+      SmartDashboard.putNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L4.getPos());
+    } else if (curLevel == 3) {
+      SmartDashboard.putNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L3.getPos());
+    } else if (curLevel == 2) {
+      SmartDashboard.putNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L2.getPos());
+    } else
+      SmartDashboard.putNumber("Levels/Wrist Setpoint", ClawConstants.Wrist.Positions.L1.getPos());
   }
 
   private void levelToDrivebase(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
     if (curLevel == 4) {
-        distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
-    } 
-    else if (curLevel == 3) {
-        distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
-    } 
-    else if (curLevel == 2) {
-        distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
-    } 
-    else
-        distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+    } else if (curLevel == 3) {
+      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+    } else if (curLevel == 2) {
+      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+    } else distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
   }
-
 }

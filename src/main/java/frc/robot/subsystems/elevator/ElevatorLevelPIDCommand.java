@@ -1,25 +1,20 @@
 package frc.robot.subsystems.elevator;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.elevator.ElevatorConstants.Positions;
-import java.util.function.Supplier;
 
 public class ElevatorLevelPIDCommand extends Command {
   private final Elevator mElevatorSubsystem;
   private double mSetpoint;
-  private double clawSetpoint;
   private final ProfiledPIDController mProfiledPIDController;
   private final ElevatorFeedforward mElevatorFeedforward;
 
-  private boolean IS_TUNING = true;
-
   public ElevatorLevelPIDCommand(Elevator pElevatorSubsystem) {
     this.mElevatorSubsystem = pElevatorSubsystem;
-    this.clawSetpoint = SmartDashboard.getNumber("TunableNumbers/Wrist/Tunable Setpoint", 0);
     this.mProfiledPIDController =
         new ProfiledPIDController(
             ElevatorConstants.kP,
@@ -32,8 +27,11 @@ public class ElevatorLevelPIDCommand extends Command {
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
     this.mProfiledPIDController.setTolerance(ElevatorConstants.kTolerance);
 
-    double pSetpoint = SmartDashboard.getNumber("Elevator/Level Setpoint", ElevatorConstants.Positions.L2.getPos());
-    this.mSetpoint = MathUtil.clamp(pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
+    double pSetpoint =
+        SmartDashboard.getNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
+    this.mSetpoint =
+        MathUtil.clamp(
+            pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);
 
     SmartDashboard.putNumber("Elevator/PID Output", 0.0);
     addRequirements(pElevatorSubsystem);
@@ -41,7 +39,9 @@ public class ElevatorLevelPIDCommand extends Command {
 
   @Override
   public void initialize() {
-    mSetpoint = SmartDashboard.getNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
+    mSetpoint =
+        SmartDashboard.getNumber(
+            "Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
     mProfiledPIDController.reset(getMeasurement());
     System.out.println(
         String.format(
@@ -53,7 +53,9 @@ public class ElevatorLevelPIDCommand extends Command {
   public void execute() {
     // double potentiometerReading = Potentiometer.getPotentiometer();
     // mProfiledPIDController.setP(potentiometerReading);
-    mSetpoint = SmartDashboard.getNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
+    mSetpoint =
+        SmartDashboard.getNumber(
+            "Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
 
     double calculatedFeedforward = mElevatorFeedforward.calculate(0);
     double calculatedProfilePID = mProfiledPIDController.calculate(getMeasurement(), mSetpoint);

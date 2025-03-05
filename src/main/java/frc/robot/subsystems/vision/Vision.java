@@ -68,7 +68,7 @@ public class Vision extends SubsystemBase {
             new Pose2d());
   }
 
-  public int getClosestReefTag(boolean isBlueAlliance) {//, double pDistanceMeters) {
+  public int getClosestReefTag(boolean isBlueAlliance) { // , double pDistanceMeters) {
     // Determine valid tag IDs based on alliance
     int[] validTags =
         isBlueAlliance ? new int[] {17, 18, 19, 20, 21, 22} : new int[] {6, 7, 8, 9, 10, 11};
@@ -119,13 +119,14 @@ public class Vision extends SubsystemBase {
         pTagID, Units.inchesToMeters(pDistanceInches), pOffset.get().getOffsetM());
   }
 
-  public Pose2d getClosestReefScoringPose(Supplier<linearPoseOffsets> pDistanceOffset, Supplier<PoseOffsets> pOffset) {
+  public Pose2d getClosestReefScoringPose(
+      Supplier<linearPoseOffsets> pDistanceOffset, Supplier<PoseOffsets> pOffset) {
     return getPoseInFrontOfAprilTag(
-        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)), 
-        pDistanceOffset.get().getOffsetM(), pOffset.get().getOffsetM());
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
+        pDistanceOffset.get().getOffsetM(),
+        pOffset.get().getOffsetM());
   }
 
-  
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }

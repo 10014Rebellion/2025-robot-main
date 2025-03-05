@@ -1,30 +1,29 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorPIDCommand;
+import frc.robot.subsystems.elevator.ElevatorLevelPIDCommand;
+import frc.robot.subsystems.claw.ClawLevelPIDCommand;
 
-public class ExtendOuttake extends ParallelCommandGroup {
+public class ManipulatorLevelCommand extends ParallelCommandGroup {
 
-  public ExtendOuttake(
+  public ManipulatorLevelCommand(
       Elevator elevator,
       Claw claw,
-      Drive drive,
-      ElevatorConstants.Positions elevatorPos,
-      ClawConstants.Wrist.Positions clawPos) {
+      Drive drive) {
     addCommands(
         new InstantCommand(
             () -> {
-              if (elevatorPos.getPos() > 30) {
+              if (SmartDashboard.getNumber("Levels/Elevator Setpoint", 0) >= 40) {
                 drive.setSpeedMultipliers(
                     DriveConstants.kLowSpeedTrans, DriveConstants.kLowSPeedRot);
               } else {
@@ -32,7 +31,9 @@ public class ExtendOuttake extends ParallelCommandGroup {
                     DriveConstants.kHighSpeedTrans, DriveConstants.kHighSpeedRot);
               }
             }),
-        new ElevatorPIDCommand(elevatorPos, elevator),
-        new SequentialCommandGroup(new WaitCommand(0.5), new ClawPIDCommand(clawPos, claw)));
+        new SequentialCommandGroup(
+          new ElevatorLevelPIDCommand(elevator),
+          new ClawLevelPIDCommand(claw)
+        ));
   }
 }

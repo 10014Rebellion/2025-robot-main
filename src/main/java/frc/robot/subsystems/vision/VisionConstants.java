@@ -17,7 +17,7 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
 
-  public static final double kDistBetweenBranchesCenter = 0.33;
+  public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13);
 
   public enum PoseOffsets {
     LEFT(kDistBetweenBranchesCenter / 2.0),
@@ -34,6 +34,7 @@ public class VisionConstants {
       return this.offset;
     }
   };
+
   public enum linearPoseOffsets {
     L4(15),
     L3(7),
@@ -48,17 +49,7 @@ public class VisionConstants {
     public double getOffsetM() {
       return this.offset;
     }
-  }
-
-  public static final int[] redReefTagIDs = {17, 18, 19, 20, 21, 22};
-  public static final int redNorthCoralTagID = 2;
-  public static final int redSouthCoralTagID = 1;
-  public static final int redSideProcessor = 3;
-
-  public static final int[] blueReefTagIDs = {6, 7, 8, 9, 10, 11};
-  public static final int blueNorthCoralTagID = 13;
-  public static final int blueSouthCoralTagID = 12;
-  public static final int blueSideProcessor = 16;
+  };
 
   // Camera names (update if necessary)
   public static final String FRONT_LEFT_CAM = "FrontLeft-OV9281";
@@ -111,7 +102,7 @@ public class VisionConstants {
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(-30) // Yaw: (angled inward)
+                      Units.degreesToRadians(-45) // Yaw: (angled inward)
                       ))),
 
           // Front Right Camera (Mounted near FR swerve module)
@@ -126,7 +117,7 @@ public class VisionConstants {
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(30) // Yaw: (angled inward)
+                      Units.degreesToRadians(45) // Yaw: (angled inward)
                       ))),
 
           // Rear Left Camera (Mounted near BL swerve module, positions TBD)

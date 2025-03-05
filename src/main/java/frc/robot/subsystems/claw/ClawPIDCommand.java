@@ -49,8 +49,7 @@ public class ClawPIDCommand extends Command {
           String.format(
               "<<< %s - %s is in TUNING mode. >>>\n",
               this.getClass().getSimpleName(), mPIDController.getClass().getSimpleName()));
-    } 
-    else {
+    } else {
       this.mSetpoint = MathUtil.clamp(pSetpoint, Wrist.kReverseSoftLimit, Wrist.kForwardSoftLimit);
     }
 

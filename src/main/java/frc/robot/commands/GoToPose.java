@@ -91,6 +91,7 @@ public class GoToPose extends Command {
 
     addRequirements(pDriveSubsystem);
   }
+
   @Override
   public void initialize() {
 
@@ -202,7 +203,7 @@ public class GoToPose extends Command {
     thetaVelocity =
         MathUtil.interpolate(
             thetaVelocity, omegaFF.getAsDouble() * DriveConstants.maxAngularSpeed, thetaS);
-    
+
     // Command speeds
     mDriveSubsystem.runVelocity(
         ChassisSpeeds.fromFieldRelativeSpeeds(

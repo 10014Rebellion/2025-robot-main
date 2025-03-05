@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -173,15 +174,23 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    // If our elevator is too high, we slow the bot down.
+    updateSpeedMultipliers();
   }
 
   public ChassisSpeeds getFieldVelocity() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
   }
 
-  public void setSpeedMultipliers(double pDriveSpeed, double pRotationSpeed) {
-    this.mDriveSpeedMultiplier = pDriveSpeed;
-    this.mRotationSpeedMultiplier = pRotationSpeed;
+  public void updateSpeedMultipliers() {
+    if (SmartDashboard.getNumber("Elevator/Position",0) >= 40) {
+      this.mDriveSpeedMultiplier = DriveConstants.kLowSpeedTrans;
+      this.mRotationSpeedMultiplier = DriveConstants.kLowSPeedRot;
+    }
+    else {
+      this.mDriveSpeedMultiplier = DriveConstants.kHighSpeedTrans;
+      this.mRotationSpeedMultiplier = DriveConstants.kHighSpeedRot;
+    }
   }
 
   /**
