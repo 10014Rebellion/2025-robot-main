@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -40,7 +41,7 @@ import java.util.function.Supplier;
 public class Controllers extends SubsystemBase {
   private final CommandXboxController driverController = new CommandXboxController(0);
   // private final CommandXboxController operatorController = new CommandXboxController(1);
-  private final CommandGenericHID operatorButtonboard = new CommandGenericHID(2);
+  private final CommandGenericHID operatorButtonboard = new CommandGenericHID(1);
 
   private IntSupplier levelSetpointInt;
   private Supplier<VisionConstants.PoseOffsets> sideScoring;
@@ -133,11 +134,17 @@ public class Controllers extends SubsystemBase {
     driverController
         .rightBumper()
         .whileTrue(
-            new ParallelCommandGroup(
-                new autoIntakeCoralCommand(mIntake),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
+            new SequentialCommandGroup(
+                new ParallelDeadlineGroup(
+                    new autoIntakeCoralCommand(mIntake),
+                    new SequentialCommandGroup(
+                        new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
+                        new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))),
+                new ParallelCommandGroup(
+                    new ClawIntakeCoralCommand(mClaw),
+                    new SequentialCommandGroup(
+                        new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
+                        new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)))))
         .whileFalse(
             new ParallelCommandGroup(
                 new IntakePIDCommand(IntakePositions.STOWED, mIntake),
@@ -145,6 +152,13 @@ public class Controllers extends SubsystemBase {
                 new InstantCommand(() -> mIntake.setIndexer(0)),
                 new InstantCommand(() -> mIntake.setRightRoller(0)),
                 new InstantCommand(() -> mClaw.setClaw(0))));
+    driverController
+        .leftBumper()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> mClaw.setClaw(-1)),
+                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false)))
+        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
     driverController
         .b()
         .whileTrue(

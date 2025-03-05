@@ -5,34 +5,33 @@ import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 
 public class ClawIntakeCoralCommand extends Command {
   public final Claw mClawSubsystem;
-  public ClawRollerVolt mIntakeVolts;
+  public double mIntakeVolts;
   public boolean hasOpened;
-  public boolean hasReachedBack;
 
   public ClawIntakeCoralCommand(Claw pClawSubsystem) {
     mClawSubsystem = pClawSubsystem;
-    mIntakeVolts = ClawRollerVolt.INTAKE_CORAL;
+    mIntakeVolts = ClawRollerVolt.INTAKE_CORAL.get();
     hasOpened = false;
-    hasReachedBack = false;
   }
 
   @Override
   public void initialize() {
+    hasOpened = false;
+    // if (mClawSubsystem.getClaw() > 20
+    //     && mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get()) {
+    //   hasOpened = true;
+    //   mIntakeVolts = 0;
+    // }
     mClawSubsystem.setClaw(mIntakeVolts);
   }
 
   @Override
   public void execute() {
-    if (!hasReachedBack) {
-      mClawSubsystem.setClaw(mIntakeVolts);
-    }
+    mClawSubsystem.setClaw(mIntakeVolts);
 
     // if the timer is not running and the claw is open, start the timer
     if (mClawSubsystem.isClawOpen() && !hasOpened) {
       hasOpened = true;
-    } else if (mClawSubsystem.getClaw() > 30) {
-      mClawSubsystem.setClaw(-mIntakeVolts.get() / 2);
-      hasReachedBack = true;
     }
   }
 
@@ -44,8 +43,10 @@ public class ClawIntakeCoralCommand extends Command {
   @Override
   public boolean isFinished() {
     // if the timer is running and the
-    return (hasOpened
-        && hasReachedBack
-        && (mClawSubsystem.getClaw() > 20 && mClawSubsystem.getClaw() < 23));
+    if (hasOpened
+        && (mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get())) {
+      ClawConstants.Claw.hasCoral = true;
+    }
+    return (ClawConstants.Claw.hasCoral);
   }
 }

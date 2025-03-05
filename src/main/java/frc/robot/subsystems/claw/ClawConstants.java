@@ -39,6 +39,7 @@ public class ClawConstants {
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
     public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
+    public static boolean hasCoral = true;
 
     public enum ClawRollerVolt {
       INTAKE_CORAL(1),
@@ -58,8 +59,8 @@ public class ClawConstants {
     };
 
     public enum ClawOpenPositions {
-      OPEN(27),
-      HAS_CORAL(22);
+      OPEN(26),
+      HAS_CORAL(24);
 
       public final double position;
 

@@ -88,7 +88,7 @@ public class Claw extends SubsystemBase {
   }
 
   public boolean isClawOpen() {
-    return (getClaw() > 30);
+    return (getClaw() > ClawConstants.Claw.ClawOpenPositions.OPEN.get());
   }
 
   public void setWrist(double pVoltage) {
