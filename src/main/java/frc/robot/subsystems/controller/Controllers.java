@@ -158,13 +158,30 @@ public class Controllers extends SubsystemBase {
                 new InstantCommand(() -> mIntake.setIndexer(0)),
                 new InstantCommand(() -> mIntake.setRightRoller(0)),
                 new InstantCommand(() -> mClaw.setClaw(0))));
+    // driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new SequentialCommandGroup(
+    //             new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, mClaw),
+    //             new ClawIntakeCoralCommand(mClaw)))
+    //     .whileFalse(
+    //         new ParallelCommandGroup(
+    //             new ClawFFCommand(mClaw), new InstantCommand(() -> mClaw.setClaw(0))));
     driverController
         .leftBumper()
         .whileTrue(
             new ParallelCommandGroup(
+                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false),
                 new InstantCommand(() -> mClaw.setClaw(-1)),
-                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false)))
-        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
+                new InstantCommand(() -> mIntake.setFunnel(-1)),
+                new InstantCommand(() -> mIntake.setIndexer(-1)),
+                new InstantCommand(() -> mIntake.setRightRoller(-1))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> mClaw.setClaw(0)),
+                new InstantCommand(() -> mIntake.setFunnel(0)),
+                new InstantCommand(() -> mIntake.setIndexer(0)),
+                new InstantCommand(() -> mIntake.setRightRoller(0))));
     driverController
         .b()
         .whileTrue(
@@ -279,9 +296,9 @@ public class Controllers extends SubsystemBase {
     if (curLevel == 4) {
       distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
     } else if (curLevel == 3) {
-      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+      distanceScoring = () -> VisionConstants.linearPoseOffsets.L3;
     } else if (curLevel == 2) {
-      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
-    } else distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
+      distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
+    } else distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
   }
 }

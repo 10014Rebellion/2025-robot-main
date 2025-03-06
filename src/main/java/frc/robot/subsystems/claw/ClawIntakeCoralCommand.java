@@ -1,5 +1,6 @@
 package frc.robot.subsystems.claw;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 
@@ -17,32 +18,39 @@ public class ClawIntakeCoralCommand extends Command {
   @Override
   public void initialize() {
     hasOpened = false;
+
     // if (mClawSubsystem.getClaw() > 20
     //     && mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get()) {
     //   hasOpened = true;
     //   mIntakeVolts = 0;
     // }
     mClawSubsystem.setClaw(mIntakeVolts);
+    SmartDashboard.putBoolean("Has Opened", hasOpened);
   }
 
   @Override
   public void execute() {
     mClawSubsystem.setClaw(mIntakeVolts);
 
-    // if the timer is not running and the claw is open, start the timer
     if (mClawSubsystem.isClawOpen() && !hasOpened) {
       hasOpened = true;
     }
+
+    SmartDashboard.putBoolean("Has Opened", hasOpened);
   }
 
   @Override
   public void end(boolean interrupted) {
     mClawSubsystem.setClaw(0);
+    // if (mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.NO_CORAL.get()) {
+    //   // basically, if the claw isn't open enough to have a coral,
+    //   // we assume that there isn't actually a coral in the claw
+    //   ClawConstants.Claw.hasCoral = false;
+    // }
   }
 
   @Override
   public boolean isFinished() {
-    // if the timer is running and the
     if (hasOpened
         && (mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get())) {
       ClawConstants.Claw.hasCoral = true;

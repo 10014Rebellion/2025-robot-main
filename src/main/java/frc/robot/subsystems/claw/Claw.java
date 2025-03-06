@@ -30,7 +30,7 @@ public class Claw extends SubsystemBase {
   private AbsoluteEncoder mWristEncoder;
 
   private final DutyCycleEncoder mClawEncoder;
-  ;
+
   private TunableNumber wristP, wristD, wristG, wristV, wristA;
   private TunableNumber tunablePosition;
 
@@ -87,10 +87,6 @@ public class Claw extends SubsystemBase {
     return measurement;
   }
 
-  public boolean isClawOpen() {
-    return (getClaw() > ClawConstants.Claw.ClawOpenPositions.OPEN.get());
-  }
-
   public void setWrist(double pVoltage) {
     mWristSparkMax.setVoltage(filterVoltage(pVoltage));
   }
@@ -135,13 +131,23 @@ public class Claw extends SubsystemBase {
     return currentDistanceCM;
   }
 
+  public boolean hasCoral() {
+    return Math.abs(getClaw() - ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get())
+        < ClawConstants.Claw.positionTolerance;
+  }
+
+  public boolean isClawOpen() {
+    return (getClaw() > ClawConstants.Claw.ClawOpenPositions.OPEN.get());
+  }
+
   @Override
   public void periodic() {
     stopIfLimit();
     SmartDashboard.putNumber("Wrist/Position", getEncoderMeasurement());
     SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
     SmartDashboard.putNumber("Wrist/Ultrasonic", getUltrasonicDistance());
-    SmartDashboard.putNumber("Wrist/Open Value", getClaw());
+    SmartDashboard.putNumber("Claw/Open Value", getClaw());
+    SmartDashboard.putBoolean("Claw/Has Coral", hasCoral());
 
     if (wristP.hasChanged()) Wrist.kP = wristP.get();
     // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);
