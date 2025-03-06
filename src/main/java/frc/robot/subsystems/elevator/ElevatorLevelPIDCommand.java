@@ -28,7 +28,8 @@ public class ElevatorLevelPIDCommand extends Command {
     this.mProfiledPIDController.setTolerance(ElevatorConstants.kTolerance);
 
     double pSetpoint =
-        SmartDashboard.getNumber("Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
+        SmartDashboard.getNumber(
+            "Levels/Elevator Setpoint", ElevatorConstants.Positions.L2.getPos());
     this.mSetpoint =
         MathUtil.clamp(
             pSetpoint, ElevatorConstants.kReverseSoftLimit, ElevatorConstants.kForwardSoftLimit);

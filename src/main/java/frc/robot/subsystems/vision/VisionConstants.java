@@ -95,8 +95,8 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.416), // X: inches forward
-                      Units.inchesToMeters(10.576), // Y: inches left
+                      Units.inchesToMeters(14.671), // X: inches forward
+                      Units.inchesToMeters(11.68), // Y: inches left
                       Units.inchesToMeters(9.144) // Z: inches above ground
                       ),
                   new Rotation3d(
@@ -110,8 +110,8 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.416), // X: inches forward
-                      Units.inchesToMeters(-10.576), // Y: inches right (negative)
+                      Units.inchesToMeters(14.671), // X: inches forward
+                      Units.inchesToMeters(-11.68), // Y: inches right (negative)
                       Units.inchesToMeters(9.144) // Z: inches above ground
                       ),
                   new Rotation3d(

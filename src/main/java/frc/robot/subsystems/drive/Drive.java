@@ -183,11 +183,10 @@ public class Drive extends SubsystemBase {
   }
 
   public void updateSpeedMultipliers() {
-    if (SmartDashboard.getNumber("Elevator/Position",0) >= 40) {
+    if (SmartDashboard.getNumber("Elevator/Position", 0) >= 40) {
       this.mDriveSpeedMultiplier = DriveConstants.kLowSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kLowSPeedRot;
-    }
-    else {
+    } else {
       this.mDriveSpeedMultiplier = DriveConstants.kHighSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kHighSpeedRot;
     }
