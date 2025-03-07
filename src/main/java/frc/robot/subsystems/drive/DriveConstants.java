@@ -88,7 +88,7 @@ public class DriveConstants {
   // Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.6;
+  public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.0;
   public static final double driveKv = 0.1;
@@ -98,6 +98,9 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Whole Bot PID
+  public static final double drivebaseDriveKp = 0.6;
+  public static final double drivebaseDriveKd = 0.6;
+
   public static final double drivebaseThetaKp = 3.0;
   public static final double drivebaseThetaKd = 0.0;
 

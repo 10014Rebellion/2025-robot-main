@@ -8,9 +8,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -62,8 +60,8 @@ public class Drive extends SubsystemBase {
   // Pathplanner and Choreo
   public static RobotConfig robotConfig;
   private final SwerveSetpointGenerator setpointGenerator;
-  private SwerveSetpoint lastSetpoint =
-      new SwerveSetpoint(new ChassisSpeeds(), zeroStates(), DriveFeedforwards.zeros(4));
+  // private SwerveSetpoint lastSetpoint =
+  //     new SwerveSetpoint(new ChassisSpeeds(), zeroStates(), DriveFeedforwards.zeros(4));
 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -108,13 +106,9 @@ public class Drive extends SubsystemBase {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (speeds, ff) -> {
-          lastSetpoint =
-              setpointGenerator.generateSetpoint(lastSetpoint, speeds, kDriveConstraints, 0.02);
-          runPathVelocity(speeds);
-        },
+        this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(DriveConstants.driveKp, 0.0, DriveConstants.driveKd),
+            new PIDConstants(DriveConstants.drivebaseDriveKp, 0.0, DriveConstants.drivebaseDriveKd),
             new PIDConstants(
                 DriveConstants.drivebaseThetaKp, 0.0, DriveConstants.drivebaseThetaKd)),
         ppConfig,
@@ -224,29 +218,6 @@ public class Drive extends SubsystemBase {
       this.mDriveSpeedMultiplier = DriveConstants.kHighSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kHighSpeedRot;
     }
-  }
-
-  public void runPathVelocity(ChassisSpeeds speeds) {
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-
-    // Generate new setpoints using lastSetpoint
-    lastSetpoint =
-        setpointGenerator.generateSetpoint(lastSetpoint, discreteSpeeds, kDriveConstraints, 0.02);
-
-    // Extract module states
-    SwerveModuleState[] setpointStates = lastSetpoint.moduleStates();
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
-
-    // Log data
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
-
-    // Send setpoints to modules
-    for (int i = 0; i < 4; i++) {
-      modules[i].runSetpoint(setpointStates[i]);
-    }
-
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /**

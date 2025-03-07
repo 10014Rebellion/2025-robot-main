@@ -49,8 +49,8 @@ public class GoToPose extends Command {
       new LoggedTunableNumber("DriveToPose/FFMaxRadius");
 
   static {
-    drivekP.initDefault(DriveConstants.driveKp);
-    drivekD.initDefault(DriveConstants.driveKd);
+    drivekP.initDefault(DriveConstants.drivebaseDriveKp);
+    drivekD.initDefault(DriveConstants.drivebaseDriveKd);
     thetakP.initDefault(DriveConstants.drivebaseThetaKp);
     thetakD.initDefault(DriveConstants.drivebaseThetaKd);
     driveMaxVelocity.initDefault(3.8);
