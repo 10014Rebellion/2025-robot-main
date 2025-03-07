@@ -146,9 +146,10 @@ public class Vision extends SubsystemBase {
             .getTranslation()
             .plus(
                 new Translation2d(
-                    (VisionConstants.kRobotYLength
-                        / 2.0), // Offset the robot length so the front is 0 meters away
-                    0));
+                        (VisionConstants.kRobotYLength
+                            / 2.0), // Offset the robot length so the front is 0 meters away
+                        0)
+                    .rotateBy(tagPose.getRotation()));
     Rotation2d tagRotation =
         tagPose.getRotation().plus(new Rotation2d(Math.PI)); // Flip the robot from the tag
 
