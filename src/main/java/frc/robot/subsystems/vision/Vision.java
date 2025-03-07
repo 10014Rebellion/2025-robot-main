@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.util.MiscUtils;
@@ -26,10 +25,8 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
   private List<PoseCamera> mCameraList;
-  private final Supplier<Rotation2d> mGyroRotation;
-  private final Supplier<SwerveModulePosition[]> mSwerveModulePositions;
-  private final SwerveDrivePoseEstimator mPoseEstimator;
   private List<PhotonPipelineResult> results;
+  private final Drive mDriveSubsystem;
 
   private void initCameraList() {
     List<PoseCamera> poseCameras = new ArrayList<>();
@@ -55,24 +52,18 @@ public class Vision extends SubsystemBase {
   }
 
   public Vision(
-      Supplier<Rotation2d> gyroRotation, Supplier<SwerveModulePosition[]> swerveModulePositions) {
-
+      Drive pDriveSubsystem,
+      Supplier<Rotation2d> gyroRotation,
+      Supplier<SwerveModulePosition[]> swerveModulePositions) {
     initCameraList();
-    mGyroRotation = gyroRotation;
-    mSwerveModulePositions = swerveModulePositions;
-    mPoseEstimator =
-        new SwerveDrivePoseEstimator(
-            DriveConstants.kSwerveDriveKinematics,
-            mGyroRotation.get(),
-            mSwerveModulePositions.get(),
-            new Pose2d());
+    this.mDriveSubsystem = pDriveSubsystem;
   }
 
   public int getClosestReefTag(boolean isBlueAlliance) { // , double pDistanceMeters) {
     // Determine valid tag IDs based on alliance
     int[] validTags =
         isBlueAlliance ? new int[] {17, 18, 19, 20, 21, 22} : new int[] {6, 7, 8, 9, 10, 11};
-    Pose2d robotPose = mPoseEstimator.getEstimatedPosition();
+    Pose2d robotPose = mDriveSubsystem.getPose();
     Pose2d closestTagPose = null;
     double closestDistance = Double.MAX_VALUE;
     int closestTagId = -1;
@@ -100,7 +91,7 @@ public class Vision extends SubsystemBase {
   public Pose2d getClosestReefTag() {
     boolean isBlueAlliance = DriverStation.getAlliance().get().equals(Alliance.Blue);
     double linearPoseOffset = SmartDashboard.getNumber("", 0);
-    return mPoseEstimator.getEstimatedPosition();
+    return mDriveSubsystem.getPose();
   }
 
   // public Pose2d getClosestReefTagPose() {
@@ -137,7 +128,7 @@ public class Vision extends SubsystemBase {
 
     if (tagPose == null) {
       updatePose();
-      return mPoseEstimator.getEstimatedPosition();
+      return mDriveSubsystem.getPose();
     }
 
     // Calculate position in front of the tag
@@ -162,12 +153,7 @@ public class Vision extends SubsystemBase {
     return targetPose2d;
   }
 
-  public Pose2d getPose() {
-    return mPoseEstimator.getEstimatedPosition();
-  }
-
   private void updatePose() {
-    mPoseEstimator.update(mGyroRotation.get(), mSwerveModulePositions.get());
     for (PoseCamera camera : mCameraList) {
       results = camera.getCameraResults();
       if (results.size() > 0) {
@@ -178,7 +164,7 @@ public class Vision extends SubsystemBase {
                   Pose2d pose = estimatedRobotPose.estimatedPose.toPose2d();
                   if (isPoseOnField(pose)) {
                     if (estimatedRobotPose.strategy == PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR) {
-                      mPoseEstimator.addVisionMeasurement(
+                      mDriveSubsystem.addVisionMeasurement(
                           pose,
                           estimatedRobotPose.timestampSeconds,
                           VisionConstants.kVisionMultiTagStandardDeviations);
@@ -188,7 +174,7 @@ public class Vision extends SubsystemBase {
                             target.getPoseAmbiguity(),
                             0.0,
                             VisionConstants.kVisionMaxPoseAmbiguity)) {
-                          mPoseEstimator.addVisionMeasurement(
+                          mDriveSubsystem.addVisionMeasurement(
                               pose,
                               estimatedRobotPose.timestampSeconds,
                               VisionConstants.kVisionSingleTagStandardDeviations);
@@ -220,7 +206,7 @@ public class Vision extends SubsystemBase {
   }
 
   public void updateTelemetry() {
-    Logger.recordOutput("Robot/Vision/EstimatedPose", mPoseEstimator.getEstimatedPosition());
+    Logger.recordOutput("Robot/Vision/EstimatedPose", mDriveSubsystem.getPose());
     // for (PoseCamera camera : mCameraList) {
     //   Logger.recordOutput("Vision/Pose/" + camera.getCameraName(),
     // camera.getCameraPoseEstimate());

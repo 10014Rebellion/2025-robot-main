@@ -11,9 +11,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Coral 11 - Pickup"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Coral 11 - Pickup"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeCoral"
+                }
+              }
+            ]
           }
         },
         {

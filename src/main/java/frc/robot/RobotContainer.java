@@ -91,10 +91,10 @@ public class RobotContainer {
         break;
     }
 
-    vision = new Vision(() -> drive.getRotation(), () -> drive.getModulePositions());
+    vision = new Vision(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
     controllers = new Controllers(drive, vision, elevator, intake, claw);
     autons = new Autons(drive, claw, elevator, pivot, intake);
-
+    autons.configureNamedCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -114,12 +114,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    configureAutonCommands();
     configureButtonBindings();
-  }
-
-  private void configureAutonCommands() {
-    autons.configureNamedCommands();
   }
 
   private void configureButtonBindings() {

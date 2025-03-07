@@ -107,7 +107,7 @@ public class Controllers extends SubsystemBase {
                     new ElevatorLevelPIDCommand(mElevator),
                     new GoToPose(
                         () -> mVision.getClosestReefScoringPose(distanceScoring, sideScoring),
-                        () -> mVision.getPose(),
+                        () -> mDrive.getPose(),
                         mDrive),
                     new WaitCommand(0.1),
                     // note: i made the coral eject now idk if this will work (im testing after

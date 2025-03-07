@@ -3,10 +3,12 @@ package frc.robot.subsystems.auton;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
+import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -15,6 +17,7 @@ import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.OTBIntake;
+import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 
 public class Autons {
   private final Drive mDrive;
@@ -41,6 +44,8 @@ public class Autons {
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
 
     NamedCommands.registerCommand("HoldElevatorAndWrist", activateElevatorWristFF());
+
+    NamedCommands.registerCommand("IntakeCoral", intakeCoral());
   }
 
   private ParallelCommandGroup activateElevatorWristFF() {
@@ -59,6 +64,23 @@ public class Autons {
             new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
             new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
         new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw));
+  }
+
+  private SequentialCommandGroup intakeCoral() {
+    return new SequentialCommandGroup(
+        new ParallelDeadlineGroup(
+            new autoIntakeCoralCommand(mIntake),
+            new SequentialCommandGroup(
+                new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))),
+        new SequentialCommandGroup(
+            new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
+            new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
+        new ParallelCommandGroup(
+            new ClawIntakeCoralCommand(mClaw),
+            new SequentialCommandGroup(
+                new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))));
   }
 
   private ClawConstants.Wrist.Positions intToWristPos(int level) {
