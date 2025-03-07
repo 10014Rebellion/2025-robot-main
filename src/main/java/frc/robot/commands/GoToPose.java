@@ -49,10 +49,10 @@ public class GoToPose extends Command {
       new LoggedTunableNumber("DriveToPose/FFMaxRadius");
 
   static {
-    drivekP.initDefault(0.6);
-    drivekD.initDefault(0.0);
-    thetakP.initDefault(3.0);
-    thetakD.initDefault(0.0);
+    drivekP.initDefault(DriveConstants.driveKp);
+    drivekD.initDefault(DriveConstants.driveKd);
+    thetakP.initDefault(DriveConstants.drivebaseThetaKp);
+    thetakD.initDefault(DriveConstants.drivebaseThetaKd);
     driveMaxVelocity.initDefault(3.8);
     driveMaxAcceleration.initDefault(3.0);
     thetaMaxVelocity.initDefault(Math.toRadians(360.0));
@@ -199,10 +199,10 @@ public class GoToPose extends Command {
     final double linearS = linearFF.get().getNorm() * 3.0;
     final double thetaS = Math.abs(omegaFF.getAsDouble()) * 3.0;
     driveVelocity =
-        driveVelocity.interpolate(linearFF.get().times(DriveConstants.maxLinearSpeed), linearS);
+        driveVelocity.interpolate(linearFF.get().times(DriveConstants.kMaxLinearSpeedMPS), linearS);
     thetaVelocity =
         MathUtil.interpolate(
-            thetaVelocity, omegaFF.getAsDouble() * DriveConstants.maxAngularSpeed, thetaS);
+            thetaVelocity, omegaFF.getAsDouble() * DriveConstants.kMaxAngularSpeedRadPS, thetaS);
 
     // Command speeds
     mDriveSubsystem.runVelocity(

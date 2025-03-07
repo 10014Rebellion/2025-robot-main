@@ -114,10 +114,9 @@ public class Controllers extends SubsystemBase {
                     // school)
                     new ParallelCommandGroup(
                         new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
-                        new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator),
-                        new InstantCommand(
-                            () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_REEF))),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
+                        new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
+                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false)))
         .onFalse(
             new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
 
@@ -134,7 +133,8 @@ public class Controllers extends SubsystemBase {
                     new SequentialCommandGroup(
                         new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
                         new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))))
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
+                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false)))
         .onFalse(
             new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
     driverController
@@ -146,6 +146,9 @@ public class Controllers extends SubsystemBase {
                     new SequentialCommandGroup(
                         new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
                         new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))),
+                new SequentialCommandGroup(
+                    new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
+                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
                 new ParallelCommandGroup(
                     new ClawIntakeCoralCommand(mClaw),
                     new SequentialCommandGroup(
@@ -209,6 +212,11 @@ public class Controllers extends SubsystemBase {
                 new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, mClaw),
                 new ClawIntakeCoralCommand(mClaw)))
         .whileFalse(new ClawFFCommand(mClaw));
+
+    driverController
+        .a()
+        .whileTrue(new InstantCommand(() -> mClaw.setClaw(1)))
+        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
     // .whileTrue(
     //     new ParallelCommandGroup(
     //         new ElevatorPIDCommand(true, 15, mElevator),

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LEDInterface;
+import frc.robot.subsystems.auton.Autons;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.controller.Controllers;
 import frc.robot.subsystems.drive.Drive;
@@ -41,6 +42,7 @@ public class RobotContainer {
   private final Telemetry telemetry;
   private final OTBIntake intake;
   private final LEDInterface LEDs;
+  private final Autons autons;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -91,6 +93,7 @@ public class RobotContainer {
 
     vision = new Vision(() -> drive.getRotation(), () -> drive.getModulePositions());
     controllers = new Controllers(drive, vision, elevator, intake, claw);
+    autons = new Autons(drive, claw, elevator, pivot, intake);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -111,7 +114,12 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    configureAutonCommands();
     configureButtonBindings();
+  }
+
+  private void configureAutonCommands() {
+    autons.configureNamedCommands();
   }
 
   private void configureButtonBindings() {

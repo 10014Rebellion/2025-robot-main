@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static int kEncoderOffset = -23; // TODO: TUNE
+    public static int kEncoderOffset = -24; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
@@ -65,7 +65,7 @@ public class ClawConstants {
       OPEN(26), // Maximum the claw goes when the coral is going in, when its tangent to the front 2
       // wheels
       HAS_CORAL(25),
-      MAX(102);
+      MAX(40);
 
       public final double position;
 

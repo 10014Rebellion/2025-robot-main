@@ -7,18 +7,21 @@ import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 public class ClawIntakeCoralCommand extends Command {
   public final Claw mClawSubsystem;
   public double mIntakeVolts;
-  public boolean hasOpened;
+  private boolean hasOpened;
+  private boolean hasReachedBack;
 
   public ClawIntakeCoralCommand(Claw pClawSubsystem) {
     mClawSubsystem = pClawSubsystem;
     mIntakeVolts = ClawRollerVolt.INTAKE_CORAL.get();
     hasOpened = false;
+    hasReachedBack = false;
   }
 
   @Override
   public void initialize() {
     hasOpened = false;
-
+    hasReachedBack = false;
+    mIntakeVolts = ClawRollerVolt.INTAKE_CORAL.get();
     // if (mClawSubsystem.getClaw() > 20
     //     && mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get()) {
     //   hasOpened = true;
@@ -34,6 +37,12 @@ public class ClawIntakeCoralCommand extends Command {
 
     if (mClawSubsystem.isClawOpen() && !hasOpened) {
       hasOpened = true;
+    }
+
+    if (mClawSubsystem.getClaw() > ClawConstants.Claw.ClawOpenPositions.MAX.get()
+        && !hasReachedBack) {
+      hasReachedBack = true;
+      mIntakeVolts = -mIntakeVolts / 2;
     }
 
     SmartDashboard.putBoolean("Has Opened", hasOpened);

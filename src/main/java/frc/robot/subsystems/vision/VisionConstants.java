@@ -95,14 +95,14 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.671), // X: inches forward
-                      Units.inchesToMeters(11.68), // Y: inches left
-                      Units.inchesToMeters(9.144) // Z: inches above ground
+                      Units.inchesToMeters(14.55), // X: inches forward
+                      Units.inchesToMeters(11.75), // Y: inches left
+                      Units.inchesToMeters(9.675) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(-45) // Yaw: (angled inward)
+                      Units.degreesToRadians(-30) // Yaw: (angled inward)
                       ))),
 
           // Front Right Camera (Mounted near FR swerve module)
@@ -110,14 +110,14 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.671), // X: inches forward
-                      Units.inchesToMeters(-11.68), // Y: inches right (negative)
-                      Units.inchesToMeters(9.144) // Z: inches above ground
+                      Units.inchesToMeters(14.55), // X: inches forward
+                      Units.inchesToMeters(-11.75), // Y: inches right (negative)
+                      Units.inchesToMeters(9.675) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(45) // Yaw: (angled inward)
+                      Units.degreesToRadians(30) // Yaw: (angled inward)
                       ))),
 
           // Rear Left Camera (Mounted near BL swerve module, positions TBD)

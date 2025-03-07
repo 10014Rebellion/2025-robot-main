@@ -15,6 +15,7 @@ package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -43,10 +44,14 @@ public class DriveConstants {
       new SwerveDriveKinematics(moduleTranslations);
 
   // Zeroed rotation values for each module, see setup instructions
-  //   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(0.2009058);
-  //   public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.8087860);
-  //   public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.2965502);
-  //   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.7473245);
+  // public static final Rotation2d frontLeftZeroRotation = new
+  // Rotation2d(0.2009058);
+  // public static final Rotation2d frontRightZeroRotation = new
+  // Rotation2d(0.8087860);
+  // public static final Rotation2d backLeftZeroRotation = new
+  // Rotation2d(0.2965502);
+  // public static final Rotation2d backRightZeroRotation = new
+  // Rotation2d(0.7473245);
 
   public static final Rotation2d frontLeftZeroRotation = new Rotation2d(3.0 * Math.PI / 2.0);
   public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
@@ -70,17 +75,20 @@ public class DriveConstants {
   public static final int driveMotorCurrentLimit = 50;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
   public static final double driveMotorReduction =
-      (45.0 * 22.0) / (13.0 * 15.0); // MAXSwerve with 13 pinion teeth and 22 spur teeth
+      (45.0 * 22.0) / (13.0 * 15.0); // MAXSwerve with 13 pinion teeth
+  // and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
 
   // Drive encoder configuration
   public static final double driveEncoderPositionFactor =
-      2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
+      2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
+  // Wheel Radians
   public static final double driveEncoderVelocityFactor =
-      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
+      (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM ->
+  // Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.0;
+  public static final double driveKp = 0.6;
   public static final double driveKd = 0.0;
   public static final double driveKs = 0.0;
   public static final double driveKv = 0.1;
@@ -89,7 +97,9 @@ public class DriveConstants {
   public static final double driveSimKs = 0.0;
   public static final double driveSimKv = 0.0789;
 
-  //
+  // Whole Bot PID
+  public static final double drivebaseThetaKp = 3.0;
+  public static final double drivebaseThetaKd = 0.0;
 
   // Turn motor configuration
   public static final boolean turnInverted = false;
@@ -110,14 +120,49 @@ public class DriveConstants {
   public static final double turnPIDMinInput = 0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
-  public static final double freeSpeed = 5.33;
-  public static final double maxLinearSpeed = freeSpeed;
-  public static final double maxAngularSpeed = freeSpeed / driveBaseRadius;
-
   // PathPlanner configuration
-  public static final double robotMassKg = 74.088; // TODO: CONFIGURE ME
-  public static final double robotMOI = 6.883; // TODO: CONFIGURE ME
+  public static final double kTotalWidthM = Units.inchesToMeters(35.5);
+  public static final double kTotalLengthM = Units.inchesToMeters(38);
+
+  public static final double robotMassKg = 61.9;
+  public static final double robotMOI = 6.883; // TODO: CONFIGURE ME MAY BE 5.39
   public static final double wheelCOF = 1.2; // TODO: CONFIGURE ME
+
+  public static final double kVortexFreeSpeed = 5.33;
+  public static final double kMaxLinearSpeedMPS = kVortexFreeSpeed;
+  public static final double kMaxAngularSpeedRadPS = kVortexFreeSpeed / driveBaseRadius;
+
+  public static final double kVortexFreeSpeedRPM = 6784;
+  public static final double kVortexStallTorqueNM = 3.6;
+  public static final double kVortexStallCurrentA = 211;
+
+  public static final double kMaxSwerveGearReduction = 5.08;
+  public static final double kWheelRPM = kVortexFreeSpeedRPM / kMaxSwerveGearReduction;
+  public static final double kWheelSpeedMPS = (kWheelRPM * 2 * Math.PI * wheelRadiusMeters) / 60;
+
+  public static final double kGearboxEfficiency = 0.95; // estimated
+  public static final double kRunningTorque =
+      kVortexStallTorqueNM * (driveMotorCurrentLimit / kVortexStallCurrentA);
+
+  public static final double kOutputTorque =
+      (kRunningTorque * kMaxSwerveGearReduction) * kGearboxEfficiency;
+  public static final double kMaxWheelTorque = kOutputTorque / wheelRadiusMeters;
+
+  public static final double kMaxLinearAccelerationMPSSq = wheelCOF * 9.81; // Mass cancels out
+  public static final double kMaxAngularAccelerationRadPSSq = kMaxWheelTorque / robotMOI;
+
+  public static final double kTurnFreeSpeedRPM = 11000;
+  public static final double kMaxTurnAngularRadPS =
+      (kTurnFreeSpeedRPM / turnMotorReduction) * (2 * Math.PI / 60);
+
+  // Pathplanner constraints
+  public static final PathConstraints kDriveConstraints =
+      new PathConstraints(
+          kMaxLinearSpeedMPS,
+          kMaxLinearAccelerationMPSSq,
+          kMaxAngularSpeedRadPS,
+          kMaxAngularAccelerationRadPSSq);
+
   public static final RobotConfig ppConfig =
       new RobotConfig(
           robotMassKg,

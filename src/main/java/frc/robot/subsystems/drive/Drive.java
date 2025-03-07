@@ -5,9 +5,13 @@ import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -55,6 +59,12 @@ public class Drive extends SubsystemBase {
   // @AutoLogOutput(key = "RobotState/RobotVelocity")
   // private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
+  // Pathplanner and Choreo
+  public static RobotConfig robotConfig;
+  private final SwerveSetpointGenerator setpointGenerator;
+  private SwerveSetpoint lastSetpoint =
+      new SwerveSetpoint(new ChassisSpeeds(), zeroStates(), DriveFeedforwards.zeros(4));
+
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -83,17 +93,34 @@ public class Drive extends SubsystemBase {
     // Start odometry thread
     SparkOdometryThread.getInstance().start();
 
+    robotConfig = DriveConstants.ppConfig;
+
+    setpointGenerator =
+        new SwerveSetpointGenerator(
+            robotConfig, // The robot configuration. This is the same config for pathplanner as well
+            DriveConstants
+                .kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per
+            // second.
+            );
+
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        this::runVelocity,
+        (speeds, ff) -> {
+          lastSetpoint =
+              setpointGenerator.generateSetpoint(lastSetpoint, speeds, kDriveConstraints, 0.02);
+          runPathVelocity(speeds);
+        },
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(DriveConstants.driveKp, 0.0, DriveConstants.driveKd),
+            new PIDConstants(
+                DriveConstants.drivebaseThetaKp, 0.0, DriveConstants.drivebaseThetaKd)),
         ppConfig,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
+
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
@@ -178,6 +205,13 @@ public class Drive extends SubsystemBase {
     updateSpeedMultipliers();
   }
 
+  public static SwerveModuleState[] zeroStates() {
+    return new SwerveModuleState[] {
+      new SwerveModuleState(), new SwerveModuleState(),
+      new SwerveModuleState(), new SwerveModuleState()
+    };
+  }
+
   public ChassisSpeeds getFieldVelocity() {
     return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), getRotation());
   }
@@ -190,6 +224,29 @@ public class Drive extends SubsystemBase {
       this.mDriveSpeedMultiplier = DriveConstants.kHighSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kHighSpeedRot;
     }
+  }
+
+  public void runPathVelocity(ChassisSpeeds speeds) {
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+
+    // Generate new setpoints using lastSetpoint
+    lastSetpoint =
+        setpointGenerator.generateSetpoint(lastSetpoint, discreteSpeeds, kDriveConstraints, 0.02);
+
+    // Extract module states
+    SwerveModuleState[] setpointStates = lastSetpoint.moduleStates();
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+
+    // Log data
+    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+
+    // Send setpoints to modules
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSetpoint(setpointStates[i]);
+    }
+
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
   }
 
   /**
