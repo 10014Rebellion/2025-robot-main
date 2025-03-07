@@ -72,6 +72,7 @@ public class IntakeConstants {
 
   public enum IntakePositions {
     STOWED(100.0),
+    ALGAEINTAKE(75),
     INTAKING(0.0);
     public final double position;
 

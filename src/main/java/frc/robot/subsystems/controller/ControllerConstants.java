@@ -5,8 +5,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class ControllerConstants {
   public static class Buttonboard {
     public static final GenericHID buttonboard = new GenericHID(1);
-    // Barge
-    public static final int kScoreBarge = 3;
+    // Algae
+    public static final int kAlgaePickupL2 = 9;
+    public static final int kAlgaePickupL3 = 3;
 
     // Intake
     public static final int kSetLeftPose = 4;
@@ -27,6 +28,6 @@ public class ControllerConstants {
     public static final int kClimbPullUp = 8;
 
     // Misc
-    public static final int kLedMisguidance = 9;
+
   }
 }

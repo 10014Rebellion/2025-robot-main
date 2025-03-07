@@ -21,9 +21,11 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawLevelPIDCommand;
+import frc.robot.subsystems.claw.ClawManualCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -31,6 +33,7 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorLevelPIDCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
+import frc.robot.subsystems.elevator.elevatorManualCommand;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
@@ -175,10 +178,11 @@ public class Controllers extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> ClawConstants.Claw.hasCoral = false),
+                new IntakePIDCommand(IntakePositions.ALGAEINTAKE, mIntake),
                 new InstantCommand(() -> mClaw.setClaw(-1)),
                 new InstantCommand(() -> mIntake.setFunnel(-1)),
                 new InstantCommand(() -> mIntake.setIndexer(-1)),
-                new InstantCommand(() -> mIntake.setRightRoller(-1))))
+                new InstantCommand(() -> mIntake.setRightRoller(-2))))
         .whileFalse(
             new ParallelCommandGroup(
                 new InstantCommand(() -> mClaw.setClaw(0)),
@@ -250,27 +254,53 @@ public class Controllers extends SubsystemBase {
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kScoreL1)
-        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 2));
+        .whileTrue(new InstantCommand(() -> levelSetpointInt = () -> 1));
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kAlgaePickupL2)
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L2ALGAE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L2ALGAE, mClaw),
+                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE))))
+        .onFalse(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
+                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE))));
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kAlgaePickupL3)
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3ALGAE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3ALGAE, mClaw),
+                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE))))
+        .onFalse(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
+                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE))));
 
     operatorButtonboard
         .axisGreaterThan(1, 0.5)
-        .whileTrue(new InstantCommand(() -> mElevator.setMotorVoltage(3)))
-        .whileFalse(new ElevatorFFCommand(mElevator));
+        .onTrue(new elevatorManualCommand(mElevator, 3))
+        .onFalse(new ElevatorFFCommand(mElevator));
 
     operatorButtonboard
         .axisLessThan(1, -0.50)
-        .whileTrue(new InstantCommand(() -> mElevator.setMotorVoltage(-2)))
-        .whileFalse(new ElevatorFFCommand(mElevator));
+        .onTrue(new elevatorManualCommand(mElevator, -3))
+        .onFalse(new ElevatorFFCommand(mElevator));
 
     operatorButtonboard
         .axisGreaterThan(0, 0.5)
-        .whileTrue(new InstantCommand(() -> mClaw.setWrist(2)))
-        .whileFalse(new ClawFFCommand(mClaw));
+        .onTrue(new ClawManualCommand(mClaw, 2))
+        .onFalse(new ClawFFCommand(mClaw));
 
     operatorButtonboard
         .axisLessThan(0, -0.50)
-        .whileTrue(new InstantCommand(() -> mClaw.setWrist(-2)))
-        .whileFalse(new ClawFFCommand(mClaw));
+        .onTrue(new ClawManualCommand(mClaw, -2))
+        .onFalse(new ClawFFCommand(mClaw));
   }
 
   private void levelToElevator(IntSupplier level) {

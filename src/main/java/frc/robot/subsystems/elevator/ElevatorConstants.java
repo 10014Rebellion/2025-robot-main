@@ -42,12 +42,15 @@ public class ElevatorConstants {
     BOTTOM(0),
     PREINTAKE(30),
     POSTINTAKE(15),
-    L1(0),
-    L2(25),
-    L3(50),
-    L4(80),
+    L1(20),
+    L2(22.5),
+    L3(42),
+    L4(73),
     SCORE(20),
-    BARGE(0);
+    BARGE(75),
+    L2ALGAE(40),
+    L3ALGAE(63),
+    HOLD_ALGAE(6);
 
     public final double position;
 

@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static int kEncoderOffset = -24; // TODO: TUNE
+    public static int kEncoderOffset = 0; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
@@ -43,7 +43,8 @@ public class ClawConstants {
 
     public enum ClawRollerVolt {
       INTAKE_CORAL(1),
-      INTAKE_ALGAE(1),
+      INTAKE_ALGAE(3),
+      HOLD_ALGAE(0.5),
       OUTTAKE_REEF(-0.5),
       OUTTAKE_BARGE(-12);
 
@@ -112,7 +113,7 @@ public class ClawConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static int kCurrentLimit = 80;
-    public static double kP = 0.09; // TODO: Configure me!
+    public static double kP = 0.12; // TODO: Configure me!
     public static double kD = 0.0; // TODO: Configure me!
     public static double kVelocityFF = 0.0; // TODO: Configure me!
 
@@ -139,12 +140,15 @@ public class ClawConstants {
     public enum Positions {
       BOTTOM(0),
       INTAKE(-65),
-      L1(40),
-      L2(50),
-      L3(50),
+      L1(20),
+      L2(45),
+      L3(45),
       L4(50),
-      SCORE(-30),
-      BARGE(0); // TO DO: redo these values
+      SCORE(-50),
+      BARGE(50),
+      L2ALGAE(-18),
+      L3ALGAE(-12),
+      HOLD_ALGAE(45); // TO DO: redo these values
 
       public final double position;
 
