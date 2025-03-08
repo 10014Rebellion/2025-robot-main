@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.190676229508196,
+        "y": 5.577407786885245
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.070820470331897,
+        "y": 5.356023869403336
+      },
+      "isLocked": false,
+      "linkedName": "C10-SCORE-START"
+    },
+    {
+      "anchor": {
+        "x": 5.070799180327868,
+        "y": 5.3496413934426235
+      },
+      "prevControl": {
+        "x": 5.200062151655896,
+        "y": 5.563629907721894
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "C10-SCORE-END"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -120.17352002964444
+  },
+  "reversed": false,
+  "folder": "SouthPaths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -119.66114620198938
+  },
+  "useDefaultConstraints": true
+}

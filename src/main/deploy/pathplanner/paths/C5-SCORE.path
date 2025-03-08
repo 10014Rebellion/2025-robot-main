@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.4905,
+        "y": 2.6404999999999994
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.6876774521507025,
+        "y": 2.955374723605045
+      },
+      "isLocked": false,
+      "linkedName": "C5-SCORE-START"
+    },
+    {
+      "anchor": {
+        "x": 3.65625,
+        "y": 2.90375
+      },
+      "prevControl": {
+        "x": 3.413132475153045,
+        "y": 2.507367773970262
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "C5-SCORE-END"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.2,
+    "rotation": 59.99999999999999
+  },
+  "reversed": false,
+  "folder": "SouthPaths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 61.232
+  },
+  "useDefaultConstraints": true
+}

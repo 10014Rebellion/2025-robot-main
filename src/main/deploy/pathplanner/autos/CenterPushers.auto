@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Lazy"
+            "pathName": "Start-Push1"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "ReadyScoreSubsystemsL3"
+            "pathName": "Push1-C12"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "IntakeCoral"
+            "pathName": "C12-Push2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Push2-Taxi"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "WORKING AUTONS",
   "choreoAuto": false
 }

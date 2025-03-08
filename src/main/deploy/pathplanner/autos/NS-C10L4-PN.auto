@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NS-C10"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReadyScoreSubsystemsL4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C10-SCORE"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C10-PN"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "WORKING AUTONS",
+  "choreoAuto": false
+}
