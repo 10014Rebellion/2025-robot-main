@@ -92,7 +92,7 @@ public class RobotContainer {
     }
 
     vision = new Vision(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
-    controllers = new Controllers(drive, vision, elevator, intake, claw);
+    controllers = new Controllers(drive, vision, elevator, pivot, intake, claw);
     autons = new Autons(drive, claw, elevator, pivot, intake);
     autons.configureNamedCommands();
     // Set up auto routines

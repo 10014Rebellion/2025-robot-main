@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.util.TunableNumber;
@@ -29,6 +30,10 @@ public class ElevatorPivot extends SubsystemBase {
 
   public void setVoltage(double pVoltage) {
     mPivotMotor.setVoltage(filterVoltage(pVoltage));
+  }
+
+  public InstantCommand stopCommand() {
+    return new InstantCommand(() -> setVoltage(0));
   }
 
   // public void setVoltageTunable() {

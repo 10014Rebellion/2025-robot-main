@@ -57,8 +57,8 @@ public class GoToPose extends Command {
     driveMaxAcceleration.initDefault(2.0);
     thetaMaxVelocity.initDefault(Math.toRadians(360.0));
     thetaMaxAcceleration.initDefault(8.0);
-    driveTolerance.initDefault(0.01);
-    thetaTolerance.initDefault(Math.toRadians(1.0));
+    driveTolerance.initDefault(0.005);
+    thetaTolerance.initDefault(Math.toRadians(0.2));
     ffMinRadius.initDefault(0.05);
     ffMaxRadius.initDefault(0.1);
   }

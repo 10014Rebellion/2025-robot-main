@@ -60,8 +60,10 @@ public class ClawIntakeCoralCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    if (hasOpened
-        && (mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get())) {
+    if (hasOpened && !(mClawSubsystem.hasCoral())) {
+      ClawConstants.Claw.hasCoral = true;
+    }
+    if (hasOpened && ClawConstants.Claw.periodicHasCoral) {
       ClawConstants.Claw.hasCoral = true;
     }
     return (ClawConstants.Claw.hasCoral);

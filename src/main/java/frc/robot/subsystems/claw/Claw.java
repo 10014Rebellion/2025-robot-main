@@ -137,7 +137,7 @@ public class Claw extends SubsystemBase {
   }
 
   public boolean isClawOpen() {
-    return (getClaw() > ClawConstants.Claw.ClawOpenPositions.OPEN.get());
+    return getClaw() > ClawConstants.Claw.ClawOpenPositions.OPEN.get();
   }
 
   @Override
@@ -147,7 +147,8 @@ public class Claw extends SubsystemBase {
     SmartDashboard.putNumber("Wrist/Voltage", mWristSparkMax.getBusVoltage());
     SmartDashboard.putNumber("Wrist/Ultrasonic", getUltrasonicDistance());
     SmartDashboard.putNumber("Claw/Open Value", getClaw());
-    SmartDashboard.putBoolean("Claw/Has Coral", hasCoral());
+    SmartDashboard.putBoolean("Claw/Periodic Has Coral", hasCoral());
+    ClawConstants.Claw.periodicHasCoral = hasCoral();
 
     if (wristP.hasChanged()) Wrist.kP = wristP.get();
     // SmartDashboard.putNumber("Tuning/Wrist/Current P", Wrist.kP);

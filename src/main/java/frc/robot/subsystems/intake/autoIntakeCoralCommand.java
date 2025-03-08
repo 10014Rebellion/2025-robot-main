@@ -49,7 +49,7 @@ public class autoIntakeCoralCommand extends Command {
     mIntake.setRightPivot(calculatedOutput);
     SmartDashboard.putNumber("Intake/FF Output", calculatedFeedforward);
     SmartDashboard.putNumber("Intake/Pivot Output", calculatedOutput);
-    mIntake.setFunnel(.7);
+    mIntake.setFunnel(0.7);
     mIntake.setIndexer(2);
     mIntake.setRightRoller(8);
   }

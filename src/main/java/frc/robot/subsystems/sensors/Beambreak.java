@@ -27,7 +27,7 @@ public class Beambreak extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Left Hang Beam", hasCageLeft());
-    SmartDashboard.putBoolean("Right Hang Beam", hasCageRight());
+    SmartDashboard.putBoolean("Sensors/Left Hang Beam", hasCageLeft());
+    SmartDashboard.putBoolean("Sensors/Right Hang Beam", hasCageRight());
   }
 }

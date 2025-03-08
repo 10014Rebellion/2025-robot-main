@@ -34,6 +34,7 @@ import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorLevelPIDCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevator.elevatorManualCommand;
+import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
@@ -61,12 +62,19 @@ public class Controllers extends SubsystemBase {
   private final Elevator mElevator;
   private final OTBIntake mIntake;
   private final Claw mClaw;
+  private final ElevatorPivot mPivot;
 
   public Controllers(
-      Drive pDrive, Vision pVision, Elevator pElevator, OTBIntake pIntake, Claw pClaw) {
+      Drive pDrive,
+      Vision pVision,
+      Elevator pElevator,
+      ElevatorPivot pPivot,
+      OTBIntake pIntake,
+      Claw pClaw) {
     this.mDrive = pDrive;
     this.mVision = pVision;
     this.mElevator = pElevator;
+    this.mPivot = pPivot;
     this.mIntake = pIntake;
     this.mClaw = pClaw;
 
@@ -112,7 +120,7 @@ public class Controllers extends SubsystemBase {
                         () -> mVision.getClosestReefScoringPose(distanceScoring, sideScoring),
                         () -> mDrive.getPose(),
                         mDrive),
-                    new WaitCommand(0.1),
+                    new WaitCommand(0.3),
                     // note: i made the coral eject now idk if this will work (im testing after
                     // school)
                     new ParallelCommandGroup(
@@ -153,6 +161,7 @@ public class Controllers extends SubsystemBase {
                     new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
                     new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
                 new ParallelCommandGroup(
+                    new InstantCommand(() -> mIntake.setFunnel(2)),
                     new ClawIntakeCoralCommand(mClaw),
                     new SequentialCommandGroup(
                         new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
@@ -232,6 +241,16 @@ public class Controllers extends SubsystemBase {
   }
 
   public void initOperatorButtonboard() {
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kClimbPullUp)
+        .whileTrue(new InstantCommand(() -> mPivot.setVoltage(12)))
+        .onFalse(mPivot.stopCommand());
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kClimbLetGo)
+        .whileTrue(new InstantCommand(() -> mPivot.setVoltage(-12)))
+        .onFalse(mPivot.stopCommand());
+
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetLeftPose)
         .whileTrue(new InstantCommand(() -> sideScoring = () -> VisionConstants.PoseOffsets.LEFT));

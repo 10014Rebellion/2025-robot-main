@@ -19,7 +19,7 @@ public class ElevatorPivotConstants {
   public static final double kD = 0;
   public static final double kTolerance = 0.5;
 
-  enum Positions {
+  public enum Positions {
     NORMAL(14),
     CLIMB(40);
     public final double position;

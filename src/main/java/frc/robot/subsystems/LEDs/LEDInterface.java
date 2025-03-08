@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LEDs.LEDConstants.RGBLEDColor;
+import frc.robot.subsystems.claw.ClawConstants;
 
 public class LEDInterface extends SubsystemBase {
 
@@ -174,10 +175,9 @@ public class LEDInterface extends SubsystemBase {
     if (SmartDashboard.getBoolean("Left Hang Beam", false)
         && SmartDashboard.getBoolean("Right Hang Beam", false)) {
       setColor(10);
-    }
-    //  else if (ClawConstants.Claw.hasCoral) {
-    //   setColor(20);
-    // } else setColor(60);
+    } else if (ClawConstants.Claw.hasCoral) {
+      setColor(20);
+    } else setColor(60);
 
     // rainbowUnicornVomit();
     // transitionRGB();

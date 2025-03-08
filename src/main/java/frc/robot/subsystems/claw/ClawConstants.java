@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static int kEncoderOffset = -103; // TODO: TUNE
+    public static double kEncoderOffset = 68.5; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
@@ -40,6 +40,7 @@ public class ClawConstants {
 
     public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
     public static boolean hasCoral = true;
+    public static boolean periodicHasCoral = false;
 
     public enum ClawRollerVolt {
       INTAKE_CORAL(1),
@@ -65,8 +66,8 @@ public class ClawConstants {
       NO_CORAL(0),
       OPEN(26), // Maximum the claw goes when the coral is going in, when its tangent to the front 2
       // wheels
-      HAS_CORAL(25),
-      MAX(40);
+      HAS_CORAL(23),
+      MAX(33);
 
       public final double position;
 
