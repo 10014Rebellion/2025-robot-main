@@ -32,6 +32,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "WORKING AUTONS",
+  "folder": null,
   "choreoAuto": false
 }
