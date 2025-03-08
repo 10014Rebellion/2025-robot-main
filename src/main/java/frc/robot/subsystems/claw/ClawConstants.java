@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static int kEncoderOffset = 0; // TODO: TUNE
+    public static int kEncoderOffset = -103; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
