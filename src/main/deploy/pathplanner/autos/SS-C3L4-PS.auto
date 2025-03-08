@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CS-Push1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Push1-C10"
+            "pathName": "SS-C3"
           }
         },
         {
@@ -25,19 +19,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C10-SCORE"
+            "pathName": "C3-SCORE"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 4.0
           }
         },
         {
@@ -49,13 +43,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C10-PN"
+            "pathName": "C3-PS"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "WORKING AUTONS",
+  "folder": "SOUTH START",
   "choreoAuto": false
 }

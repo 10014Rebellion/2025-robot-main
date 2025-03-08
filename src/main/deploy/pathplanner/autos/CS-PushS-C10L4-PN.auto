@@ -7,61 +7,55 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SS-C2"
+            "pathName": "CS-Push1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Push1-C10"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ReadyScoreSubsystemsL2"
+            "name": "ReadyScoreSubsystemsL4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2-SCORE"
+            "pathName": "C10-SCORE"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C2-PS"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PS-C5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReadyScoreSubsystemsL2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C5-SCORE"
+            "waitTime": 2.0
           }
         },
         {
           "type": "named",
           "data": {
             "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C10-PN"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "SOUTH START",
+  "folder": "CENTER START",
   "choreoAuto": false
 }

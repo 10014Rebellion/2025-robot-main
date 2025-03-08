@@ -114,13 +114,13 @@ public class Controllers extends SubsystemBase {
                 new InstantCommand(() -> levelToElevator(levelSetpointInt)),
                 new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
                 new SequentialCommandGroup(
-                    new ClawLevelPIDCommand(mClaw),
                     new ElevatorLevelPIDCommand(mElevator),
+                    new ClawLevelPIDCommand(mClaw),
                     new GoToPose(
                         () -> mVision.getClosestReefScoringPose(distanceScoring, sideScoring),
                         () -> mDrive.getPose(),
                         mDrive),
-                    new WaitCommand(0.8),
+                    new WaitCommand(0.5),
                     // note: i made the coral eject now idk if this will work (im testing after
                     // school)
                     new ParallelCommandGroup(
@@ -198,15 +198,15 @@ public class Controllers extends SubsystemBase {
                 new InstantCommand(() -> mIntake.setFunnel(0)),
                 new InstantCommand(() -> mIntake.setIndexer(0)),
                 new InstantCommand(() -> mIntake.setRightRoller(0))));
-    driverController
-        .b()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw),
-                new InstantCommand(
-                    () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.INTAKE_CORAL))))
-        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
+    // driverController
+    //     .b()
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, mElevator),
+    //             new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw),
+    //             new InstantCommand(
+    //                 () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.INTAKE_CORAL))))
+    //     .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
 
     driverController
         .x()
@@ -238,13 +238,17 @@ public class Controllers extends SubsystemBase {
     // .whileFalse(
     //     new ParallelCommandGroup(
     //         new ElevatorFFCommand(mElevator), new InstantCommand(() -> mClaw.setClaw(0))));
+
   }
 
   public void initOperatorButtonboard() {
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kClimbPullUp)
-        .whileTrue(new InstantCommand(() -> mPivot.setVoltage(12)))
-        .onFalse(mPivot.stopCommand());
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> mPivot.setVoltage(12)),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.CLIMB, mClaw)))
+        .onFalse(new ParallelCommandGroup(mPivot.stopCommand(), new ClawFFCommand(mClaw)));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kClimbLetGo)
@@ -320,6 +324,22 @@ public class Controllers extends SubsystemBase {
         .axisLessThan(0, -0.50)
         .onTrue(new ClawManualCommand(mClaw, -2))
         .onFalse(new ClawFFCommand(mClaw));
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kClawAimForPickup)
+        .whileTrue(
+            new InstantCommand(
+                () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_BARGE)))
+        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kGoToBarge)
+        .whileTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.BARGE, mElevator),
+                new ClawPIDCommand(ClawConstants.Wrist.Positions.BARGE, mClaw)))
+        .whileFalse(
+            new ParallelCommandGroup(new ElevatorFFCommand(mElevator), new ClawFFCommand(mClaw)));
   }
 
   private void levelToElevator(IntSupplier level) {

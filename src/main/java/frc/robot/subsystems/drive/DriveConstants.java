@@ -98,8 +98,8 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Whole Bot PID
-  public static final double drivebaseDriveKp = 0.58;
-  public static final double drivebaseDriveKd = 0.0;
+  public static final double drivebaseDriveKp = 0.45;
+  public static final double drivebaseDriveKd = 0.01;
 
   public static final double drivebaseThetaKp = 3.0;
   public static final double drivebaseThetaKd = 0.0;

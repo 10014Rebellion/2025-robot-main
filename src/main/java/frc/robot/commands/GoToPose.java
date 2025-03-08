@@ -226,6 +226,16 @@ public class GoToPose extends Command {
               Rotation2d.fromRadians(thetaController.getSetpoint().position))
         });
     Logger.recordOutput("DriveToPose/Goal", new Pose2d[] {targetPose});
+
+    SmartDashboard.putBoolean(
+        "Drive/Within Tolerance",
+        withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(2.5))));
+    SmartDashboard.putBoolean(
+        "Drive/Within Position Tolerance",
+        running && Math.abs(driveErrorAbs) < driveTolerance.getAsDouble());
+    SmartDashboard.putBoolean(
+        "Drive/Within Rotation Tolerance",
+        running && Math.abs(thetaErrorAbs) < thetaTolerance.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
@@ -246,7 +256,7 @@ public class GoToPose extends Command {
   @Override
   public boolean isFinished() {
 
-    return withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(1)));
+    return withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(2.5)));
   }
 
   public boolean atGoal() {

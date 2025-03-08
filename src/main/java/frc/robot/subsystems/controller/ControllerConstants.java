@@ -8,6 +8,7 @@ public class ControllerConstants {
     // Algae
     public static final int kAlgaePickupL2 = 9;
     public static final int kAlgaePickupL3 = 3;
+    public static final int kGoToBarge = 2;
 
     // Intake
     public static final int kSetLeftPose = 4;
@@ -15,7 +16,6 @@ public class ControllerConstants {
 
     // Claw Coral Grabbing
     public static final int kClawAimForPickup = 5;
-    public static final int kClawGrabCoral = 2;
 
     // Coral Scoring
     public static final int kScoreL4 = 6;

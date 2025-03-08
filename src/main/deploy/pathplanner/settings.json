@@ -3,11 +3,17 @@
   "robotLength": 0.965,
   "holonomicMode": true,
   "pathFolders": [
-    "SouthPaths",
-    "Pushing"
+    "PUSH",
+    "SCORE",
+    "STARTING",
+    "TEST"
   ],
   "autoFolders": [
-    "WORKING AUTONS"
+    "NORTH START",
+    "DEBUGGING",
+    "CENTER START",
+    "SOUTH START",
+    "WIP"
   ],
   "defaultMaxVel": 4.0,
   "defaultMaxAccel": 3.0,

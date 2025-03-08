@@ -50,7 +50,7 @@ public class ElevatorConstants {
     BARGE(75),
     L2ALGAE(40),
     L3ALGAE(63),
-    HOLD_ALGAE(6);
+    HOLD_ALGAE(7);
 
     public final double position;
 

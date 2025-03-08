@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 164.32047587758075
+    "rotation": 164.32047587758078
   },
   "reversed": false,
-  "folder": "SouthPaths",
+  "folder": "STARTING",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 178.60281897270363

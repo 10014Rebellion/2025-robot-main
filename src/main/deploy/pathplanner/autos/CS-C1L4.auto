@@ -7,49 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SS-C2"
+            "pathName": "CS-C1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ReadyScoreSubsystemsL2"
+            "name": "ReadyScoreSubsystemsL4"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2-SCORE"
+            "pathName": "C1-SCORE"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C2-PS"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PS-C5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReadyScoreSubsystemsL2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C5-SCORE"
+            "waitTime": 5.0
           }
         },
         {
@@ -62,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "SOUTH START",
+  "folder": "CENTER START",
   "choreoAuto": false
 }

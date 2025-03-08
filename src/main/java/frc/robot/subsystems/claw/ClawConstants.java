@@ -10,7 +10,7 @@ public class ClawConstants {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
-    public static double kEncoderOffset = 68.5; // TODO: TUNE
+    public static double kEncoderOffset = 48.5; // TODO: TUNE
 
     public static int kEncoderOpenPosition = 0; // TODO: Tune
 
@@ -47,7 +47,7 @@ public class ClawConstants {
       INTAKE_ALGAE(3),
       HOLD_ALGAE(0.5),
       OUTTAKE_REEF(-0.5),
-      OUTTAKE_BARGE(-12);
+      OUTTAKE_BARGE(-8);
 
       public final double voltage;
 
@@ -146,10 +146,11 @@ public class ClawConstants {
       L3(45),
       L4(50),
       SCORE(-50),
-      BARGE(50),
+      BARGE(60),
       L2ALGAE(-18),
       L3ALGAE(-12),
-      HOLD_ALGAE(45); // TO DO: redo these values
+      HOLD_ALGAE(7),
+      CLIMB(57); // TO DO: redo these values
 
       public final double position;
 
