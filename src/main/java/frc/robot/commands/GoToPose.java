@@ -53,7 +53,7 @@ public class GoToPose extends Command {
     drivekD.initDefault(DriveConstants.drivebaseDriveKd);
     thetakP.initDefault(DriveConstants.drivebaseThetaKp);
     thetakD.initDefault(DriveConstants.drivebaseThetaKd);
-    driveMaxVelocity.initDefault(2);
+    driveMaxVelocity.initDefault(1.25);
     driveMaxAcceleration.initDefault(2.0);
     thetaMaxVelocity.initDefault(Math.toRadians(360.0));
     thetaMaxAcceleration.initDefault(8.0);
@@ -246,7 +246,7 @@ public class GoToPose extends Command {
   @Override
   public boolean isFinished() {
 
-    return withinTolerance(0.05, new Rotation2d(Units.degreesToRadians(5)));
+    return withinTolerance(0.05, new Rotation2d(Units.degreesToRadians(1)));
   }
 
   public boolean atGoal() {

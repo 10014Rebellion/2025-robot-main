@@ -120,7 +120,7 @@ public class Controllers extends SubsystemBase {
                         () -> mVision.getClosestReefScoringPose(distanceScoring, sideScoring),
                         () -> mDrive.getPose(),
                         mDrive),
-                    new WaitCommand(0.3),
+                    new WaitCommand(0.8),
                     // note: i made the coral eject now idk if this will work (im testing after
                     // school)
                     new ParallelCommandGroup(
