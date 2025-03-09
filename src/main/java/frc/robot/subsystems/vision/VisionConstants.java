@@ -37,8 +37,9 @@ public class VisionConstants {
 
   public enum linearPoseOffsets {
     L4(Units.inchesToMeters(10)),
-    L3(Units.inchesToMeters(5)),
-    L2(Units.inchesToMeters(1));
+    L3(Units.inchesToMeters(3)),
+    L2(Units.inchesToMeters(0.5)),
+    L1(Units.inchesToMeters(0.25));
 
     public final double offset;
 

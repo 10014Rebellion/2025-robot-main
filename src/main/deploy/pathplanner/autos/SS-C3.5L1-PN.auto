@@ -7,61 +7,49 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SS-C2"
+            "pathName": "SS-C3.5"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ReadyScoreSubsystemsL2"
+            "name": "ReadyScoreSubsystemsL1"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "C2-SCORE"
+            "pathName": "C3.5-SCORE"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C2-PS"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PS-C5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReadyScoreSubsystemsL2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C5-SCORE"
+            "waitTime": 0.5
           }
         },
         {
           "type": "named",
           "data": {
             "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C3.5-PS"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "WORKING AUTONS",
   "choreoAuto": false
 }

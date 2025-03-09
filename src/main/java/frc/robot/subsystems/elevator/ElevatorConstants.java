@@ -41,15 +41,15 @@ public class ElevatorConstants {
   public enum Positions {
     BOTTOM(0),
     PREINTAKE(30),
-    POSTINTAKE(13),
+    POSTINTAKE(20),
     L1(20),
-    L2(22.5),
-    L3(44),
+    L2(27.5),
+    L3(45),
     L4(75),
     SCORE(20),
-    BARGE(75),
-    L2ALGAE(40),
-    L3ALGAE(63),
+    BARGE(80),
+    L2ALGAE(44.5),
+    L3ALGAE(67.5),
     HOLD_ALGAE(7);
 
     public final double position;

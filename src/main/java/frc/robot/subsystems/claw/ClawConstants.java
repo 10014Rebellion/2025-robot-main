@@ -47,7 +47,8 @@ public class ClawConstants {
       INTAKE_ALGAE(3),
       HOLD_ALGAE(0.5),
       OUTTAKE_REEF(-0.5),
-      OUTTAKE_BARGE(-8);
+      OUTTAKE_BARGE(-8),
+      EJECT_CORAL(-3);
 
       public final double voltage;
 
@@ -133,7 +134,7 @@ public class ClawConstants {
 
     public static double kS = 0.0;
     public static double kG = 0.21;
-    public static double kV = 2.05;
+    public static double kV = 2.15;
     public static double kA = 0.0;
 
     public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
@@ -142,14 +143,14 @@ public class ClawConstants {
       BOTTOM(0),
       INTAKE(-65),
       L1(20),
-      L2(45),
-      L3(45),
+      L2(50),
+      L3(70),
       L4(50),
       SCORE(-50),
-      BARGE(60),
-      L2ALGAE(-18),
+      BARGE(70),
+      L2ALGAE(-12),
       L3ALGAE(-12),
-      HOLD_ALGAE(7),
+      HOLD_ALGAE(14),
       CLIMB(57); // TO DO: redo these values
 
       public final double position;

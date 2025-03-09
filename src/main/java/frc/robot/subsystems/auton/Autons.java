@@ -1,14 +1,12 @@
 package frc.robot.subsystems.auton;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
@@ -24,6 +22,9 @@ import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
+import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
+import java.util.function.Supplier;
 
 public class Autons {
   private final Drive mDrive;
@@ -34,7 +35,12 @@ public class Autons {
   private final OTBIntake mIntake;
 
   public Autons(
-      Drive pDrive, Vision pVision, Claw pClaw, Elevator pElevator, ElevatorPivot pPivot, OTBIntake pIntake) {
+      Drive pDrive,
+      Vision pVision,
+      Claw pClaw,
+      Elevator pElevator,
+      ElevatorPivot pPivot,
+      OTBIntake pIntake) {
     this.mDrive = pDrive;
     this.mVision = pVision;
     this.mClaw = pClaw;
@@ -55,27 +61,45 @@ public class Autons {
 
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
 
-    // NamedCommands.registerCommand("MoveToPose", GoToPose("C10-SCORE"));
+    NamedCommands.registerCommand("ScoreToPoseC10L2", GoToPose(10, 2));
+    NamedCommands.registerCommand("ScoreToPoseC3L2", GoToPose(3, 2));
+    NamedCommands.registerCommand("ScoreToPoseC10L4", GoToPose(10, 4));
+    NamedCommands.registerCommand("ScoreToPoseC3L4", GoToPose(3, 4));
   }
 
-  // Holy Shit.
-  private SequentialCommandGroup GoToPose(String pathToFollowAfter) {
-    try {
-      PathPlannerPath pathToGoal = PathPlannerPath.fromPathFile(pathToFollowAfter);
+  private SequentialCommandGroup GoToPose(int branch, int level) {
+    Supplier<linearPoseOffsets> horizontalOffset = () -> intToOffsets(level);
+    Supplier<PoseOffsets> awayOffset =
+        () -> ((branch % 2 == 0) ? PoseOffsets.RIGHT : PoseOffsets.LEFT);
 
-      return new SequentialCommandGroup(
-          new InstantCommand(() -> mDrive.stopAllCommands()),
-
-          new GoToPose(
-              () -> mVision.getPoseInFrontOfAprilTag(10, 2), // TODO: UPDATE WHEN USING
-              () -> mDrive.getPose(),
-              mDrive),
-          AutoBuilder.followPath(pathToGoal));
-    } catch (Exception e) {
-      return new SequentialCommandGroup(
-          new InstantCommand(() -> System.out.println("<<FAILED TO FIND GoToPose AUTONS>>")));
-    }
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> mDrive.stop()),
+        new GoToPose(
+            () -> mVision.getClosestReefScoringPose(horizontalOffset, awayOffset),
+            () -> mDrive.getPose(),
+            mDrive),
+        new WaitCommand(0.5),
+        scoreCoral());
   }
+
+  // private SequentialCommandGroup GoToPose(String pathToFollowAfter, int tagID,
+  // double distAway, double distHorizontal) {
+  // try {
+  // PathPlannerPath pathToGoal = PathPlannerPath.fromPathFile(pathToFollowAfter);
+
+  // return new SequentialCommandGroup(
+  // new InstantCommand(() -> mDrive.stopAllCommands()),
+  // new GoToPose(
+  // () -> mVision.getPoseInFrontOfAprilTag(tagID, distAway, distHorizontal),
+  // () -> mDrive.getPose(),
+  // mDrive),
+  // AutoBuilder.followPath(pathToGoal));
+  // } catch (Exception e) {
+  // return new SequentialCommandGroup(
+  // new InstantCommand(() -> System.out.println("<<FAILED TO FIND GoToPose
+  // AUTONS>>")));
+  // }
+  // }
 
   private ParallelCommandGroup activateElevatorWristFF() {
     return new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator));
@@ -137,6 +161,20 @@ public class Autons {
         return ElevatorConstants.Positions.L3;
       default:
         return ElevatorConstants.Positions.L4;
+    }
+  }
+
+  private linearPoseOffsets intToOffsets(int level) {
+    int curLevel = MathUtil.clamp(level, 1, 4);
+    switch (curLevel) {
+      case 1:
+        return linearPoseOffsets.L1;
+      case 2:
+        return linearPoseOffsets.L2;
+      case 3:
+        return linearPoseOffsets.L3;
+      default:
+        return linearPoseOffsets.L4;
     }
   }
 }

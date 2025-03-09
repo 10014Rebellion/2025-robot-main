@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SS-C2"
+            "pathName": "NS-C10"
           }
         },
         {
@@ -17,9 +17,21 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "C2-SCORE"
+            "pathName": "C10-SCORE"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 4.0
           }
         },
         {
@@ -31,37 +43,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C2-PS"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PS-C5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReadyScoreSubsystemsL2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C5-SCORE"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ScoreCoral"
+            "pathName": "C10-PN"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "WORKING AUTONS",
   "choreoAuto": false
 }

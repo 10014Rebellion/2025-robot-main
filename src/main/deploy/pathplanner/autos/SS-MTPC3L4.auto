@@ -23,33 +23,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "C3-SCORE"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C3-PS"
+            "name": "ScoreToPoseC3L4"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "WORKING AUTONS",
+  "folder": "MOVETOPOSEPATHS",
   "choreoAuto": false
 }

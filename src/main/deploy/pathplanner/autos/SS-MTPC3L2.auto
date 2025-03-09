@@ -13,43 +13,25 @@
         {
           "type": "named",
           "data": {
-            "name": "ReadyScoreSubsystemsL4"
+            "name": "ReadyScoreSubsystemsL2"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C3-SCORE"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
+            "waitTime": 0.2
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "C3-PS"
+            "name": "ScoreToPoseC3L2"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "WORKING AUTONS",
+  "folder": "MOVETOPOSEPATHS",
   "choreoAuto": false
 }

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.082073426752363,
-        "y": 2.691181009318999
+        "x": 4.973153649824539,
+        "y": 2.6046013491581363
       },
       "isLocked": false,
       "linkedName": "C3-SCORE-START"
@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 5.0468237704918035,
-        "y": 2.616444672131148
+        "y": 2.6404200819672123
       },
       "prevControl": {
-        "x": 5.165158888206697,
-        "y": 2.3833847308123044
+        "x": 5.267650884830823,
+        "y": 2.503753289146372
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "SCORE",
+  "folder": "SouthPaths",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 121.70142966950579

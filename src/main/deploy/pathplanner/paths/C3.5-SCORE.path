@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.4084016393442615,
-        "y": 2.220850409836065
+        "x": 5.346516393442624,
+        "y": 2.5445184426229503
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.880942622950819,
-        "y": 2.3287397540983603
+        "x": 5.139638156800022,
+        "y": 2.7130702918561203
       },
       "isLocked": false,
-      "linkedName": "SS-GLOBAL"
+      "linkedName": "C3.5-SCORE-START"
     },
     {
       "anchor": {
-        "x": 5.1786885245901635,
-        "y": 2.4606045081967203
+        "x": 5.190676229508196,
+        "y": 2.84421106557377
       },
       "prevControl": {
-        "x": 5.454405737704919,
-        "y": 2.41265368852459
+        "x": 5.3903229887067985,
+        "y": 2.6937412295882965
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C3-SCORE-START"
+      "linkedName": "C3.5-SCORE-END"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 121.70142966950579
+    "rotation": 120.96375653207356
   },
   "reversed": false,
-  "folder": null,
+  "folder": "SouthPaths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 144.32359177813797
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }
