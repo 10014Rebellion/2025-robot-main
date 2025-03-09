@@ -44,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "CENTER START",
+  "folder": null,
   "choreoAuto": false
 }

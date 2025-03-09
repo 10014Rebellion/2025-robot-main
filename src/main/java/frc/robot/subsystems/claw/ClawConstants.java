@@ -48,6 +48,7 @@ public class ClawConstants {
       HOLD_ALGAE(0.5),
       OUTTAKE_REEF(-0.5),
       OUTTAKE_BARGE(-8),
+      OUTTAKE_PROCESSOR(-6),
       EJECT_CORAL(-3);
 
       public final double voltage;

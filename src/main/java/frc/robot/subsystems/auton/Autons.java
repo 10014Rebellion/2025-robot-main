@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
@@ -65,6 +66,42 @@ public class Autons {
     NamedCommands.registerCommand("ScoreToPoseC3L2", GoToPose(3, 2));
     NamedCommands.registerCommand("ScoreToPoseC10L4", GoToPose(10, 4));
     NamedCommands.registerCommand("ScoreToPoseC3L4", GoToPose(3, 4));
+
+    NamedCommands.registerCommand("ReadyAlgaeL3", readyAlgaeL3());
+    NamedCommands.registerCommand("ReadyAlgaeL2", readyAlgaeL2());
+
+    NamedCommands.registerCommand("HoldAlgae", holdAlgae());
+
+    NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
+  }
+
+  private SequentialCommandGroup scoreProcessor() {
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_PROCESSOR)),
+        new WaitCommand(3),
+        new InstantCommand(() -> mClaw.setClaw(0)));
+  }
+
+  private ParallelCommandGroup holdAlgae() {
+    return new ParallelCommandGroup(
+        new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
+        new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
+        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE)));
+  }
+
+  private ParallelCommandGroup readyAlgaeL3() {
+    return new ParallelCommandGroup(
+        new ElevatorPIDCommand(ElevatorConstants.Positions.L3ALGAE, mElevator),
+        new ClawPIDCommand(ClawConstants.Wrist.Positions.L3ALGAE, mClaw),
+        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
+  }
+
+  private ParallelCommandGroup readyAlgaeL2() {
+    return new ParallelCommandGroup(
+        new ElevatorPIDCommand(ElevatorConstants.Positions.L2ALGAE, mElevator),
+        new ClawPIDCommand(ClawConstants.Wrist.Positions.L2ALGAE, mClaw),
+        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
   }
 
   private SequentialCommandGroup GoToPose(int branch, int level) {
