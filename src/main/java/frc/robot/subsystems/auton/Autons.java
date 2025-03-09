@@ -68,6 +68,7 @@ public class Autons {
     NamedCommands.registerCommand("ScoreToPoseC3L4", GoToPose(3, 4));
 
     NamedCommands.registerCommand("ReadyAlgaeL3", readyAlgaeL3());
+    NamedCommands.registerCommand("ReadyAlgaeL2", readyAlgaeL2());
 
     NamedCommands.registerCommand("HoldAlgae", holdAlgae());
 
@@ -93,6 +94,13 @@ public class Autons {
     return new ParallelCommandGroup(
         new ElevatorPIDCommand(ElevatorConstants.Positions.L3ALGAE, mElevator),
         new ClawPIDCommand(ClawConstants.Wrist.Positions.L3ALGAE, mClaw),
+        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
+  }
+
+  private ParallelCommandGroup readyAlgaeL2() {
+    return new ParallelCommandGroup(
+        new ElevatorPIDCommand(ElevatorConstants.Positions.L2ALGAE, mElevator),
+        new ClawPIDCommand(ClawConstants.Wrist.Positions.L2ALGAE, mClaw),
         new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
   }
 
