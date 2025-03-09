@@ -1,10 +1,15 @@
 package frc.robot.subsystems.auton;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawFFCommand;
@@ -18,17 +23,20 @@ import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.intake.autoIntakeCoralCommand;
+import frc.robot.subsystems.vision.Vision;
 
 public class Autons {
   private final Drive mDrive;
+  private final Vision mVision;
   private final Claw mClaw;
   private final Elevator mElevator;
   private final ElevatorPivot mPivot;
   private final OTBIntake mIntake;
 
   public Autons(
-      Drive pDrive, Claw pClaw, Elevator pElevator, ElevatorPivot pPivot, OTBIntake pIntake) {
+      Drive pDrive, Vision pVision, Claw pClaw, Elevator pElevator, ElevatorPivot pPivot, OTBIntake pIntake) {
     this.mDrive = pDrive;
+    this.mVision = pVision;
     this.mClaw = pClaw;
     this.mElevator = pElevator;
     this.mPivot = pPivot;
@@ -46,6 +54,27 @@ public class Autons {
     NamedCommands.registerCommand("HoldElevatorAndWrist", activateElevatorWristFF());
 
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
+
+    // NamedCommands.registerCommand("MoveToPose", GoToPose("C10-SCORE"));
+  }
+
+  // Holy Shit.
+  private SequentialCommandGroup GoToPose(String pathToFollowAfter) {
+    try {
+      PathPlannerPath pathToGoal = PathPlannerPath.fromPathFile(pathToFollowAfter);
+
+      return new SequentialCommandGroup(
+          new InstantCommand(() -> mDrive.stopAllCommands()),
+
+          new GoToPose(
+              () -> mVision.getPoseInFrontOfAprilTag(10, 2), // TODO: UPDATE WHEN USING
+              () -> mDrive.getPose(),
+              mDrive),
+          AutoBuilder.followPath(pathToGoal));
+    } catch (Exception e) {
+      return new SequentialCommandGroup(
+          new InstantCommand(() -> System.out.println("<<FAILED TO FIND GoToPose AUTONS>>")));
+    }
   }
 
   private ParallelCommandGroup activateElevatorWristFF() {
