@@ -50,6 +50,7 @@ public class NewClawPIDCommand extends Command {
     // mPIDController.reset(getMeasurement());
     mPIDController.reset(
         new TrapezoidProfile.State(getMeasurement(), mClawSubsystem.getVelocity()));
+    //mPIDController.setGoal(mSetpoint);
     mFeedforward = new ArmFeedforward(ClawConstants.Wrist.kS, kG, kV, kA);
     System.out.println(
         String.format(
@@ -59,7 +60,9 @@ public class NewClawPIDCommand extends Command {
 
   @Override
   public void execute() {
-    double calculatedFeedforward = mFeedforward.calculate(getMeasurement(), 0); // velocity setpoint
+    double calculatedFeedforward = mFeedforward.calculate(
+        Math.toRadians(mPIDController.getSetpoint().position), 
+        Math.toRadians(mPIDController.getSetpoint().velocity)); // velocity setpoint
 
     double calculatedProfilePID = mPIDController.calculate(getMeasurement(), mSetpoint);
 

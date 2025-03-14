@@ -8,12 +8,10 @@ import frc.robot.subsystems.claw.ClawConstants.Wrist;
 public class NewClawFFCommand extends Command {
   private final tempClaw mClawSubsystem;
   private ArmFeedforward mClawFeedforward;
-  private double pivotPosition;
 
   public NewClawFFCommand(tempClaw pClawSubsystem) {
     this.mClawSubsystem = pClawSubsystem;
     this.mClawFeedforward = new ArmFeedforward(Wrist.kS, Wrist.kG, Wrist.kV, Wrist.kA);
-    this.pivotPosition = SmartDashboard.getNumber("Pivot/Position", 0.0);
     addRequirements(pClawSubsystem);
   }
 
@@ -22,7 +20,7 @@ public class NewClawFFCommand extends Command {
     double kG = SmartDashboard.getNumber("Wrist/Tuning/kG", ClawConstants.Wrist.kG);
     double kV = SmartDashboard.getNumber("Wrist/Tuning/kV", ClawConstants.Wrist.kV);
     double kA = SmartDashboard.getNumber("Wrist/Tuning/kA", ClawConstants.Wrist.kA);
-    mClawFeedforward = new ArmFeedforward(0.0, kG, kV, kA);
+    mClawFeedforward = new ArmFeedforward(ClawConstants.Wrist.kS, kG, kV, kA);
     System.out.println(
         String.format(
             "<<< %s - %s is STARTING :D >>>\n",

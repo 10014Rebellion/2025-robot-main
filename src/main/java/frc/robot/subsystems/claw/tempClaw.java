@@ -92,8 +92,8 @@ public class tempClaw extends SubsystemBase {
                       mAppliedVoltage.mut_replace(
                       mWristSparkFlex.get() * RobotController.getBatteryVoltage(), Volts))
                     .angularPosition(mPositionAngle.mut_replace(getEncoderMeasurement(), Degrees))
-                    .angularVelocity(mVelocityAngle.mut_replace(velocity, DegreesPerSecond));
-              }, this));
+                    .angularVelocity(mVelocityAngle.mut_replace(getVelocity(), DegreesPerSecond));
+          }, this));
   }
 
   public void setWrist(double pVoltage) {
