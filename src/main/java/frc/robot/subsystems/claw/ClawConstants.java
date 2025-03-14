@@ -123,8 +123,8 @@ public class ClawConstants {
     public static double kV = 2.02;
     public static double kA = 0.02;
 
-    public static double kMaxAcceleration = 8850;
-    public static double kMaxVelocity = 1600;
+    public static double kMaxAcceleration = 7000;
+    public static double kMaxVelocity = 1000;
     public static double kTolerance = 1;
 
     public static double kForwardSoftLimit = 90;

@@ -14,10 +14,12 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawManualCommand;
+import frc.robot.subsystems.claw.NewClawFFCommand;
 import frc.robot.subsystems.claw.NewClawPIDCommand;
 import frc.robot.subsystems.claw.tempClaw;
 import frc.robot.subsystems.drive.Drive;
@@ -173,6 +175,10 @@ public class Controllers extends SubsystemBase {
                 new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator)))
         .whileFalse(new ElevatorFFCommand(mElevator));
     driverController
+        .povLeft()
+        .whileTrue(new NewClawFFCommand(mNewClaw))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
+    driverController
         .y()
         .whileTrue(new InstantCommand(() -> mNewClaw.setWrist(2)))
         .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
@@ -193,6 +199,26 @@ public class Controllers extends SubsystemBase {
         .leftBumper()
         .whileTrue(new InstantCommand(() -> mNewClaw.setClaw(-2)))
         .whileFalse(new InstantCommand(() -> mNewClaw.setClaw(0)));
+  }
+
+  public void sysIdBindings() {
+      driverController
+        .a()
+        .and(driverController.rightBumper())
+        .whileTrue(mNewClaw.runQuasistatic(SysIdRoutine.Direction.kReverse));
+      driverController
+        .y()
+        .and(driverController.rightBumper())
+        .whileTrue(mNewClaw.runQuasistatic(SysIdRoutine.Direction.kForward));
+      
+      driverController
+        .x()
+        .and(driverController.rightBumper())
+        .whileTrue(mNewClaw.runDynamic(SysIdRoutine.Direction.kReverse));
+      driverController
+        .b()
+        .and(driverController.rightBumper())
+        .whileTrue(mNewClaw.runQuasistatic(SysIdRoutine.Direction.kForward));
   }
 
   private void levelToElevator(IntSupplier level) {

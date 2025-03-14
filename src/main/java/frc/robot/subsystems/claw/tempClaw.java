@@ -2,12 +2,28 @@ package frc.robot.subsystems.claw;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.claw.ClawConstants.Wrist;
 import frc.robot.util.TunableNumber;
 
@@ -24,6 +40,15 @@ public class tempClaw extends SubsystemBase {
 
   private double previousPosition, previousTime, previousVelocity;
   private double velocity, acceleration;
+
+  private final SysIdRoutine mSysIdRoutine;
+
+  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
+  private final MutVoltage mAppliedVoltage = Volts.mutable(0);
+  // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
+  private final MutAngle mPositionAngle = Degrees.mutable(0);
+  // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
+  private final MutAngularVelocity mVelocityAngle = DegreesPerSecond.mutable(0);
 
   public tempClaw() {
     this.mClawSparkFlex =
@@ -51,6 +76,19 @@ public class tempClaw extends SubsystemBase {
     // wristD.setDefault(0.0);
     // wristV.setDefault(0.0);
     // wristA.setDefault(0.0);
+
+    mSysIdRoutine = new SysIdRoutine(
+          new SysIdRoutine.Config(), 
+          new SysIdRoutine.Mechanism(mWristSparkFlex::setVoltage, log -> {
+                // Record a frame for the left motors.  Since these share an encoder, we consider
+                // the entire group to be one motor.
+                log.motor("wristSparkFlex")
+                    .voltage(
+                      mAppliedVoltage.mut_replace(
+                      mWristSparkFlex.get() * RobotController.getBatteryVoltage(), Volts))
+                    .angularPosition(mPositionAngle.mut_replace(getEncoderMeasurement(), Degrees))
+                    .angularVelocity(mVelocityAngle.mut_replace(velocity, DegreesPerSecond));
+              }, this));
   }
 
   public void setWrist(double pVoltage) {
@@ -93,6 +131,14 @@ public class tempClaw extends SubsystemBase {
     double encoderMeasurement = -(mWristEncoder.get() * 360) + ClawConstants.Wrist.kEncoderOffset;
     if (encoderMeasurement > 180) encoderMeasurement -= 360;
     return encoderMeasurement;
+  }
+
+  public Command runQuasistatic(SysIdRoutine.Direction direction) {
+    return mSysIdRoutine.quasistatic(direction);
+  }
+
+  public Command runDynamic(SysIdRoutine.Direction direction) {
+    return mSysIdRoutine.dynamic(direction);
   }
 
   @Override
