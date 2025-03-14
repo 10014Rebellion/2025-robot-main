@@ -5,12 +5,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.claw.ClawConstants.Setpoints;
 
 public class ClawIntakeCoralCommand extends Command {
-  public final Claw mClawSubsystem;
+  public final ClawSubsystem mClawSubsystem;
   public double mIntakeVolts;
   private boolean hasOpened;
   private boolean hasReachedBack;
 
-  public ClawIntakeCoralCommand(Claw pClawSubsystem) {
+  public ClawIntakeCoralCommand(ClawSubsystem pClawSubsystem) {
     mClawSubsystem = pClawSubsystem;
     mIntakeVolts = Setpoints.INTAKE_CORAL.get();
     hasOpened = false;
@@ -60,13 +60,6 @@ public class ClawIntakeCoralCommand extends Command {
 
   @Override
   public boolean isFinished() {
-    // Ik this looks stupid, its temporary
-    if (hasOpened && !(mClawSubsystem.hasCoral())) {
-      return true;
-    }
-    if (hasOpened && ClawConstants.periodicHasCoral) {
-      return true;
-    }
-    return false;
+    return hasOpened && mClawSubsystem.hasCoral();
   }
 }

@@ -9,17 +9,17 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakeConstants.OTBIntakeConstants;
 
 public class IntakePIDCommand extends Command {
-  private final OTBIntake mIntake;
+  private final IntakeSubsystem mIntake;
   private final PIDController mPIDController;
   private ArmFeedforward mFeedforward;
   private double mSetpoint;
   private boolean IS_TUNING = true;
 
-  public IntakePIDCommand(IntakePositions pSetpoint, OTBIntake pIntakeSubsystem) {
+  public IntakePIDCommand(IntakePositions pSetpoint, IntakeSubsystem pIntakeSubsystem) {
     this(false, pSetpoint.getPos(), pIntakeSubsystem);
   }
 
-  public IntakePIDCommand(boolean isTuning, double pSetpoint, OTBIntake pIntakeSubsystem) {
+  public IntakePIDCommand(boolean isTuning, double pSetpoint, IntakeSubsystem pIntakeSubsystem) {
     this.mIntake = pIntakeSubsystem;
     this.IS_TUNING = isTuning;
 

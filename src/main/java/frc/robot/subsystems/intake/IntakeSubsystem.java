@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.IntakeConstants.OTBIntakeConstants;
 import frc.robot.util.TunableNumber;
 
-public class OTBIntake extends SubsystemBase {
+public class IntakeSubsystem extends SubsystemBase {
   private SparkFlex mRightPivotMotor;
   private SparkFlex mRightRollerMotor;
   private SparkFlex mFunnelMotor;
@@ -22,7 +22,7 @@ public class OTBIntake extends SubsystemBase {
 
   private DutyCycleEncoder mRightPivotEncoder;
 
-  public OTBIntake() {
+  public IntakeSubsystem() {
     this.mRightPivotMotor =
         new SparkFlex(OTBIntakeConstants.kRightPivotID, OTBIntakeConstants.kMotorType);
     this.mRightRollerMotor =

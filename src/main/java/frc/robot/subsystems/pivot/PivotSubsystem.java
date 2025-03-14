@@ -12,12 +12,12 @@ import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.util.TunableNumber;
 
-public class Pivot extends SubsystemBase {
+public class PivotSubsystem extends SubsystemBase {
   private final SparkMax mPivotMotor;
   private final AbsoluteEncoder mPivotEncoder;
   private final TunableNumber kP;
 
-  public Pivot() {
+  public PivotSubsystem() {
     this.mPivotMotor =
         new SparkMax(PivotConstants.kMotorID, PivotConstants.kMotorType);
     this.mPivotEncoder = mPivotMotor.getAbsoluteEncoder();

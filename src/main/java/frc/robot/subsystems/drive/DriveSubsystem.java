@@ -41,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase {
+public class DriveSubsystem extends SubsystemBase {
   public double mDriveSpeedMultiplier = kHighSpeedTrans;
   public double mRotationSpeedMultiplier = kHighSpeedRot;
   static final Lock odometryLock = new ReentrantLock();
@@ -60,7 +60,6 @@ public class Drive extends SubsystemBase {
 
   // Pathplanner and Choreo
   public static RobotConfig robotConfig;
-  private final SwerveSetpointGenerator setpointGenerator;
   // private SwerveSetpoint lastSetpoint =
   // new SwerveSetpoint(new ChassisSpeeds(), zeroStates(),
   // DriveFeedforwards.zeros(4));
@@ -75,7 +74,7 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
-  public Drive(
+  public DriveSubsystem(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
@@ -94,14 +93,6 @@ public class Drive extends SubsystemBase {
     SparkOdometryThread.getInstance().start();
 
     robotConfig = DriveConstants.ppConfig;
-
-    setpointGenerator =
-        new SwerveSetpointGenerator(
-            robotConfig, // The robot configuration. This is the same config for pathplanner as well
-            DriveConstants
-                .kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per
-            // second.
-            );
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(

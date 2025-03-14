@@ -5,19 +5,19 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawPIDCommand;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakePIDCommand;
-import frc.robot.subsystems.intake.OTBIntake;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 
 public class IntakeCoral extends SequentialCommandGroup {
-  public IntakeCoral(Elevator elevator, Claw claw, OTBIntake intake) {
+  public IntakeCoral(ElevatorSubsystem elevator, ClawSubsystem claw, IntakeSubsystem intake) {
     addCommands(
         new ParallelDeadlineGroup(
             new autoIntakeCoralCommand(intake),

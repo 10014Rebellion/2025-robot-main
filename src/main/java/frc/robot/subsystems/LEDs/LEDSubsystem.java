@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LEDs.LEDConstants.RGBLEDColor;
 import frc.robot.subsystems.claw.ClawConstants;
 
-public class LEDInterface extends SubsystemBase {
+public class LEDSubsystem extends SubsystemBase {
 
   private final AddressableLED led;
   private final AddressableLEDBuffer ledBuffer;
@@ -26,7 +26,7 @@ public class LEDInterface extends SubsystemBase {
 
   private boolean instantTransition;
 
-  public LEDInterface() {
+  public LEDSubsystem() {
     led = new AddressableLED(0);
     ledBuffer = new AddressableLEDBuffer(1000); // Update this with the correct lenth later
 

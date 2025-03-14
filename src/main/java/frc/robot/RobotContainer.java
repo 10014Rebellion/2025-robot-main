@@ -4,22 +4,25 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.LEDs.LEDInterface;
-import frc.robot.subsystems.auton.Autons;
-import frc.robot.subsystems.claw.Claw;
-import frc.robot.subsystems.controls.Controllers;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.LEDs.LEDSubsystem;
+import frc.robot.subsystems.auton.AutonSubsystem;
+import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.controls.ControlsSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.intake.OTBIntake;
-import frc.robot.subsystems.pivot.ElevatorPivot;
-import frc.robot.subsystems.sensors.Beambreak;
-import frc.robot.subsystems.telemetry.Telemetry;
-import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
+import frc.robot.subsystems.sensors.BeambreakSubsystem;
+import frc.robot.subsystems.telemetry.TelemetrySubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.wrist.WristSubsystem;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -32,35 +35,36 @@ public class RobotContainer {
   // Axes Multipler
 
   // Subsystems
-  private final Drive drive;
-  private final Claw claw;
-  private final Vision vision;
-  private final Elevator elevator;
-  private final ElevatorPivot pivot;
-  private final Controllers controllers;
-  private final Beambreak beambreak;
-  private final Telemetry telemetry;
-  private final OTBIntake intake;
-  private final LEDInterface LEDs;
-  private final Autons autons;
+  private final DriveSubsystem drive;
+  private final ClawSubsystem claw;
+  private final WristSubsystem wrist;
+  private final VisionSubsystem vision;
+  private final ElevatorSubsystem elevator;
+  private final PivotSubsystem pivot;
+  private final ControlsSubsystem controls;
+  private final BeambreakSubsystem beambreak;
+  private final TelemetrySubsystem telemetry;
+  private final IntakeSubsystem intake;
+  private final LEDSubsystem LEDs;
+  private final AutonSubsystem autons;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
-    claw = new Claw();
-    elevator = new Elevator();
-    telemetry = new Telemetry();
-    intake = new OTBIntake();
-    pivot = new ElevatorPivot();
-    beambreak = new Beambreak();
-    LEDs = new LEDInterface();
+    claw = new ClawSubsystem();
+    wrist = new WristSubsystem();
+    elevator = new ElevatorSubsystem();
+    telemetry = new TelemetrySubsystem();
+    intake = new IntakeSubsystem();
+    pivot = new PivotSubsystem();
+    beambreak = new BeambreakSubsystem();
+    LEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
-        // Real robot, instantiate hardware IO implementations
         drive =
-            new Drive(
+            new DriveSubsystem(
                 new GyroIOPigeon2(),
                 new ModuleIOSpark(0),
                 new ModuleIOSpark(1),
@@ -69,9 +73,8 @@ public class RobotContainer {
         break;
 
       case SIM:
-        // Sim robot, instantiate physics sim IO implementations
         drive =
-            new Drive(
+            new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIOSim(),
                 new ModuleIOSim(),
@@ -80,9 +83,8 @@ public class RobotContainer {
         break;
 
       default:
-        // Replayed robot, disable IO implementations
         drive =
-            new Drive(
+            new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
@@ -91,9 +93,9 @@ public class RobotContainer {
         break;
     }
 
-    vision = new Vision(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
-    controllers = new Controllers(drive, vision, elevator, pivot, intake, claw);
-    autons = new Autons(drive, vision, claw, elevator, pivot, intake);
+    vision = new VisionSubsystem(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
+    controls = new ControlsSubsystem(drive, vision, elevator, pivot, intake, claw);
+    autons = new AutonSubsystem(drive, wrist, vision, claw, elevator, pivot, intake);
     autons.configureNamedCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -118,8 +120,8 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    controllers.initDriverController();
-    controllers.initOperatorButtonboard();
+    controls.initDriverController();
+    controls.initOperatorButtonboard();
   }
 
   public Command getAutonomousCommand() {

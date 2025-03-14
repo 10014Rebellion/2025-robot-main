@@ -9,12 +9,12 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.intake.IntakeConstants.OTBIntakeConstants;
 
 public class autoIntakeCoralCommand extends Command {
-  private final OTBIntake mIntake;
+  private final IntakeSubsystem mIntake;
   private final PIDController mPIDController;
   private ArmFeedforward mFeedforward;
   private double mSetpoint;
 
-  public autoIntakeCoralCommand(OTBIntake intakeSubsytem) {
+  public autoIntakeCoralCommand(IntakeSubsystem intakeSubsytem) {
     this.mIntake = intakeSubsytem;
     this.mPIDController = new PIDController(OTBIntakeConstants.kP, 0.0, OTBIntakeConstants.kD);
     this.mPIDController.setTolerance(OTBIntakeConstants.kTolerance);

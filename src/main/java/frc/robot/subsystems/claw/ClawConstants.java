@@ -6,40 +6,38 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ClawConstants {
 
-    public static int kLeftClawID = 43;
-    public static int kRightClawID = 44;
-    public static int kEncoderDIOPort = 1;
-    public static double kEncoderOffset = 48.5; // TODO: TUNE
+    public static final int kLeftClawID = 43;
+    public static final int kRightClawID = 44;
+    public static final int kEncoderDIOPort = 1;
+    public static final double kEncoderOffset = 48.5; // TODO: TUNE
 
-    public static int kEncoderOpenPosition = 0; // TODO: Tune
+    public static final int kEncoderOpenPosition = 0; // TODO: Tune
 
-    public static MotorType kMotorType = MotorType.kBrushless;
-    public static IdleMode kIdleMode = IdleMode.kBrake;
-    public static int kCurrentLimit = 80;
-    public static double kP = 0.01; // TODO: Configure me!
-    public static double kD = 0.0; // TODO: Configure me!
-    public static double kVelocityFF = 0.0; // TODO: Configure me!
+    public static final MotorType kMotorType = MotorType.kBrushless;
+    public static final IdleMode kIdleMode = IdleMode.kBrake;
+    public static final int kCurrentLimit = 80;
+    public static final double kP = 0.01; // TODO: Configure me!
+    public static final double kD = 0.0; // TODO: Configure me!
+    public static final double kVelocityFF = 0.0; // TODO: Configure me!
 
-    public static double kMaxAcceleration = 1000;
-    public static double kMaxVelocity = 10000;
-    public static double kTolerance = 1;
+    public static final double kMaxAcceleration = 1000;
+    public static final double kMaxVelocity = 10000;
+    public static final double kTolerance = 1;
 
-    public static double kForwardSoftLimit = 10014;
-    public static double kReverseSoftLimit = 0;
+    public static final double kForwardSoftLimit = 10014;
+    public static final double kReverseSoftLimit = 0;
 
-    public static double kEncoderOffsetRev = 0.18528; // In revolutions
+    public static final double kEncoderOffsetRev = 0.18528; // In revolutions
 
-    public static double kGearRatio = 1.6 / 1;
+    public static final double kGearRatio = 1.6 / 1;
 
-    public static double kPositionConversionFactor =
+    public static final double kPositionConversionFactor =
         kGearRatio
             * 360.0; // (Drum Circumference * Final Gear Ratio) / One Encoder Revolution (if its 1:1
     // with motor shaft)  // TODO: Configure me!
-    public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+    public static final double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
     public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
-    public static boolean hasCoral = true;
-    public static boolean periodicHasCoral = false;
 
     public enum Setpoints {
       INTAKE_CORAL(1),

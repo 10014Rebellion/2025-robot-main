@@ -2,7 +2,7 @@ package frc.robot.subsystems.controls;
 
 import edu.wpi.first.wpilibj.GenericHID;
 
-public class ControllerConstants {
+public class ControlsConstants {
   public static class Buttonboard {
     public static final GenericHID buttonboard = new GenericHID(1);
     // Algae

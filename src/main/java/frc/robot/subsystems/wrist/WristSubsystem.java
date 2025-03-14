@@ -13,10 +13,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
@@ -35,17 +34,16 @@ public class WristSubsystem extends SubsystemBase {
   public WristSubsystem() {
     this.mWristSparkMax = new SparkMax(WristConstants.kMotorID, WristConstants.kMotorType);
     this.mWristEncoder = mWristSparkMax.getAbsoluteEncoder();
-    this.mWristProfiledPID = new ProfiledPIDController(WristConstants.kP, 0, WristConstants.kD, new Constraints(WristConstants.kMaxVelocity, WristConstants.kMaxAcceleration));
+    this.mWristProfiledPID = new ProfiledPIDController(WristConstants.kP, 0, WristConstants.kD,
+        new Constraints(WristConstants.kMaxVelocity, WristConstants.kMaxAcceleration));
     this.mWristFF = new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV, WristConstants.kA);
     this.mCurrentController = Controllers.Manual;
     this.mWristSetpoint = 0;
 
-    mWristSparkMax.configure(
+    this.mWristSparkMax.configure(
         WristConstants.kWristConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-  }
 
-  public void setTriggers() {
-    new Trigger(() -> isPIDAtGoal()).onTrue(null);
+    this.setDefaultCommand(enableFFCmd());
   }
 
   // TODO: IMPLEMENT THE PIVOT OFFSET ON HERE
@@ -55,38 +53,35 @@ public class WristSubsystem extends SubsystemBase {
     }, () -> {
       double calculatedOutput = mWristFF.calculate(getEncReading(), 0);
       setVolts(calculatedOutput);
-    }, (interrupted) -> {
-      setVolts(0);
-    }, () -> isPIDAtGoal(), this);
+    }, (interrupted) -> setVolts(0),
+        () -> false,
+        this);
   }
 
   public boolean isPIDAtGoal() {
-    return mWristProfiledPID.atGoal();
+    return mCurrentController.equals(Controllers.ProfiledPID) && mWristProfiledPID.atGoal();
   }
 
   // TODO: IMPLEMENT THE PIVOT OFFSET ON HERE
-  public FunctionalCommand setPIDCmd(WristConstants.Setpoints setpoint) {
+  public FunctionalCommand setPIDCmd(WristConstants.Setpoints pSetpoint) {
     return new FunctionalCommand(() -> {
       mCurrentController = Controllers.ProfiledPID;
-      mWristProfiledPID.setGoal(setpoint.getPos());
+      mWristProfiledPID.setGoal(pSetpoint.getPos());
     }, () -> {
       double encoderReading = getEncReading();
       double calculatedPID = mWristFF.calculate(encoderReading, 0.0);
       double calculatedFF = mWristProfiledPID.calculate(encoderReading);
-      double calculatedOutput = calculatedPID + calculatedFF;
-
-      setVolts(calculatedOutput);
-    }, (interrupted) -> {
-      setVolts(0);
-    }, () -> isPIDAtGoal(), this);
+      setVolts(calculatedPID + calculatedFF);
+    }, (interrupted) -> setVolts(0),
+        () -> isPIDAtGoal(),
+        this);
   }
 
-  public void setVoltsCmd(double pVoltage) {
-    new FunctionalCommand(() -> {
+  public InstantCommand setVoltsCmd(double pVoltage) {
+    return new InstantCommand(() -> {
       mCurrentController = Controllers.Manual;
-    }, () -> {
       setVolts(pVoltage);
-    }, (interrupted) -> {}, () -> false, this);
+    });
   }
 
   public void setVolts(double pVoltage) {

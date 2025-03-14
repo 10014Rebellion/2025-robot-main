@@ -10,6 +10,7 @@ public class ElevatorConstants {
   public static int kMotorID = 41;
   public static MotorType kMotorType = MotorType.kBrushless;
   public static IdleMode kIdleMode = IdleMode.kBrake;
+  public static boolean kInverted = true;
   public static int kCurrentLimit = 80;
   public static double kP = 1.5; // TODO: Configure me!
   public static double kI = 0.0;
@@ -38,7 +39,7 @@ public class ElevatorConstants {
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
 
-  public enum Positions {
+  public enum Setpoints {
     BOTTOM(0),
     PREINTAKE(30),
     POSTINTAKE(16),
@@ -52,36 +53,26 @@ public class ElevatorConstants {
     L3ALGAE(67.5),
     HOLD_ALGAE(7);
 
-    public final double position;
+    public final double setpoint;
 
-    private Positions(double position) {
-      this.position = position;
+    private Setpoints(double setpoint) {
+      this.setpoint = setpoint;
     }
 
     public double getPos() {
-      return this.position;
+      return this.setpoint;
     }
   };
 
   static {
-    kElevatorConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
+    kElevatorConfig
+      .idleMode(kIdleMode)
+      .smartCurrentLimit(kCurrentLimit)
+      .inverted(kInverted);
 
     kElevatorConfig
         .encoder
         .positionConversionFactor(kPositionConversionFactor)
         .velocityConversionFactor(kVelocityConversionFactor);
-
-    kElevatorConfig
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pidf(kP, 0.0, kD, kVelocityFF)
-        .outputRange(-1, 1);
-
-    kElevatorConfig
-        .closedLoop
-        .maxMotion
-        .maxVelocity(kMaxVelocity)
-        .maxAcceleration(kMaxAcceleration)
-        .allowedClosedLoopError(kTolerance);
   }
 }

@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.TunableNumber;
 
-public class Claw extends SubsystemBase {
+public class ClawSubsystem extends SubsystemBase {
   private final SparkFlex mLeftClawSparkMax;
   private final SparkFlex mRightClawSparkMax;
 
   private final DutyCycleEncoder mClawEncoder;
 
-  public Claw() {
+  public ClawSubsystem() {
     this.mLeftClawSparkMax =
         new SparkFlex(ClawConstants.kLeftClawID, ClawConstants.kMotorType);
     this.mRightClawSparkMax =
@@ -72,6 +72,5 @@ public class Claw extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Claw/Open Value", getClaw());
     SmartDashboard.putBoolean("Claw/Periodic Has Coral", hasCoral());
-    ClawConstants.periodicHasCoral = hasCoral();
   }
 }

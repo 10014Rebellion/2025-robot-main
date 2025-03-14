@@ -7,17 +7,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.pivot.PivotConstants.Positions;
 
 public class PivotPIDCommand extends Command {
-  private final Pivot mPivot;
+  private final PivotSubsystem mPivot;
   private final PIDController mPIDController;
   private double mSetpoint;
   private boolean IS_TUNING = true;
 
-  public PivotPIDCommand(Positions pSetpoint, Pivot pPivotSubsystem) {
+  public PivotPIDCommand(Positions pSetpoint, PivotSubsystem pPivotSubsystem) {
     this(false, pSetpoint.getPos(), pPivotSubsystem);
   }
 
   public PivotPIDCommand(
-      boolean isTuning, double pSetpoint, Pivot pPivotSubsystem) {
+      boolean isTuning, double pSetpoint, PivotSubsystem pPivotSubsystem) {
     this.mPivot = pPivotSubsystem;
     this.IS_TUNING = isTuning;
 

@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class IntakeFFCommand extends Command {
 
-  private final OTBIntake mIntake;
+  private final IntakeSubsystem mIntake;
   private ArmFeedforward mIntakeFeedforward;
   private double pivotPosition;
 
-  public IntakeFFCommand(OTBIntake pIntakeSubsystem) {
+  public IntakeFFCommand(IntakeSubsystem pIntakeSubsystem) {
     this.mIntake = pIntakeSubsystem;
     this.mIntakeFeedforward = new ArmFeedforward(0.0, IntakeConstants.OTBIntakeConstants.kG, 0.0);
     this.pivotPosition = SmartDashboard.getNumber("Pivot/Position", 0.0);

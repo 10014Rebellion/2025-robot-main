@@ -9,14 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.sensors.Potentiometer;
 
-public class Telemetry extends SubsystemBase {
+public class TelemetrySubsystem extends SubsystemBase {
 
   HttpCamera frontRight =
       new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1182/stream.mjpg");
   HttpCamera frontLeft =
       new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1184/stream.mjpg");
 
-  public Telemetry() {}
+  public TelemetrySubsystem() {}
 
   @Override
   public void periodic() {

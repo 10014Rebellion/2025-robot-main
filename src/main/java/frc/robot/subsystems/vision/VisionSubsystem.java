@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.util.MiscUtils;
@@ -23,10 +23,10 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class Vision extends SubsystemBase {
+public class VisionSubsystem extends SubsystemBase {
   private List<PoseCamera> mCameraList;
   private List<PhotonPipelineResult> results;
-  private final Drive mDriveSubsystem;
+  private final DriveSubsystem mDriveSubsystem;
 
   private void initCameraList() {
     List<PoseCamera> poseCameras = new ArrayList<>();
@@ -51,8 +51,8 @@ public class Vision extends SubsystemBase {
     mCameraList = poseCameras;
   }
 
-  public Vision(
-      Drive pDriveSubsystem,
+  public VisionSubsystem(
+      DriveSubsystem pDriveSubsystem,
       Supplier<Rotation2d> gyroRotation,
       Supplier<SwerveModulePosition[]> swerveModulePositions) {
     initCameraList();

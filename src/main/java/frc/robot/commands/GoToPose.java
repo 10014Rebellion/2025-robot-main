@@ -14,7 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
@@ -68,7 +68,7 @@ public class GoToPose extends Command {
 
   private final Supplier<Pose2d> mTargetPose;
   private Supplier<Pose2d> robot;
-  private final Drive mDriveSubsystem;
+  private final DriveSubsystem mDriveSubsystem;
   private Translation2d lastSetpointTranslation = new Translation2d();
 
   private double driveErrorAbs = 0.0;
@@ -81,7 +81,7 @@ public class GoToPose extends Command {
       new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
 
   public GoToPose(
-      Supplier<Pose2d> pTargetPose, Supplier<Pose2d> pCurrentPoseSupplier, Drive pDriveSubsystem) {
+      Supplier<Pose2d> pTargetPose, Supplier<Pose2d> pCurrentPoseSupplier, DriveSubsystem pDriveSubsystem) {
     this.mTargetPose = pTargetPose;
     this.mCurrentPoseSupplier = pCurrentPoseSupplier;
     this.mDriveSubsystem = pDriveSubsystem;

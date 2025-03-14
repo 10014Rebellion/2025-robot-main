@@ -8,10 +8,11 @@ public class WristConstants {
     public static int kMotorID = 42;
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
+    public static boolean kInverted = false;
+
     public static int kCurrentLimit = 80;
     public static double kP = 0.12;
     public static double kD = 0.0;
-    public static double kVelocityFF = 0.0;
 
     public static double kMaxAcceleration = 100;
     public static double kMaxVelocity = 100;
@@ -61,7 +62,8 @@ public class WristConstants {
     static {
         kWristConfig
                 .idleMode(kIdleMode)
-                .smartCurrentLimit(kCurrentLimit);
+                .smartCurrentLimit(kCurrentLimit)
+                .inverted(kInverted);
 
         kWristConfig.absoluteEncoder
                 .positionConversionFactor(kPositionConversionFactor)
