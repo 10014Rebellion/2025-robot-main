@@ -10,21 +10,24 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
+import frc.robot.subsystems.claw.ClawConstants.Setpoints;
 import frc.robot.subsystems.claw.ClawFFCommand;
 import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
-import frc.robot.subsystems.claw.ClawPIDCommand;
+import frc.robot.subsystems.claw.WristPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
-import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.intake.autoIntakeCoralCommand;
+import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
+import frc.robot.subsystems.wrist.WristConstants;
+import frc.robot.subsystems.wrist.WristSubsystem;
+
 import java.util.function.Supplier;
 
 public class Autons {
@@ -32,17 +35,20 @@ public class Autons {
   private final Vision mVision;
   private final Claw mClaw;
   private final Elevator mElevator;
-  private final ElevatorPivot mPivot;
+  private final Pivot mPivot;
   private final OTBIntake mIntake;
+  private final WristSubsystem mWrist;
 
   public Autons(
       Drive pDrive,
+      WristSubsystem pWrist,
       Vision pVision,
       Claw pClaw,
       Elevator pElevator,
-      ElevatorPivot pPivot,
+      Pivot pPivot,
       OTBIntake pIntake) {
     this.mDrive = pDrive;
+    this.mWrist = pWrist;
     this.mVision = pVision;
     this.mClaw = pClaw;
     this.mElevator = pElevator;
@@ -78,7 +84,7 @@ public class Autons {
   private SequentialCommandGroup scoreProcessor() {
     return new SequentialCommandGroup(
         new InstantCommand(
-            () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_PROCESSOR)),
+            () -> mClaw.setClaw(ClawConstants.Setpoints.OUTTAKE_PROCESSOR)),
         new WaitCommand(3),
         new InstantCommand(() -> mClaw.setClaw(0)));
   }
@@ -86,22 +92,22 @@ public class Autons {
   private ParallelCommandGroup holdAlgae() {
     return new ParallelCommandGroup(
         new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
-        new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
-        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE)));
+        new WristPIDCommand(WristConstants.Setpoints.HOLD_ALGAE, mWrist),
+        new InstantCommand(() -> mClaw.setClaw(Setpoints.HOLD_ALGAE)));
   }
 
   private ParallelCommandGroup readyAlgaeL3() {
     return new ParallelCommandGroup(
         new ElevatorPIDCommand(ElevatorConstants.Positions.L3ALGAE, mElevator),
-        new ClawPIDCommand(ClawConstants.Wrist.Positions.L3ALGAE, mClaw),
-        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
+        new WristPIDCommand(WristConstants.Setpoints.L3ALGAE, mWrist),
+        new InstantCommand(() -> mClaw.setClaw(Setpoints.INTAKE_ALGAE)));
   }
 
   private ParallelCommandGroup readyAlgaeL2() {
     return new ParallelCommandGroup(
         new ElevatorPIDCommand(ElevatorConstants.Positions.L2ALGAE, mElevator),
-        new ClawPIDCommand(ClawConstants.Wrist.Positions.L2ALGAE, mClaw),
-        new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE)));
+        new WristPIDCommand(WristConstants.Setpoints.L2ALGAE, mWrist),
+        new InstantCommand(() -> mClaw.setClaw(Setpoints.INTAKE_ALGAE)));
   }
 
   private SequentialCommandGroup GoToPose(int branch, int level) {
@@ -144,16 +150,16 @@ public class Autons {
 
   private SequentialCommandGroup readyScoreSubsystems(int level) {
     return new SequentialCommandGroup(
-        new ClawPIDCommand(intToWristPos(level), mClaw),
+        new WristPIDCommand(intToWristPos(level), mClaw),
         new ElevatorPIDCommand(intToElevatorPos(level), mElevator));
   }
 
   private SequentialCommandGroup scoreCoral() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
-            new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
+            new WristPIDCommand(WristConstants.Setpoints.SCORE, mWrist),
             new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator)),
-        new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw));
+        new WristPIDCommand(WristConstants.Setpoints.INTAKE, mWrist));
   }
 
   private SequentialCommandGroup intakeCoral() {
@@ -162,28 +168,28 @@ public class Autons {
             new autoIntakeCoralCommand(mIntake),
             new SequentialCommandGroup(
                 new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))),
+                new WristPIDCommand(WristConstants.Setpoints.INTAKE, mWrist))),
         new SequentialCommandGroup(
             new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
-            new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
+            new WristPIDCommand(WristConstants.Setpoints.INTAKE, mWrist)),
         new ParallelCommandGroup(
             new ClawIntakeCoralCommand(mClaw),
             new SequentialCommandGroup(
                 new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))));
+                new WristPIDCommand(WristConstants.Setpoints.INTAKE, mWrist))));
   }
 
-  private ClawConstants.Wrist.Positions intToWristPos(int level) {
+  private WristConstants.Setpoints intToWristPos(int level) {
     int curLevel = MathUtil.clamp(level, 1, 4);
     switch (curLevel) {
       case 1:
-        return ClawConstants.Wrist.Positions.L1;
+        return WristConstants.Setpoints.L1;
       case 2:
-        return ClawConstants.Wrist.Positions.L2;
+        return WristConstants.Setpoints.L2;
       case 3:
-        return ClawConstants.Wrist.Positions.L3;
+        return WristConstants.Setpoints.L3;
       default:
-        return ClawConstants.Wrist.Positions.L4;
+        return WristConstants.Setpoints.L4;
     }
   }
 

@@ -2,7 +2,7 @@ package frc.robot.subsystems.claw;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
+import frc.robot.subsystems.claw.ClawConstants.Setpoints;
 
 public class ClawIntakeCoralCommand extends Command {
   public final Claw mClawSubsystem;
@@ -12,7 +12,7 @@ public class ClawIntakeCoralCommand extends Command {
 
   public ClawIntakeCoralCommand(Claw pClawSubsystem) {
     mClawSubsystem = pClawSubsystem;
-    mIntakeVolts = ClawRollerVolt.INTAKE_CORAL.get();
+    mIntakeVolts = Setpoints.INTAKE_CORAL.get();
     hasOpened = false;
     hasReachedBack = false;
   }
@@ -21,7 +21,7 @@ public class ClawIntakeCoralCommand extends Command {
   public void initialize() {
     hasOpened = false;
     hasReachedBack = false;
-    mIntakeVolts = ClawRollerVolt.INTAKE_CORAL.get();
+    mIntakeVolts = Setpoints.INTAKE_CORAL.get();
     // if (mClawSubsystem.getClaw() > 20
     //     && mClawSubsystem.getClaw() < ClawConstants.Claw.ClawOpenPositions.HAS_CORAL.get()) {
     //   hasOpened = true;
@@ -39,7 +39,7 @@ public class ClawIntakeCoralCommand extends Command {
       hasOpened = true;
     }
 
-    if (mClawSubsystem.getClaw() > ClawConstants.Claw.ClawOpenPositions.MAX.get()
+    if (mClawSubsystem.getClaw() > ClawConstants.ClawOpenPositions.MAX.get()
         && !hasReachedBack) {
       hasReachedBack = true;
       mIntakeVolts = -mIntakeVolts / 2;
@@ -60,12 +60,13 @@ public class ClawIntakeCoralCommand extends Command {
 
   @Override
   public boolean isFinished() {
+    // Ik this looks stupid, its temporary
     if (hasOpened && !(mClawSubsystem.hasCoral())) {
-      ClawConstants.Claw.hasCoral = true;
+      return true;
     }
-    if (hasOpened && ClawConstants.Claw.periodicHasCoral) {
-      ClawConstants.Claw.hasCoral = true;
+    if (hasOpened && ClawConstants.periodicHasCoral) {
+      return true;
     }
-    return (ClawConstants.Claw.hasCoral);
+    return false;
   }
 }

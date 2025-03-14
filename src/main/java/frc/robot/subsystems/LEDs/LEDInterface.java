@@ -172,16 +172,16 @@ public class LEDInterface extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (SmartDashboard.getBoolean("Left Hang Beam", false)
-        && SmartDashboard.getBoolean("Right Hang Beam", false)) {
-      setColor(10);
-    } else if (ClawConstants.Claw.hasCoral) {
-      setColor(20);
-    } else setColor(60);
+    // if (SmartDashboard.getBoolean("Left Hang Beam", false)
+    //     && SmartDashboard.getBoolean("Right Hang Beam", false)) {
+    //   setColor(10);
+    // } else if (ClawConstants.Claw.hasCoral) {
+    //   setColor(20);
+    // } else setColor(60);
 
     // rainbowUnicornVomit();
     // transitionRGB();
-    led.setData(ledBuffer);
+    // led.setData(ledBuffer);
     /*SmartDashboard.putNumber("Current R Color", finalRGB[0]);
     SmartDashboard.putNumber("Current G Color", finalRGB[1]);
     SmartDashboard.putNumber("Current B Color", finalRGB[2]);*/

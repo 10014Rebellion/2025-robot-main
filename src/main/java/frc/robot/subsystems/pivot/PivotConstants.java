@@ -1,10 +1,10 @@
-package frc.robot.subsystems.elevatorPivot;
+package frc.robot.subsystems.pivot;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-public class ElevatorPivotConstants {
+public class PivotConstants {
   public static int kMotorID = 45;
   public static int kCurrentLimit = 20;
   public static MotorType kMotorType = MotorType.kBrushed;

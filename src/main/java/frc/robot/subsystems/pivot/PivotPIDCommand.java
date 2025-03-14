@@ -1,29 +1,29 @@
-package frc.robot.subsystems.elevatorPivot;
+package frc.robot.subsystems.pivot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.elevatorPivot.ElevatorPivotConstants.Positions;
+import frc.robot.subsystems.pivot.PivotConstants.Positions;
 
-public class ElevatorPivotPIDCommand extends Command {
-  private final ElevatorPivot mPivot;
+public class PivotPIDCommand extends Command {
+  private final Pivot mPivot;
   private final PIDController mPIDController;
   private double mSetpoint;
   private boolean IS_TUNING = true;
 
-  public ElevatorPivotPIDCommand(Positions pSetpoint, ElevatorPivot pElevatorPivotSubsystem) {
-    this(false, pSetpoint.getPos(), pElevatorPivotSubsystem);
+  public PivotPIDCommand(Positions pSetpoint, Pivot pPivotSubsystem) {
+    this(false, pSetpoint.getPos(), pPivotSubsystem);
   }
 
-  public ElevatorPivotPIDCommand(
-      boolean isTuning, double pSetpoint, ElevatorPivot pElevatorPivotSubsystem) {
-    this.mPivot = pElevatorPivotSubsystem;
+  public PivotPIDCommand(
+      boolean isTuning, double pSetpoint, Pivot pPivotSubsystem) {
+    this.mPivot = pPivotSubsystem;
     this.IS_TUNING = isTuning;
 
     this.mPIDController =
-        new PIDController(ElevatorPivotConstants.kP, 0.0, ElevatorPivotConstants.kD);
-    this.mPIDController.setTolerance(ElevatorPivotConstants.kTolerance);
+        new PIDController(PivotConstants.kP, 0.0, PivotConstants.kD);
+    this.mPIDController.setTolerance(PivotConstants.kTolerance);
 
     if (IS_TUNING) {
       this.mSetpoint = SmartDashboard.getNumber("TunableNumbers/Pivot/Setpoint", 0);
@@ -35,17 +35,17 @@ public class ElevatorPivotPIDCommand extends Command {
       this.mSetpoint =
           MathUtil.clamp(
               pSetpoint,
-              ElevatorPivotConstants.kReverseSoftLimit,
-              ElevatorPivotConstants.kForwardSoftLimit);
+              PivotConstants.kReverseSoftLimit,
+              PivotConstants.kForwardSoftLimit);
     }
 
-    addRequirements(pElevatorPivotSubsystem);
+    addRequirements(pPivotSubsystem);
   }
 
   @Override
   public void initialize() {
     double kP = SmartDashboard.getNumber("TunableNumbers/Pivot/kP", 0);
-    mPIDController.setPID(kP, 0, ElevatorPivotConstants.kD);
+    mPIDController.setPID(kP, 0, PivotConstants.kD);
     mPIDController.reset();
     System.out.println(
         String.format(

@@ -6,7 +6,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ClawConstants {
 
-  public static class Claw {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
     public static int kEncoderDIOPort = 1;
@@ -42,7 +41,7 @@ public class ClawConstants {
     public static boolean hasCoral = true;
     public static boolean periodicHasCoral = false;
 
-    public enum ClawRollerVolt {
+    public enum Setpoints {
       INTAKE_CORAL(1),
       INTAKE_ALGAE(3),
       HOLD_ALGAE(0.5),
@@ -51,14 +50,14 @@ public class ClawConstants {
       OUTTAKE_PROCESSOR(-6),
       EJECT_CORAL(-3);
 
-      public final double voltage;
+      public final double setpointVolts;
 
-      private ClawRollerVolt(double voltage) {
-        this.voltage = voltage;
+      private Setpoints(double setpointVolts) {
+        this.setpointVolts = setpointVolts;
       }
 
       public double get() {
-        return this.voltage;
+        return this.setpointVolts;
       }
     };
 
@@ -85,112 +84,12 @@ public class ClawConstants {
     static {
       kClawConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
 
-      // kWristConfig
-      //     .softLimit
-      //     .forwardSoftLimit(kForwardSoftLimit)
-      //     .reverseSoftLimit(kReverseSoftLimit);
-
       kClawConfig
           .absoluteEncoder
           .positionConversionFactor(kPositionConversionFactor)
           .velocityConversionFactor(kVelocityConversionFactor)
           .zeroOffset(kEncoderOffsetRev);
 
-      // kWristConfig
-      //     .closedLoop
-      //     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      //     .pidf(kP, 0.0, kD, kVelocityFF)
-      //     .outputRange(-1, 1);
-
-      // kWristConfig
-      //     .closedLoop
-      //     .maxMotion
-      //     .maxVelocity(kMaxVelocity)
-      //     .maxAcceleration(kMaxAcceleration)
-      //     .allowedClosedLoopError(kTolerance);
     }
-  }
-
-  public static class Wrist {
-    public static int kMotorID = 42;
-    public static MotorType kMotorType = MotorType.kBrushless;
-    public static IdleMode kIdleMode = IdleMode.kBrake;
-    public static int kCurrentLimit = 80;
-    public static double kP = 0.12; // TODO: Configure me!
-    public static double kD = 0.0; // TODO: Configure me!
-    public static double kVelocityFF = 0.0; // TODO: Configure me!
-
-    public static double kMaxAcceleration = 100;
-    public static double kMaxVelocity = 100;
-    public static double kTolerance = 5;
-
-    public static double kForwardSoftLimit = 70;
-    public static double kReverseSoftLimit = -62;
-    public static double kGearRatio = 50.0 / 84.0;
-
-    public static double kEncoderOffsetRev = 0.0623246; // In revolutions
-
-    public static double kPositionConversionFactor = kGearRatio * 360.0;
-    public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
-
-    public static double kS = 0.0;
-    public static double kG = 0.21;
-    public static double kV = 2.15;
-    public static double kA = 0.0;
-
-    public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
-
-    public enum Positions {
-      BOTTOM(0),
-      INTAKE(-65),
-      L1(20),
-      L2(50),
-      L3(70),
-      L4(50),
-      SCORE(-50),
-      BARGE(70),
-      L2ALGAE(-12),
-      L3ALGAE(-12),
-      HOLD_ALGAE(14),
-      CLIMB(57); // TO DO: redo these values
-
-      public final double position;
-
-      private Positions(double position) {
-        this.position = position;
-      }
-
-      public double getPos() {
-        return this.position;
-      }
-    };
-
-    static {
-      kWristConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit);
-
-      // kWristConfig
-      //     .softLimit
-      //     .forwardSoftLimit(kForwardSoftLimit)
-      //     .reverseSoftLimit(kReverseSoftLimit);
-
-      kWristConfig
-          .absoluteEncoder
-          .positionConversionFactor(kPositionConversionFactor)
-          .velocityConversionFactor(kVelocityConversionFactor)
-          .zeroOffset(kEncoderOffsetRev);
-
-      // kWristConfig
-      //     .closedLoop
-      //     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      //     .pidf(kP, 0.0, kD, kVelocityFF)
-      //     .outputRange(-1, 1);
-
-      // kWristConfig
-      //     .closedLoop
-      //     .maxMotion
-      //     .maxVelocity(kMaxVelocity)
-      //     .maxAcceleration(kMaxAcceleration)
-      //     .allowedClosedLoopError(kTolerance);
-    }
-  }
+  
 }

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.elevatorPivot;
+package frc.robot.subsystems.pivot;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -9,23 +9,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.util.TunableNumber;
 
-public class ElevatorPivot extends SubsystemBase {
+public class Pivot extends SubsystemBase {
   private final SparkMax mPivotMotor;
   private final AbsoluteEncoder mPivotEncoder;
   private final TunableNumber kP;
 
-  public ElevatorPivot() {
+  public Pivot() {
     this.mPivotMotor =
-        new SparkMax(ElevatorPivotConstants.kMotorID, ElevatorPivotConstants.kMotorType);
+        new SparkMax(PivotConstants.kMotorID, PivotConstants.kMotorType);
     this.mPivotEncoder = mPivotMotor.getAbsoluteEncoder();
     mPivotMotor.configure(
-        ElevatorPivotConstants.kPivotConfig,
+        PivotConstants.kPivotConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
-    kP = new TunableNumber("Pivot/kP", ElevatorPivotConstants.kP);
+    kP = new TunableNumber("Pivot/kP", PivotConstants.kP);
   }
 
   public void setVoltage(double pVoltage) {
@@ -50,16 +51,16 @@ public class ElevatorPivot extends SubsystemBase {
   }
 
   private double filterToLimits(double pInput) {
-    return (pInput > 0 && getEncoderMeasurement() >= ElevatorPivotConstants.kForwardSoftLimit)
-            || (pInput < 0 && getEncoderMeasurement() <= ElevatorPivotConstants.kReverseSoftLimit)
+    return (pInput > 0 && getEncoderMeasurement() >= PivotConstants.kForwardSoftLimit)
+            || (pInput < 0 && getEncoderMeasurement() <= PivotConstants.kReverseSoftLimit)
         ? 0.0
         : pInput;
   }
 
   private void stopIfLimit() {
     double motorOutput = getMotorOutput();
-    if ((motorOutput > 0 && getEncoderMeasurement() >= ClawConstants.Wrist.kForwardSoftLimit)
-        || (motorOutput < 0 && getEncoderMeasurement() <= ClawConstants.Wrist.kReverseSoftLimit)) {
+    if ((motorOutput > 0 && getEncoderMeasurement() >= WristConstants.kForwardSoftLimit)
+        || (motorOutput < 0 && getEncoderMeasurement() <= WristConstants.kReverseSoftLimit)) {
       setVoltage(0);
     }
   }
@@ -74,6 +75,6 @@ public class ElevatorPivot extends SubsystemBase {
     SmartDashboard.putNumber("Pivot/Voltage", mPivotMotor.getBusVoltage());
     SmartDashboard.putNumber(
         "Pivot/Position",
-        mPivotEncoder.getPosition() * ElevatorPivotConstants.kPositionConversionFactor);
+        mPivotEncoder.getPosition() * PivotConstants.kPositionConversionFactor);
   }
 }

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.controller;
+package frc.robot.subsystems.controls;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -33,13 +33,15 @@ import frc.robot.subsystems.elevator.ElevatorFFCommand;
 import frc.robot.subsystems.elevator.ElevatorLevelPIDCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevator.elevatorManualCommand;
-import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
+import frc.robot.subsystems.pivot.ElevatorPivot;
 import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
 import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.wrist.WristConstants;
+
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -204,7 +206,7 @@ public class Controllers extends SubsystemBase {
         .y()
         .whileTrue(
             new SequentialCommandGroup(
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, mClaw),
+                new ClawPIDCommand(WristConstants.Setpoints.L3, mClaw),
                 new ClawIntakeCoralCommand(mClaw)))
         .whileFalse(new ClawFFCommand(mClaw));
 
