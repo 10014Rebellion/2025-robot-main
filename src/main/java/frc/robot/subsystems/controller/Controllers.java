@@ -202,6 +202,16 @@ public class Controllers extends SubsystemBase {
   }
 
   public void sysIdBindings() {
+      driverController.povRight()
+          .whileTrue(new ElevatorPIDCommand(false, 50, mElevator))
+          .whileFalse(new ElevatorFFCommand(mElevator));
+      driverController.povUp()
+        .whileTrue(new ClawManualCommand(mNewClaw, 2))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
+      driverController.povDown()
+        .whileTrue(new ClawManualCommand(mNewClaw, -2))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
+
       driverController
         .a()
         .and(driverController.rightBumper())

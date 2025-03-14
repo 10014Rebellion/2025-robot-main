@@ -6,17 +6,23 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volt;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -78,10 +84,9 @@ public class tempClaw extends SubsystemBase {
     // wristA.setDefault(0.0);
 
     mSysIdRoutine = new SysIdRoutine(
-          new SysIdRoutine.Config(), 
-          new SysIdRoutine.Mechanism(mWristSparkFlex::setVoltage, log -> {
-                // Record a frame for the left motors.  Since these share an encoder, we consider
-                // the entire group to be one motor.
+          new SysIdRoutine.Config(null, Volts.of(1), Time.ofBaseUnits(5.0, Units.Seconds)), 
+          new SysIdRoutine.Mechanism(this::setWristVoltage, log -> {
+                // Record a frame for the wrist motor
                 log.motor("wristSparkFlex")
                     .voltage(
                       mAppliedVoltage.mut_replace(
@@ -95,6 +100,10 @@ public class tempClaw extends SubsystemBase {
     mWristSparkFlex.setVoltage(-pVoltage);
   }
 
+  private void setWristVoltage(Voltage pVoltage) {
+    mWristSparkFlex.setVoltage(pVoltage.times(-1));
+  }
+ 
   public void setClaw(double pVoltage) {
     mClawSparkFlex.setVoltage(-pVoltage);
   }

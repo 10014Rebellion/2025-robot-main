@@ -124,7 +124,7 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     controllers.initDriverController();
-    controllers.initOperatorButtonboard();
+    //controllers.initOperatorButtonboard();
     controllers.initTestingController();
   }
 
