@@ -7,6 +7,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LEDInterface;
 import frc.robot.subsystems.auton.Autons;
 import frc.robot.subsystems.claw.Claw;
+import frc.robot.subsystems.claw.tempClaw;
 import frc.robot.subsystems.controller.Controllers;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -34,6 +35,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Claw claw;
+  private final tempClaw newClaw;
   private final Vision vision;
   private final Elevator elevator;
   private final ElevatorPivot pivot;
@@ -55,6 +57,7 @@ public class RobotContainer {
     pivot = new ElevatorPivot();
     beambreak = new Beambreak();
     LEDs = new LEDInterface();
+    newClaw = new tempClaw();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -92,7 +95,7 @@ public class RobotContainer {
     }
 
     vision = new Vision(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
-    controllers = new Controllers(drive, vision, elevator, pivot, intake, claw);
+    controllers = new Controllers(drive, vision, elevator, pivot, intake, claw, newClaw);
     autons = new Autons(drive, vision, claw, elevator, pivot, intake);
     autons.configureNamedCommands();
     // Set up auto routines
@@ -120,6 +123,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     controllers.initDriverController();
     controllers.initOperatorButtonboard();
+    controllers.initTestingController();
   }
 
   public Command getAutonomousCommand() {

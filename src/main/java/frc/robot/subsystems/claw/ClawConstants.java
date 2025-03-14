@@ -2,6 +2,7 @@ package frc.robot.subsystems.claw;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ClawConstants {
@@ -9,10 +10,6 @@ public class ClawConstants {
   public static class Claw {
     public static int kLeftClawID = 43;
     public static int kRightClawID = 44;
-    public static int kEncoderDIOPort = 1;
-    public static double kEncoderOffset = 48.5; // TODO: TUNE
-
-    public static int kEncoderOpenPosition = 0; // TODO: Tune
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
@@ -116,16 +113,22 @@ public class ClawConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static int kCurrentLimit = 80;
-    public static double kP = 0.12; // TODO: Configure me!
+    public static int kEncoderDIOPort = 1;
+    public static double kEncoderOffset = 214.3;
+    public static double kP = 0.13; // TODO: Configure me!
     public static double kD = 0.0; // TODO: Configure me!
-    public static double kVelocityFF = 0.0; // TODO: Configure me!
 
-    public static double kMaxAcceleration = 100;
-    public static double kMaxVelocity = 100;
-    public static double kTolerance = 5;
+    public static double kS = 0.0;
+    public static double kG = 0.3;
+    public static double kV = 2.02;
+    public static double kA = 0.02;
 
-    public static double kForwardSoftLimit = 70;
-    public static double kReverseSoftLimit = -62;
+    public static double kMaxAcceleration = 8850;
+    public static double kMaxVelocity = 1600;
+    public static double kTolerance = 1;
+
+    public static double kForwardSoftLimit = 90;
+    public static double kReverseSoftLimit = -90;
     public static double kGearRatio = 50.0 / 84.0;
 
     public static double kEncoderOffsetRev = 0.0623246; // In revolutions
@@ -133,21 +136,17 @@ public class ClawConstants {
     public static double kPositionConversionFactor = kGearRatio * 360.0;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
-    public static double kS = 0.0;
-    public static double kG = 0.21;
-    public static double kV = 2.15;
-    public static double kA = 0.0;
-
-    public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
+    public static final SparkFlexConfig kWristConfig = new SparkFlexConfig();
 
     public enum Positions {
       BOTTOM(0),
       INTAKE(-65),
-      L1(20),
-      L2(50),
-      L3(70),
-      L4(50),
-      SCORE(-50),
+      GROUNDINTAKE(-17.5),
+      L1(-27),
+      L2(56),
+      L3(56),
+      L4(56),
+      SCORE(15),
       BARGE(70),
       L2ALGAE(-12),
       L3ALGAE(-12),
@@ -177,7 +176,7 @@ public class ClawConstants {
           .absoluteEncoder
           .positionConversionFactor(kPositionConversionFactor)
           .velocityConversionFactor(kVelocityConversionFactor)
-          .zeroOffset(kEncoderOffsetRev);
+          .inverted(false);
 
       // kWristConfig
       //     .closedLoop

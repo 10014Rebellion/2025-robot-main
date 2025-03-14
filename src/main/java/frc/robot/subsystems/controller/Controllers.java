@@ -8,36 +8,26 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
-import frc.robot.subsystems.claw.ClawFFCommand;
-import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
-import frc.robot.subsystems.claw.ClawLevelPIDCommand;
 import frc.robot.subsystems.claw.ClawManualCommand;
-import frc.robot.subsystems.claw.ClawPIDCommand;
+import frc.robot.subsystems.claw.NewClawPIDCommand;
+import frc.robot.subsystems.claw.tempClaw;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorFFCommand;
-import frc.robot.subsystems.elevator.ElevatorLevelPIDCommand;
 import frc.robot.subsystems.elevator.ElevatorPIDCommand;
 import frc.robot.subsystems.elevator.elevatorManualCommand;
 import frc.robot.subsystems.elevatorPivot.ElevatorPivot;
-import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
-import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.OTBIntake;
-import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.function.IntSupplier;
@@ -63,6 +53,7 @@ public class Controllers extends SubsystemBase {
   private final OTBIntake mIntake;
   private final Claw mClaw;
   private final ElevatorPivot mPivot;
+  private final tempClaw mNewClaw;
 
   public Controllers(
       Drive pDrive,
@@ -70,13 +61,15 @@ public class Controllers extends SubsystemBase {
       Elevator pElevator,
       ElevatorPivot pPivot,
       OTBIntake pIntake,
-      Claw pClaw) {
+      Claw pClaw,
+      tempClaw pTempClaw) {
     this.mDrive = pDrive;
     this.mVision = pVision;
     this.mElevator = pElevator;
     this.mPivot = pPivot;
     this.mIntake = pIntake;
     this.mClaw = pClaw;
+    this.mNewClaw = pTempClaw;
 
     levelSetpointInt = () -> 2;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
@@ -101,262 +94,105 @@ public class Controllers extends SubsystemBase {
             () -> -driverController.getLeftX(),
             () -> -driverController.getRightX(),
             () -> mSwerveFieldOriented));
-
-    driverController
-        .b()
-        .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
-
-    driverController
-        .rightTrigger()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
-                new GoToPose(
-                    () ->
-                        mVision.getClosestReefScoringPose(
-                            distanceScoring, () -> VisionConstants.PoseOffsets.RIGHT),
-                    () -> mDrive.getPose(),
-                    mDrive)));
-
-    driverController
-        .leftTrigger()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
-                new GoToPose(
-                    () ->
-                        mVision.getClosestReefScoringPose(
-                            distanceScoring, () -> VisionConstants.PoseOffsets.LEFT),
-                    () -> mDrive.getPose(),
-                    mDrive)));
-
-    driverController
-        .rightBumper()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new ParallelDeadlineGroup(
-                    new autoIntakeCoralCommand(mIntake),
-                    new SequentialCommandGroup(
-                        new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
-                        new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
-                new ParallelCommandGroup(
-                    new InstantCommand(() -> mIntake.setFunnel(2)),
-                    new ClawIntakeCoralCommand(mClaw),
-                    new SequentialCommandGroup(
-                        new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
-                        new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new IntakePIDCommand(IntakePositions.STOWED, mIntake),
-                new InstantCommand(() -> mIntake.setFunnel(0)),
-                new InstantCommand(() -> mIntake.setIndexer(0)),
-                new InstantCommand(() -> mIntake.setRightRoller(0)),
-                new InstantCommand(() -> mClaw.setClaw(0))));
-    // driverController
-    // .rightBumper()
-    // .whileTrue(
-    // new SequentialCommandGroup(
-    // new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, mClaw),
-    // new ClawIntakeCoralCommand(mClaw)))
-    // .whileFalse(
-    // new ParallelCommandGroup(
-    // new ClawFFCommand(mClaw), new InstantCommand(() -> mClaw.setClaw(0))));
-    driverController
-        .leftBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> ClawConstants.Claw.hasCoral = false),
-                new IntakePIDCommand(IntakePositions.ALGAEINTAKE, mIntake),
-                new InstantCommand(() -> mClaw.setClaw(-1)),
-                new InstantCommand(() -> mIntake.setFunnel(-1)),
-                new InstantCommand(() -> mIntake.setIndexer(-1)),
-                new InstantCommand(() -> mIntake.setRightRoller(-2))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> mClaw.setClaw(0)),
-                new InstantCommand(() -> mIntake.setFunnel(0)),
-                new InstantCommand(() -> mIntake.setIndexer(0)),
-                new InstantCommand(() -> mIntake.setRightRoller(0))));
-    // driverController
-    // .b()
-    // .whileTrue(
-    // new ParallelCommandGroup(
-    // new ElevatorPIDCommand(ElevatorConstants.Positions.POSTINTAKE, mElevator),
-    // new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw),
-    // new InstantCommand(
-    // () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.INTAKE_CORAL))))
-    // .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
-
     driverController
         .x()
         .onTrue(
-            Commands.runOnce(
-                    () ->
-                        mDrive.setPose(
-                            new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
-                    mDrive)
-                .ignoringDisable(true));
-
-    driverController
-        .y()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, mClaw),
-                new ClawIntakeCoralCommand(mClaw)))
-        .whileFalse(new ClawFFCommand(mClaw));
-
-    driverController
-        .a()
-        .whileTrue(new InstantCommand(() -> mClaw.setClaw(1)))
-        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
+            new InstantCommand(() -> mDrive.setPose(new Pose2d(0.0, 0.0, new Rotation2d(0.0)))));
   }
 
   public void initOperatorButtonboard() {
+    operatorButtonboard.axisGreaterThan(0, 0.5).whileTrue(new ClawManualCommand(mNewClaw, 1));
+    operatorButtonboard.axisLessThan(0, -0.5).whileTrue(new ClawManualCommand(mNewClaw, -1));
     operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kReadyScoring)
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> levelToWrist(levelSetpointInt)),
-                new InstantCommand(() -> levelToElevator(levelSetpointInt)),
-                new SequentialCommandGroup(
-                    new ElevatorLevelPIDCommand(mElevator), new ClawLevelPIDCommand(mClaw))))
-        .onFalse(
-            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
-
+        .axisGreaterThan(1, 0.5)
+        .whileTrue(new elevatorManualCommand(mElevator, 3))
+        .whileFalse(new ElevatorFFCommand(mElevator));
     operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kScoreCoral)
-        .whileTrue(
-            new ParallelCommandGroup(
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.SCORE, mClaw),
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.SCORE, mElevator))
-                .andThen(new InstantCommand(() -> ClawConstants.Claw.hasCoral = false)))
-        .onFalse(
-            new SequentialCommandGroup(
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw),
-                new ParallelCommandGroup(
-                    new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator))));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kClimbPullUp)
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> mPivot.setVoltage(12)),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.CLIMB, mClaw)))
-        .onFalse(new ParallelCommandGroup(mPivot.stopCommand(), new ClawFFCommand(mClaw)));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kClimbLetGo)
-        .whileTrue(new InstantCommand(() -> mPivot.setVoltage(-12)))
-        .onFalse(mPivot.stopCommand());
+        .axisLessThan(1, -0.5)
+        .whileTrue(new elevatorManualCommand(mElevator, -3))
+        .whileFalse(new ElevatorFFCommand(mElevator));
 
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetScoreL4)
-        .whileTrue(
+        .onTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 4),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.L4, mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.L4, mClaw))))
-        .onFalse(
-            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
-
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L4, mElevator),
+                new NewClawPIDCommand(ClawConstants.Wrist.Positions.L4.getPos(), mNewClaw)));
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetScoreL3)
-        .whileTrue(
+        .onTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 3),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.L3, mClaw))))
-        .onFalse(
-            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
-
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator),
+                new NewClawPIDCommand(ClawConstants.Wrist.Positions.L3.getPos(), mNewClaw)));
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetScoreL2)
-        .whileTrue(
+        .onTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 2),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.L2, mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.L2, mClaw))))
-        .onFalse(
-            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
-
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L2, mElevator),
+                new NewClawPIDCommand(ClawConstants.Wrist.Positions.L2.getPos(), mNewClaw)));
     operatorButtonboard
         .button(ControllerConstants.Buttonboard.kSetScoreL1)
+        .onTrue(
+            new ParallelCommandGroup(
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L1, mElevator),
+                new NewClawPIDCommand(ClawConstants.Wrist.Positions.L1.getPos(), mNewClaw)));
+
+    operatorButtonboard
+        .button(ControllerConstants.Buttonboard.kScoreCoral)
+        .onTrue(
+            new SequentialCommandGroup(
+                new NewClawPIDCommand(ClawConstants.Wrist.Positions.SCORE.getPos(), mNewClaw),
+                new InstantCommand(() -> mNewClaw.setClaw(-2))))
+        .onFalse(new InstantCommand(() -> mNewClaw.setClaw(0)));
+    // new SequentialCommandGroup(
+    //   new WaitCommand(0.2),
+    //   new InstantCommand(() -> mNewClaw.setClaw(-2))
+    // );
+  }
+
+  public void initTestingController() {
+    driverController
+        .povUp()
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 1),
-                new SequentialCommandGroup(
-                    new ElevatorPIDCommand(ElevatorConstants.Positions.L1, mElevator),
-                    new ClawPIDCommand(ClawConstants.Wrist.Positions.L1, mClaw))))
-        .onFalse(
-            new ParallelCommandGroup(new ClawFFCommand(mClaw), new ElevatorFFCommand(mElevator)));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kAlgaePickupL2)
+                new NewClawPIDCommand(45.0, mNewClaw),
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator)))
+        .whileFalse(new ElevatorFFCommand(mElevator));
+    driverController
+        .povRight()
         .whileTrue(
             new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L2ALGAE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L2ALGAE, mClaw),
-                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE))))
-        .onFalse(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
-                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE))));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kAlgaePickupL3)
+                new NewClawPIDCommand(0.0, mNewClaw),
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator)))
+        .whileFalse(new ElevatorFFCommand(mElevator));
+    driverController
+        .povDown()
         .whileTrue(
             new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.L3ALGAE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.L3ALGAE, mClaw),
-                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.INTAKE_ALGAE))))
-        .onFalse(
-            new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.HOLD_ALGAE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.HOLD_ALGAE, mClaw),
-                new InstantCommand(() -> mClaw.setClaw(ClawRollerVolt.HOLD_ALGAE))));
-
-    operatorButtonboard
-        .axisGreaterThan(1, 0.5)
-        .onTrue(new elevatorManualCommand(mElevator, 3))
-        .onFalse(new ElevatorFFCommand(mElevator));
-
-    operatorButtonboard
-        .axisLessThan(1, -0.50)
-        .onTrue(new elevatorManualCommand(mElevator, -3))
-        .onFalse(new ElevatorFFCommand(mElevator));
-
-    operatorButtonboard
-        .axisGreaterThan(0, 0.5)
-        .onTrue(new ClawManualCommand(mClaw, 2))
-        .onFalse(new ClawFFCommand(mClaw));
-
-    operatorButtonboard
-        .axisLessThan(0, -0.50)
-        .onTrue(new ClawManualCommand(mClaw, -2))
-        .onFalse(new ClawFFCommand(mClaw));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kEjectAlgaeToBarge)
-        .whileTrue(
-            new InstantCommand(
-                () -> mClaw.setClaw(ClawConstants.Claw.ClawRollerVolt.OUTTAKE_BARGE)))
-        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
-
-    operatorButtonboard
-        .button(ControllerConstants.Buttonboard.kGoToBarge)
+                new NewClawPIDCommand(-45.0, mNewClaw),
+                new ElevatorPIDCommand(ElevatorConstants.Positions.L3, mElevator)))
+        .whileFalse(new ElevatorFFCommand(mElevator));
+    driverController
+        .y()
+        .whileTrue(new InstantCommand(() -> mNewClaw.setWrist(2)))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
+    driverController
+        .a()
+        .whileTrue(new InstantCommand(() -> mNewClaw.setWrist(-2)))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setWrist(0)));
+    driverController
+        .rightBumper()
         .whileTrue(
             new ParallelCommandGroup(
-                new ElevatorPIDCommand(ElevatorConstants.Positions.BARGE, mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.BARGE, mClaw)))
-        .whileFalse(
-            new ParallelCommandGroup(new ElevatorFFCommand(mElevator), new ClawFFCommand(mClaw)));
+                new ElevatorPIDCommand(ElevatorConstants.Positions.GROUNDINTAKE, mElevator),
+                new NewClawPIDCommand(
+                    ClawConstants.Wrist.Positions.GROUNDINTAKE.getPos(), mNewClaw),
+                new InstantCommand(() -> mNewClaw.setClaw(5))))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setClaw(0)));
+    driverController
+        .leftBumper()
+        .whileTrue(new InstantCommand(() -> mNewClaw.setClaw(-2)))
+        .whileFalse(new InstantCommand(() -> mNewClaw.setClaw(0)));
   }
 
   private void levelToElevator(IntSupplier level) {

@@ -12,7 +12,6 @@ import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.Claw.ClawRollerVolt;
 import frc.robot.subsystems.claw.ClawFFCommand;
-import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.claw.ClawPIDCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -166,11 +165,9 @@ public class Autons {
         new SequentialCommandGroup(
             new ElevatorPIDCommand((ElevatorConstants.Positions.PREINTAKE), mElevator),
             new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)),
-        new ParallelCommandGroup(
-            new ClawIntakeCoralCommand(mClaw),
-            new SequentialCommandGroup(
-                new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
-                new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw))));
+        new SequentialCommandGroup(
+            new ElevatorPIDCommand((ElevatorConstants.Positions.POSTINTAKE), mElevator),
+            new ClawPIDCommand(ClawConstants.Wrist.Positions.INTAKE, mClaw)));
   }
 
   private ClawConstants.Wrist.Positions intToWristPos(int level) {

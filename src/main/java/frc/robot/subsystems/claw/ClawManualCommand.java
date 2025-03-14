@@ -3,10 +3,10 @@ package frc.robot.subsystems.claw;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ClawManualCommand extends Command {
-  private final Claw mClaw;
+  private final tempClaw mClaw;
   private double mVolts;
 
-  public ClawManualCommand(Claw clawSubsystem, double setVolts) {
+  public ClawManualCommand(tempClaw clawSubsystem, double setVolts) {
     this.mClaw = clawSubsystem;
     this.mVolts = setVolts;
     addRequirements(mClaw);
