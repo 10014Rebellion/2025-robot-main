@@ -6,11 +6,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class WristConstants {
   public static int kMotorID = 42;
-  public static int kEncoderPort = 1; // TODO: CONFIGURE ME
+  public static int kEncoderPort = 1;
 
   public static MotorType kMotorType = MotorType.kBrushless;
   public static IdleMode kIdleMode = IdleMode.kBrake;
-  public static boolean kMotorInverted = false;
+  public static boolean kMotorInverted = true;
 
   public static int kCurrentLimit = 80;
   public static double kP = 0.12;
@@ -20,15 +20,13 @@ public class WristConstants {
   public static double kMaxVelocity = 100;
   public static double kTolerance = 5;
 
-  public static double kForwardSoftLimit = -90;
-  public static double kReverseSoftLimit = 0;
-  public static double kGearRatio = 50.0 / 84.0;
+  public static double kForwardSoftLimit = 90;
+  public static double kReverseSoftLimit = -85;
 
-  public static double kEncoderOffsetDeg = 0;
+  public static double kEncoderOffsetDeg = 145;
   public static boolean kEncoderInverted = true;
 
-
-  public static double kPositionConversionFactor = kGearRatio * 360.0;
+  public static double kPositionConversionFactor = 360.0;
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static double kS = 0.0;

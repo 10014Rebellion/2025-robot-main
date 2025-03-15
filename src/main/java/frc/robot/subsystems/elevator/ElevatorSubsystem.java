@@ -139,8 +139,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic() {
     stopIfLimit();
 
-    SmartDashboard.putNumber("Elevator/Position", mEncoder.getPosition());
-    SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
+    SmartDashboard.putNumber("Elevator/Position", getEncReading());
+    // SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator/Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator/Voltage", mElevatorSparkMax.getBusVoltage());
   }
