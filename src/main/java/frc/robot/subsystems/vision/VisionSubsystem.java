@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
@@ -107,6 +108,13 @@ public class VisionSubsystem extends SubsystemBase {
         pOffset.get().getOffsetM());
   }
 
+  public Pose2d getClosestReefScoringPose(PoseOffsets pOffset) {
+    return getPoseInFrontOfAprilTag(
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
+        VisionConstants.kScoringDistance,
+        pOffset.getOffsetM());
+  }
+
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }
@@ -126,7 +134,7 @@ public class VisionSubsystem extends SubsystemBase {
             .getTranslation()
             .plus(
                 new Translation2d(
-                        (VisionConstants.kRobotYLength
+                        (VisionConstants.kRobotXLength
                             / 2.0), // Offset the robot length so the front is 0 meters away
                         0)
                     .rotateBy(tagPose.getRotation()));
@@ -137,7 +145,14 @@ public class VisionSubsystem extends SubsystemBase {
     Translation2d frontOfTag =
         tagTranslation.plus(new Translation2d(-pXOffsetM, pYOffsetM).rotateBy(tagRotation));
 
-    Pose2d targetPose2d = new Pose2d(frontOfTag, tagRotation);
+    Pose2d targetPose2d =
+        new Pose2d(frontOfTag, tagRotation)
+            .plus(
+                new Transform2d(
+                    0,
+                    0,
+                    new Rotation2d(
+                        Math.toRadians(-90.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
     Logger.recordOutput("Robot/Vision/AprilTagSetpoint", targetPose2d);
     return targetPose2d;
   }

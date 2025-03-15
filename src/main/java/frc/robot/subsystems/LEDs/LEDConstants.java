@@ -11,6 +11,23 @@ public class LEDConstants {
     public static final int purple = 140;
   }
 
+  public enum ledColor {
+    RED(60.0),
+    BLUE(120),
+    PURPLE(90),
+    GREEN(20);
+
+    public final double color;
+
+    private ledColor(double color) {
+      this.color = color;
+    }
+
+    public double getColor() {
+      return this.color;
+    }
+  };
+
   public static final class RGBLEDColor {
     // These colors are gotten online / through trial and error
     // Please dont touch them it would be a pain to fix ;-;

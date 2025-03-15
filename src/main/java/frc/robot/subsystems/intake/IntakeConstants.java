@@ -6,12 +6,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeConstants {
   public static class Beambreak {
-    public static int kSensor1DIOPort = 2;
-    public static int kSensor2DIOPort = 3;
+    public static int kFrontSensorDIOPort = 5;
+    public static int kBackSensorDIOPort = 6;
   }
 
   public static class Indexer {
-    public static int kIndexerID = 58;
+    public static int kIndexerID = 55;
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static int kCurrentLimit = 60;
@@ -30,7 +30,7 @@ public class IntakeConstants {
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static boolean kInverted = false;
 
-    public static int kRollerCurrentLimit = 60;
+    public static int kRollerCurrentLimit = 80;
 
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 

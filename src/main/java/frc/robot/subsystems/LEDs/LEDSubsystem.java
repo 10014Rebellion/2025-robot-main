@@ -2,6 +2,9 @@ package frc.robot.subsystems.LEDs;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -170,12 +173,22 @@ public class LEDSubsystem extends SubsystemBase {
     // } else if (ClawConstants.Claw.hasCoral) {
     //   setColor(20);
     // } else setColor(60);
+    if (SmartDashboard.getBoolean("Claw/Beam Break", false)) {
+      setColor(20);
+    } else {
+      if (DriverStation.getAlliance().get().equals(Alliance.Red)) {
+        setColor(60);
+      } else {
+        setColor(120);
+      }
+    }
+    led.setData(ledBuffer);
 
     // rainbowUnicornVomit();
     // transitionRGB();
-    // led.setData(ledBuffer);
     /*SmartDashboard.putNumber("Current R Color", finalRGB[0]);
     SmartDashboard.putNumber("Current G Color", finalRGB[1]);
     SmartDashboard.putNumber("Current B Color", finalRGB[2]);*/
+
   }
 }

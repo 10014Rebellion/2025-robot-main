@@ -16,9 +16,9 @@ public class ElevatorConstants {
 
   public static double kMaxAcceleration = 250;
   public static double kMaxVelocity = 500;
-  public static double kTolerance = 5;
+  public static double kTolerance = 1;
 
-  public static double kForwardSoftLimit = 80;
+  public static double kForwardSoftLimit = 85;
   public static double kReverseSoftLimit = 0;
 
   public static double kS = 0.0;
@@ -33,12 +33,13 @@ public class ElevatorConstants {
 
   public enum Setpoints {
     BOTTOM(0),
-    PREINTAKE(30),
-    POSTINTAKE(16),
-    L1(20),
-    L2(27.5),
-    L3(45),
-    L4(75),
+    PREINTAKE(35),
+    POSTINTAKE(25),
+    GROUNDINTAKE(0.5),
+    L1(45),
+    L2(10),
+    L3(37.5),
+    L4(83),
     SCORE(20),
     BARGE(80),
     L2ALGAE(44.5),

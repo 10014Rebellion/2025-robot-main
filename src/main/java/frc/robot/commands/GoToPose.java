@@ -256,7 +256,7 @@ public class GoToPose extends Command {
   @Override
   public boolean isFinished() {
 
-    return withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(1)));
+    return withinTolerance(Units.inchesToMeters(0.5), new Rotation2d(Units.degreesToRadians(1)));
   }
 
   public boolean atGoal() {

@@ -8,8 +8,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
-import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawConstants.Setpoints;
+import frc.robot.subsystems.claw.ClawConstants.RollerSpeed;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -74,7 +73,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreProcessor() {
     return new SequentialCommandGroup(
-        new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.OUTTAKE_PROCESSOR)),
+        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.OUTTAKE_PROCESSOR)),
         new WaitCommand(3),
         new InstantCommand(() -> mClaw.setClaw(0)));
   }
@@ -83,21 +82,21 @@ public class AutonSubsystem {
     return new ParallelCommandGroup(
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
         mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(Setpoints.HOLD_ALGAE)));
+        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.HOLD_ALGAE)));
   }
 
   private ParallelCommandGroup readyAlgaeL3() {
     return new ParallelCommandGroup(
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
         mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(Setpoints.INTAKE_ALGAE)));
+        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.INTAKE_ALGAE)));
   }
 
   private ParallelCommandGroup readyAlgaeL2() {
     return new ParallelCommandGroup(
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
         mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(Setpoints.INTAKE_ALGAE)));
+        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.INTAKE_ALGAE)));
   }
 
   private SequentialCommandGroup GoToPose(int branch, int level) {

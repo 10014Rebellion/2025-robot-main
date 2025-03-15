@@ -103,9 +103,7 @@ public class ControlsSubsystem extends SubsystemBase {
             new SequentialCommandGroup(
                 new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
                 new GoToPose(
-                    () ->
-                        mVision.getClosestReefScoringPose(
-                            distanceScoring, () -> VisionConstants.PoseOffsets.RIGHT),
+                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.RIGHT),
                     () -> mDrive.getPose(),
                     mDrive)));
 
@@ -113,11 +111,8 @@ public class ControlsSubsystem extends SubsystemBase {
         .leftTrigger()
         .whileTrue(
             new SequentialCommandGroup(
-                new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
                 new GoToPose(
-                    () ->
-                        mVision.getClosestReefScoringPose(
-                            distanceScoring, () -> VisionConstants.PoseOffsets.LEFT),
+                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
                     () -> mDrive.getPose(),
                     mDrive)));
 
@@ -130,26 +125,98 @@ public class ControlsSubsystem extends SubsystemBase {
                             new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
                     mDrive)
                 .ignoringDisable(true));
+
+    driverController
+        .rightBumper()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+                // mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                mIntake.setIndexerCmd(1.5),
+                mIntake.setRollerCmd(8)))
+        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+    driverController
+        .leftBumper()
+        .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
+        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+    ;
+    driverController
+        .y()
+        .whileTrue(
+            new ParallelCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
+                new ParallelCommandGroup(
+                    mClaw.intakeCoralCmd(),
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE))));
+    driverController.a().whileTrue(mClaw.intakeCoralCmd());
+  }
+
+  public void tuningDrive() {
+    mDrive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            mDrive,
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightX(),
+            () -> mSwerveFieldOriented));
+
+    driverController
+        .b()
+        .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+
+    driverController
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        mDrive.setPose(
+                            new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+                    mDrive)
+                .ignoringDisable(true));
+
+    driverController
+        .povUp()
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                mDrive, () -> -1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
+
+    driverController
+        .povDown()
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                mDrive, () -> 1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
+
+    driverController
+        .povLeft()
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                mDrive, () -> 0, () -> 0, () -> 1, () -> mSwerveFieldOriented));
+
+    driverController
+        .povRight()
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                mDrive, () -> 0, () -> 0, () -> -1, () -> mSwerveFieldOriented));
   }
 
   public void initOperatorButtonboard() {
-    operatorButtonboard
-        .button(ControlsConstants.Buttonboard.kReadyScoring)
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> levelToWrist(levelSetpointInt)),
-                new InstantCommand(() -> levelToElevator(levelSetpointInt)),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.L2))));
+    // operatorButtonboard
+    //     .button(ControlsConstants.Buttonboard.kReadyScoring)
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             new InstantCommand(() -> levelToWrist(levelSetpointInt)),
+    //             new InstantCommand(() -> levelToElevator(levelSetpointInt)),
+    //             new SequentialCommandGroup(
+    //                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
+    //                 mWrist.setPIDCmd(WristConstants.Setpoints.L2))));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kScoreCoral)
         .whileTrue(
-            new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.SCORE),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.SCORE)))
-        .onFalse(mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE));
+            new SequentialCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.setClawCmd(-0.5)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
@@ -167,39 +234,29 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kSetScoreL4)
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 4),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L4),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.L4))));
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L4),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L4)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL3)
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 3),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.L3))));
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L3)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL2)
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 2),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2)
-                    // mWrist.setPIDCmd(WristConstants.Setpoints.L2)
-                    )));
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L2)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL1)
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> levelSetpointInt = () -> 1),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L1)
-                    // mWrist.setPIDCmd(WristConstants.Setpoints.L1)
-                    )));
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L1),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L1)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kAlgaePickupL2)
@@ -207,12 +264,12 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.INTAKE_ALGAE))))
+                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.INTAKE_ALGAE))))
         .onFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.HOLD_ALGAE))));
+                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kAlgaePickupL3)
@@ -220,12 +277,24 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.INTAKE_ALGAE))))
+                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.INTAKE_ALGAE))))
         .onFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.HOLD_ALGAE))));
+                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
+    operatorButtonboard
+        .button(ControlsConstants.Buttonboard.kPickup)
+        .whileTrue(
+            new SequentialCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                new ParallelCommandGroup(
+                    mClaw.intakeCoralCmd(),
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)));
 
     operatorButtonboard.axisLessThan(1, -0.5).whileTrue(mElevator.setVoltsCmd(3));
 
@@ -237,7 +306,7 @@ public class ControlsSubsystem extends SubsystemBase {
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kEjectAlgaeToBarge)
-        .whileTrue(mClaw.setClawCmd(ClawConstants.Setpoints.OUTTAKE_BARGE.get()))
+        .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get()))
         .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
 
     operatorButtonboard

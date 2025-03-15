@@ -13,11 +13,11 @@ public class WristConstants {
   public static boolean kMotorInverted = true;
 
   public static int kCurrentLimit = 80;
-  public static double kP = 0.12;
+  public static double kP = 0.13;
   public static double kD = 0.0;
 
-  public static double kMaxAcceleration = 100;
-  public static double kMaxVelocity = 100;
+  public static double kMaxAcceleration = 1000;
+  public static double kMaxVelocity = 1000;
   public static double kTolerance = 5;
 
   public static double kForwardSoftLimit = 90;
@@ -30,25 +30,26 @@ public class WristConstants {
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static double kS = 0.0;
-  public static double kG = 0.21;
-  public static double kV = 2.15;
-  public static double kA = 0.0;
+  public static double kG = 0.3;
+  public static double kV = 2.02;
+  public static double kA = 0.02;
 
   public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
   public enum Setpoints {
     BOTTOM(0),
-    INTAKE(-65),
-    L1(20),
-    L2(50),
-    L3(70),
-    L4(50),
-    SCORE(-50),
+    INTAKE(-85),
+    L1(-27),
+    L2(56),
+    L3(56),
+    L4(56),
+    SCORE(15),
     BARGE(70),
     L2ALGAE(-12),
     L3ALGAE(-12),
     HOLD_ALGAE(14),
-    CLIMB(57);
+    CLIMB(45),
+    GROUNDINTAKE(-17.5);
 
     public final double setpoint;
 

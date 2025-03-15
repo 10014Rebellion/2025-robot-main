@@ -23,6 +23,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -84,6 +86,10 @@ public class DriveSubsystem extends SubsystemBase {
     modules[1] = new Module(frModuleIO, 1);
     modules[2] = new Module(blModuleIO, 2);
     modules[3] = new Module(brModuleIO, 3);
+    // modules[0] = new Module(flModuleIO, 1);
+    // modules[1] = new Module(frModuleIO, 3);
+    // modules[2] = new Module(blModuleIO, 0);
+    // modules[3] = new Module(brModuleIO, 2);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -124,7 +130,7 @@ public class DriveSubsystem extends SubsystemBase {
             new SysIdRoutine.Config(
                 null,
                 null,
-                null,
+                Time.ofBaseUnits(7.0, Units.Second),
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));

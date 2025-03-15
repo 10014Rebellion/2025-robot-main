@@ -70,7 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Intake Volts", 1);
     SmartDashboard.putNumber("Intake/kG", IntakeConstants.IntakePivot.kG);
 
-    mCoralSensor1 = new DigitalInput(Beambreak.kSensor1DIOPort);
+    mCoralSensor1 = new DigitalInput(Beambreak.kFrontSensorDIOPort);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -169,6 +169,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public boolean getCoralDetected() {
     return !mCoralSensor1.get();
+  }
+
+  public InstantCommand setRollerCmd(double pVoltage) {
+    return new InstantCommand(() -> setVoltsIntakeRoller(pVoltage));
+  }
+
+  public InstantCommand setIndexerCmd(double pVoltage) {
+    return new InstantCommand(() -> setVoltsIndexer(pVoltage));
   }
 
   @Override

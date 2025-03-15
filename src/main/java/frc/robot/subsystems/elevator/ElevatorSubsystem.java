@@ -41,6 +41,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             0,
             ElevatorConstants.kD,
             new Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
+    this.mElevatorProfiledPID.setTolerance(ElevatorConstants.kTolerance);
     this.mElevatorFF =
         new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
@@ -69,14 +70,16 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public boolean isPIDAtGoal() {
-    return mCurrentController.equals(Controllers.ProfiledPID) && mElevatorProfiledPID.atGoal();
+    return mElevatorProfiledPID.atGoal();
   }
 
   public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
+          mElevatorProfiledPID.reset(getEncReading());
           mElevatorProfiledPID.setGoal(pSetpoint.getPos());
+          SmartDashboard.putNumber("Elevator/Setpoint", pSetpoint.getPos());
         },
         () -> {
           double encoderReading = getEncReading();
@@ -84,7 +87,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
           setVolts(calculatedPID + calculatedFF);
         },
-        (interrupted) -> setVolts(0),
+        (interrupted) -> setVolts(mElevatorFF.calculate(getEncReading(), 0)),
         () -> isPIDAtGoal(),
         this);
   }
