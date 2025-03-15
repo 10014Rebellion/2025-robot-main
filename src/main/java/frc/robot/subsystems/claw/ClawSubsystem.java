@@ -4,40 +4,22 @@
 
 package frc.robot.subsystems.claw;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.TunableNumber;
 
 public class ClawSubsystem extends SubsystemBase {
-  private final SparkFlex mLeftClawSparkMax;
-  private final SparkFlex mRightClawSparkMax;
-
-  private final DutyCycleEncoder mClawEncoder;
+  private final SparkFlex mClawSparkMax;
 
   public ClawSubsystem() {
-    this.mLeftClawSparkMax =
-        new SparkFlex(ClawConstants.kLeftClawID, ClawConstants.kMotorType);
-    this.mRightClawSparkMax =
-        new SparkFlex(ClawConstants.kRightClawID, ClawConstants.kMotorType);
-    this.mClawEncoder = new DutyCycleEncoder(ClawConstants.kEncoderDIOPort);
+    this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
 
-    mLeftClawSparkMax.configure(
+    mClawSparkMax.configure(
         ClawConstants.kClawConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
-    mRightClawSparkMax.configure(
-        ClawConstants.kClawConfig.inverted(true),
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
   }
@@ -47,30 +29,13 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public void setClaw(double pVoltage) {
-    mLeftClawSparkMax.setVoltage(MathUtil.clamp(pVoltage, -12, 12));
-    mRightClawSparkMax.setVoltage(MathUtil.clamp(pVoltage, -12, 12));
-  }
-
-  public double getClaw() {
-    double measurement = (mClawEncoder.get() * 360.0) + ClawConstants.kEncoderOffset;
-    if (measurement >= 180) {
-      return measurement - 360;
-    }
-    return measurement;
-  }
-
-  public boolean hasCoral() {
-    return Math.abs(getClaw() - ClawConstants.ClawOpenPositions.HAS_CORAL.get())
-        < ClawConstants.positionTolerance;
-  }
-
-  public boolean isClawOpen() {
-    return getClaw() > ClawConstants.ClawOpenPositions.OPEN.get();
+    mClawSparkMax.setVoltage(MathUtil.clamp(pVoltage, -12, 12));
   }
 
   @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Claw/Open Value", getClaw());
-    SmartDashboard.putBoolean("Claw/Periodic Has Coral", hasCoral());
+  public void periodic() {}
+
+  public Command setClawCmd(double pVoltage) {
+    return new InstantCommand(() -> setClaw(pVoltage));
   }
 }

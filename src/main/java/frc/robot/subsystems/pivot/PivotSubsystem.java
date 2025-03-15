@@ -28,11 +28,16 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   public PivotSubsystem() {
-    this.mPivotMotor =
-        new SparkMax(PivotConstants.kMotorID, PivotConstants.kMotorType);
-    this.mPivotProfiledPID = new ProfiledPIDController(PivotConstants.kP, 0, PivotConstants.kD,
-        new Constraints(PivotConstants.kMaxVelocity, PivotConstants.kMaxAcceleration));
-    this.mPivotFF = new ArmFeedforward(PivotConstants.kS, PivotConstants.kG, PivotConstants.kV, PivotConstants.kA);
+    this.mPivotMotor = new SparkMax(PivotConstants.kMotorID, PivotConstants.kMotorType);
+    this.mPivotProfiledPID =
+        new ProfiledPIDController(
+            PivotConstants.kP,
+            0,
+            PivotConstants.kD,
+            new Constraints(PivotConstants.kMaxVelocity, PivotConstants.kMaxAcceleration));
+    this.mPivotFF =
+        new ArmFeedforward(
+            PivotConstants.kS, PivotConstants.kG, PivotConstants.kV, PivotConstants.kA);
     this.mPivotEncoder = mPivotMotor.getAbsoluteEncoder();
     mPivotMotor.configure(
         PivotConstants.kPivotConfig,
@@ -45,24 +50,28 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   public FunctionalCommand setPIDCmd(PivotConstants.Setpoints pSetpoint) {
-    return new FunctionalCommand(() -> {
-      mCurrentController = Controllers.ProfiledPID;
-      mPivotProfiledPID.setGoal(pSetpoint.getPos());
-    }, () -> {
-      double encoderReading = getEncReading();
-      double calculatedPID = mPivotFF.calculate(encoderReading, 0.0);
-      double calculatedFF = mPivotProfiledPID.calculate(encoderReading);
-      setVolts(calculatedPID + calculatedFF);
-    }, (interrupted) -> setVolts(0),
-    () -> isPIDAtGoal(),
-    this);
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          mPivotProfiledPID.setGoal(pSetpoint.getPos());
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID = mPivotFF.calculate(encoderReading, 0.0);
+          double calculatedFF = mPivotProfiledPID.calculate(encoderReading);
+          setVolts(calculatedPID + calculatedFF);
+        },
+        (interrupted) -> setVolts(0),
+        () -> isPIDAtGoal(),
+        this);
   }
 
   public InstantCommand setVoltsCmd(double pVoltage) {
-    return new InstantCommand(() -> {
-      mCurrentController = Controllers.Manual;
-      setVolts(pVoltage);
-    });
+    return new InstantCommand(
+        () -> {
+          mCurrentController = Controllers.Manual;
+          setVolts(pVoltage);
+        });
   }
 
   public void setVolts(double pVoltage) {
@@ -78,8 +87,12 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   public double getEncReading() {
-    double encoderMeasurement = mPivotEncoder.getPosition();
+    double encoderMeasurement = getRawEncReading() * PivotConstants.kPositionConversionFactor;
     return encoderMeasurement;
+  }
+
+  public double getRawEncReading() {
+    return mPivotEncoder.getPosition();
   }
 
   private boolean isOutOfBounds(double pInput) {

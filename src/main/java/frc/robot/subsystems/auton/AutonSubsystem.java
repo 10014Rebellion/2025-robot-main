@@ -8,20 +8,19 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
-import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.Setpoints;
+import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
 import java.util.function.Supplier;
 
 public class AutonSubsystem {
@@ -58,7 +57,6 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
 
-
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
 
     NamedCommands.registerCommand("ScoreToPoseC10L2", GoToPose(10, 2));
@@ -76,8 +74,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreProcessor() {
     return new SequentialCommandGroup(
-        new InstantCommand(
-            () -> mClaw.setClaw(ClawConstants.Setpoints.OUTTAKE_PROCESSOR)),
+        new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.OUTTAKE_PROCESSOR)),
         new WaitCommand(3),
         new InstantCommand(() -> mClaw.setClaw(0)));
   }
@@ -137,11 +134,9 @@ public class AutonSubsystem {
   // }
   // }
 
-
   private SequentialCommandGroup readyScoreSubsystems(int level) {
     return new SequentialCommandGroup(
-        mWrist.setPIDCmd(intToWristPos(level)),
-        mElevator.setPIDCmd(intToElevatorPos(level)));
+        mWrist.setPIDCmd(intToWristPos(level)), mElevator.setPIDCmd(intToElevatorPos(level)));
   }
 
   private SequentialCommandGroup scoreCoral() {

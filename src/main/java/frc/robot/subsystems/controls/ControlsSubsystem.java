@@ -17,18 +17,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
-import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.pivot.PivotSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
@@ -121,7 +120,7 @@ public class ControlsSubsystem extends SubsystemBase {
                             distanceScoring, () -> VisionConstants.PoseOffsets.LEFT),
                     () -> mDrive.getPose(),
                     mDrive)));
-                    
+
     driverController
         .x()
         .onTrue(
@@ -141,23 +140,22 @@ public class ControlsSubsystem extends SubsystemBase {
                 new InstantCommand(() -> levelToWrist(levelSetpointInt)),
                 new InstantCommand(() -> levelToElevator(levelSetpointInt)),
                 new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2), mWrist.setPIDCmd(WristConstants.Setpoints.L2))));
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.L2))));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kScoreCoral)
         .whileTrue(
             new ParallelCommandGroup(
-                    mWrist.setPIDCmd(WristConstants.Setpoints.SCORE),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.SCORE)))
-        .onFalse(
-            mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE));
+                mWrist.setPIDCmd(WristConstants.Setpoints.SCORE),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.SCORE)))
+        .onFalse(mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
         .whileTrue(
             new ParallelCommandGroup(
-                mPivot.setVoltsCmd(12),
-                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
+                mPivot.setVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
         .onFalse(mPivot.stopCommand());
 
     operatorButtonboard
@@ -189,8 +187,9 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 new InstantCommand(() -> levelSetpointInt = () -> 2),
                 new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.L2))));
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2)
+                    // mWrist.setPIDCmd(WristConstants.Setpoints.L2)
+                    )));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL1)
@@ -198,8 +197,9 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 new InstantCommand(() -> levelSetpointInt = () -> 1),
                 new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L1),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.L1))));
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.L1)
+                    // mWrist.setPIDCmd(WristConstants.Setpoints.L1)
+                    )));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kAlgaePickupL2)
@@ -227,27 +227,17 @@ public class ControlsSubsystem extends SubsystemBase {
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
                 new InstantCommand(() -> mClaw.setClaw(ClawConstants.Setpoints.HOLD_ALGAE))));
 
-    operatorButtonboard
-        .axisGreaterThan(1, 0.5)
-        .onTrue(mElevator.setVoltsCmd(3));
+    operatorButtonboard.axisLessThan(1, -0.5).whileTrue(mElevator.setVoltsCmd(3));
 
-    operatorButtonboard
-        .axisLessThan(1, -0.50)
-        .onTrue(mElevator.setVoltsCmd(-3));
+    operatorButtonboard.axisGreaterThan(1, 0.5).whileTrue(mElevator.setVoltsCmd(-3));
 
-    operatorButtonboard
-        .axisGreaterThan(0, 0.5)
-        .onTrue(mWrist.setVoltsCmd(2));
+    operatorButtonboard.axisGreaterThan(0, 0.5).whileTrue(mWrist.setVoltsCmd(2));
 
-    operatorButtonboard
-        .axisLessThan(0, -0.50)
-        .onTrue(mWrist.setVoltsCmd(-2));
+    operatorButtonboard.axisLessThan(0, -0.50).whileTrue(mWrist.setVoltsCmd(-2));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kEjectAlgaeToBarge)
-        .whileTrue(
-            new InstantCommand(
-                () -> mClaw.setClaw(ClawConstants.Setpoints.OUTTAKE_BARGE)))
+        .whileTrue(mClaw.setClawCmd(ClawConstants.Setpoints.OUTTAKE_BARGE.get()))
         .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
 
     operatorButtonboard
@@ -280,8 +270,7 @@ public class ControlsSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L3.getPos());
     } else if (curLevel == 2) {
       SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
-    } else
-      SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L1.getPos());
+    } else SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L1.getPos());
   }
 
   private void levelToDrivebase(IntSupplier level) {

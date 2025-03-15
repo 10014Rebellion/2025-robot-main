@@ -35,17 +35,14 @@ public class IntakeConstants {
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 
     static {
-      kRollerConfig
-          .idleMode(kIdleMode)
-          .smartCurrentLimit(kRollerCurrentLimit)
-          .inverted(kInverted);
+      kRollerConfig.idleMode(kIdleMode).smartCurrentLimit(kRollerCurrentLimit).inverted(kInverted);
     }
   }
 
   public static class IntakePivot {
     public static int kPivotID = 53;
-    public static int kEncoderDIOPort = 0;
-    public static double kEncoderOffset = 130;
+    public static int kEncoderPort = 0;
+    public static double kEncoderOffsetDeg = 130;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
@@ -53,7 +50,7 @@ public class IntakeConstants {
 
     public static int kCurrentLimit = 60;
 
-    public static double kPositionConversionFactor = 360;
+    public static double kPositionConversionFactor = 360.0;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60;
 
     public static double kEncoderOffsetRev = 0;
@@ -74,28 +71,23 @@ public class IntakeConstants {
     public static double kV = 0.0;
     public static double kA = 0.0;
 
-
     public enum Setpoints {
       STOWED(100.0),
       ALGAEINTAKE(75),
       INTAKING(0.0);
       public final double position;
-  
+
       private Setpoints(double position) {
         this.position = position;
       }
-  
+
       public double getPos() {
         return this.position;
       }
     };
 
     static {
-      kPivotConfig
-          .idleMode(kIdleMode)
-          .smartCurrentLimit(kCurrentLimit)
-          .inverted(kInverted);
+      kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kInverted);
     }
-
   }
 }

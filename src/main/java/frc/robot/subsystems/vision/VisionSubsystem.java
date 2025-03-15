@@ -8,7 +8,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
@@ -87,16 +86,6 @@ public class VisionSubsystem extends SubsystemBase {
     // Get the corrected pose in front of the closest reef tag
     return closestTagId;
   }
-
-  public Pose2d getClosestReefTag() {
-    boolean isBlueAlliance = DriverStation.getAlliance().get().equals(Alliance.Blue);
-    double linearPoseOffset = SmartDashboard.getNumber("", 0);
-    return mDriveSubsystem.getPose();
-  }
-
-  // public Pose2d getClosestReefTagPose() {
-
-  // }
 
   @Override
   public void periodic() {

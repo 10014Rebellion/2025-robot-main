@@ -21,7 +21,6 @@ import frc.robot.subsystems.sensors.BeambreakSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -62,7 +61,7 @@ public class RobotContainer {
 
     switch (Constants.currentMode) {
       case REAL:
-      mDrive =
+        mDrive =
             new DriveSubsystem(
                 new GyroIOPigeon2(),
                 new ModuleIOSpark(0),
@@ -72,7 +71,7 @@ public class RobotContainer {
         break;
 
       case SIM:
-      mDrive =
+        mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIOSim(),
@@ -82,7 +81,7 @@ public class RobotContainer {
         break;
 
       default:
-      mDrive =
+        mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIO() {},
@@ -92,7 +91,8 @@ public class RobotContainer {
         break;
     }
 
-    mVision = new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
+    mVision =
+        new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
     mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mPivot, mIntake, mClaw);
     mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mPivot, mIntake);
     mAutons.configureNamedCommands();

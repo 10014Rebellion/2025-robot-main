@@ -14,8 +14,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.GeomUtil;
 import frc.robot.util.LoggedTunableNumber;
 import java.util.function.DoubleSupplier;
@@ -67,7 +67,6 @@ public class GoToPose extends Command {
   private DoubleSupplier omegaFF = () -> 0.0;
 
   private final Supplier<Pose2d> mTargetPose;
-  private Supplier<Pose2d> robot;
   private final DriveSubsystem mDriveSubsystem;
   private Translation2d lastSetpointTranslation = new Translation2d();
 
@@ -81,11 +80,12 @@ public class GoToPose extends Command {
       new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
 
   public GoToPose(
-      Supplier<Pose2d> pTargetPose, Supplier<Pose2d> pCurrentPoseSupplier, DriveSubsystem pDriveSubsystem) {
+      Supplier<Pose2d> pTargetPose,
+      Supplier<Pose2d> pCurrentPoseSupplier,
+      DriveSubsystem pDriveSubsystem) {
     this.mTargetPose = pTargetPose;
     this.mCurrentPoseSupplier = pCurrentPoseSupplier;
     this.mDriveSubsystem = pDriveSubsystem;
-    this.robot = () -> pDriveSubsystem.getPose();
 
     this.thetaController.enableContinuousInput(-Math.PI, Math.PI);
 

@@ -2,12 +2,10 @@ package frc.robot.subsystems.LEDs;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LEDs.LEDConstants.RGBLEDColor;
-import frc.robot.subsystems.claw.ClawConstants;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -22,7 +20,6 @@ public class LEDSubsystem extends SubsystemBase {
   private int transitionSpeed;
   private int hueVariation = 180;
   private int startingLED;
-  private double stripLength = 0.67 * 2;
 
   private boolean instantTransition;
 
@@ -72,12 +69,7 @@ public class LEDSubsystem extends SubsystemBase {
       if (startingLED >= 71) {
         startingLED = 71;
       }
-      int increment = 1;
-      if (initialHue > finalHue) {
-        increment = -1;
-      } else {
-        increment = 1;
-      }
+
       startingLED += transitionSpeed;
       // (initialHue - finalHue) / (ledBuffer.getLength() - startingLED);
 

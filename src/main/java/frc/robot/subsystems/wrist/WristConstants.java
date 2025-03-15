@@ -5,70 +5,71 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class WristConstants {
-    public static int kMotorID = 42;
-    public static MotorType kMotorType = MotorType.kBrushless;
-    public static IdleMode kIdleMode = IdleMode.kBrake;
-    public static boolean kInverted = false;
+  public static int kMotorID = 42;
+  public static int kEncoderPort = 1; // TODO: CONFIGURE ME
 
-    public static int kCurrentLimit = 80;
-    public static double kP = 0.12;
-    public static double kD = 0.0;
+  public static MotorType kMotorType = MotorType.kBrushless;
+  public static IdleMode kIdleMode = IdleMode.kBrake;
+  public static boolean kMotorInverted = false;
 
-    public static double kMaxAcceleration = 100;
-    public static double kMaxVelocity = 100;
-    public static double kTolerance = 5;
+  public static int kCurrentLimit = 80;
+  public static double kP = 0.12;
+  public static double kD = 0.0;
 
-    public static double kForwardSoftLimit = 70;
-    public static double kReverseSoftLimit = -62;
-    public static double kGearRatio = 50.0 / 84.0;
+  public static double kMaxAcceleration = 100;
+  public static double kMaxVelocity = 100;
+  public static double kTolerance = 5;
 
-    public static double kEncoderOffsetRev = 0.0623246; // In revolutions
+  public static double kForwardSoftLimit = -90;
+  public static double kReverseSoftLimit = 0;
+  public static double kGearRatio = 50.0 / 84.0;
 
-    public static double kPositionConversionFactor = kGearRatio * 360.0;
-    public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+  public static double kEncoderOffsetDeg = 0;
+  public static boolean kEncoderInverted = true;
 
-    public static double kS = 0.0;
-    public static double kG = 0.21;
-    public static double kV = 2.15;
-    public static double kA = 0.0;
 
-    public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
+  public static double kPositionConversionFactor = kGearRatio * 360.0;
+  public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
-    public enum Setpoints {
-        BOTTOM(0),
-        INTAKE(-65),
-        L1(20),
-        L2(50),
-        L3(70),
-        L4(50),
-        SCORE(-50),
-        BARGE(70),
-        L2ALGAE(-12),
-        L3ALGAE(-12),
-        HOLD_ALGAE(14),
-        CLIMB(57); 
+  public static double kS = 0.0;
+  public static double kG = 0.21;
+  public static double kV = 2.15;
+  public static double kA = 0.0;
 
-        public final double setpoint;
+  public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
-        private Setpoints(double setpoint) {
-            this.setpoint = setpoint;
-        }
+  public enum Setpoints {
+    BOTTOM(0),
+    INTAKE(-65),
+    L1(20),
+    L2(50),
+    L3(70),
+    L4(50),
+    SCORE(-50),
+    BARGE(70),
+    L2ALGAE(-12),
+    L3ALGAE(-12),
+    HOLD_ALGAE(14),
+    CLIMB(57);
 
-        public double getPos() {
-            return this.setpoint;
-        }
-    };
+    public final double setpoint;
 
-    static {
-        kWristConfig
-                .idleMode(kIdleMode)
-                .smartCurrentLimit(kCurrentLimit)
-                .inverted(kInverted);
-
-        kWristConfig.absoluteEncoder
-                .positionConversionFactor(kPositionConversionFactor)
-                .velocityConversionFactor(kVelocityConversionFactor)
-                .zeroOffset(kEncoderOffsetRev);
+    private Setpoints(double setpoint) {
+      this.setpoint = setpoint;
     }
 
+    public double getPos() {
+      return this.setpoint;
+    }
+  };
+
+  static {
+    kWristConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kMotorInverted);
+
+    kWristConfig
+        .absoluteEncoder
+        .positionConversionFactor(1)
+        .velocityConversionFactor(1)
+        .zeroOffset(0);
+  }
 }

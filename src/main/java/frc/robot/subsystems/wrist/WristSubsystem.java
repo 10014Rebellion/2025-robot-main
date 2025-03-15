@@ -4,33 +4,24 @@
 
 package frc.robot.subsystems.wrist;
 
-import static edu.wpi.first.units.Units.Volt;
-import static edu.wpi.first.units.Units.Volts;
-
-import org.littletonrobotics.junction.Logger;
-
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
   private final ProfiledPIDController mWristProfiledPID;
   private final ArmFeedforward mWristFF;
-  private final SparkAbsoluteEncoder mWristEncoder;
-  private double mWristSetpoint;
+  private final DutyCycleEncoder mWristEncoder;
   private Controllers mCurrentController;
-  // private final SysIdRoutine mSysIdRoutine;
 
   private enum Controllers {
     ProfiledPID,
@@ -40,43 +31,39 @@ public class WristSubsystem extends SubsystemBase {
 
   public WristSubsystem() {
     this.mWristSparkMax = new SparkMax(WristConstants.kMotorID, WristConstants.kMotorType);
-    this.mWristEncoder = mWristSparkMax.getAbsoluteEncoder();
-    this.mWristProfiledPID = new ProfiledPIDController(WristConstants.kP, 0, WristConstants.kD,
-        new Constraints(WristConstants.kMaxVelocity, WristConstants.kMaxAcceleration));
-    this.mWristFF = new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV, WristConstants.kA);
+    this.mWristEncoder = new DutyCycleEncoder(WristConstants.kEncoderPort);
+    this.mWristProfiledPID =
+        new ProfiledPIDController(
+            WristConstants.kP,
+            0,
+            WristConstants.kD,
+            new Constraints(WristConstants.kMaxVelocity, WristConstants.kMaxAcceleration));
+    this.mWristFF =
+        new ArmFeedforward(
+            WristConstants.kS, WristConstants.kG, WristConstants.kV, WristConstants.kA);
     this.mCurrentController = Controllers.Manual;
-    this.mWristSetpoint = 0;
+
+    mWristEncoder.setDutyCycleRange(0, 1);
+    mWristEncoder.setInverted(WristConstants.kEncoderInverted);
 
     this.mWristSparkMax.configure(
-        WristConstants.kWristConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-
-
-    // this.mSysIdRoutine = new SysIdRoutine(
-    //   new SysIdRoutine.Config(
-    //       null, // Default ramp rate
-    //       null, // Default step voltage
-    //       null, // Default timeout
-    //       (state) -> Logger.recordOutput("Wrist/SysIdState", state.toString()) // Log state
-    //   ),
-    //   new SysIdRoutine.Mechanism(
-    //       (voltage) -> setVolts(voltage.in(Volts)), // Provide voltage to motor
-    //       (log) -> {
-    //         log.accept(mWristSparkMax.getAppliedOutput() * 12.0); // Voltage applied
-    //         log.accept(mWristEncoder.getPosition()); // Position
-    //         log.accept(mWristEncoder.getVelocity()); // Velocity
-    //       }, this));
+        WristConstants.kWristConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kNoPersistParameters);
 
     this.setDefaultCommand(enableFFCmd());
   }
 
-  // TODO: IMPLEMENT THE PIVOT OFFSET ON HERE
   public FunctionalCommand enableFFCmd() {
-    return new FunctionalCommand(() -> {
-      mCurrentController = Controllers.Feedforward;
-    }, () -> {
-      double calculatedOutput = mWristFF.calculate(getEncReading(), 0);
-      setVolts(calculatedOutput);
-    }, (interrupted) -> setVolts(0),
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.Feedforward;
+        },
+        () -> {
+          double calculatedOutput = mWristFF.calculate(getEncReading(), 0);
+          setVolts(calculatedOutput);
+        },
+        (interrupted) -> setVolts(0),
         () -> false,
         this);
   }
@@ -85,26 +72,32 @@ public class WristSubsystem extends SubsystemBase {
     return mCurrentController.equals(Controllers.ProfiledPID) && mWristProfiledPID.atGoal();
   }
 
-  // TODO: IMPLEMENT THE PIVOT OFFSET ON HERE
   public FunctionalCommand setPIDCmd(WristConstants.Setpoints pSetpoint) {
-    return new FunctionalCommand(() -> {
-      mCurrentController = Controllers.ProfiledPID;
-      mWristProfiledPID.setGoal(pSetpoint.getPos());
-    }, () -> {
-      double encoderReading = getEncReading();
-      double calculatedPID = mWristFF.calculate(encoderReading, 0.0);
-      double calculatedFF = mWristProfiledPID.calculate(encoderReading);
-      setVolts(calculatedPID + calculatedFF);
-    }, (interrupted) -> setVolts(0),
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          mWristProfiledPID.setGoal(pSetpoint.getPos());
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID = mWristFF.calculate(encoderReading, 0.0);
+          double calculatedFF = mWristProfiledPID.calculate(encoderReading);
+          setVolts(calculatedPID + calculatedFF);
+        },
+        (interrupted) -> setVolts(0),
         () -> isPIDAtGoal(),
         this);
   }
 
-  public InstantCommand setVoltsCmd(double pVoltage) {
-    return new InstantCommand(() -> {
-      mCurrentController = Controllers.Manual;
-      setVolts(pVoltage);
-    });
+  public FunctionalCommand setVoltsCmd(double pVoltage) {
+    return new FunctionalCommand(
+        () -> {},
+        () -> {
+          setVolts(pVoltage);
+        },
+        (interrupted) -> setVolts(0),
+        () -> false,
+        this);
   }
 
   public void setVolts(double pVoltage) {
@@ -135,21 +128,21 @@ public class WristSubsystem extends SubsystemBase {
   }
 
   public double getEncReading() {
-    double encoderMeasurement = mWristEncoder.getPosition();
+    double encoderMeasurement =
+        getRawEncReading() * WristConstants.kPositionConversionFactor
+            - WristConstants.kEncoderOffsetDeg;
     if (encoderMeasurement > WristConstants.kPositionConversionFactor / 2.0)
       encoderMeasurement -= WristConstants.kPositionConversionFactor;
     return encoderMeasurement;
   }
 
   public double getRawEncReading() {
-    double encoderMeasurement = mWristEncoder.getPosition();
-    if (encoderMeasurement > WristConstants.kPositionConversionFactor / 2.0)
-      encoderMeasurement -= WristConstants.kPositionConversionFactor;
-    return encoderMeasurement;
+    return mWristEncoder.get();
   }
 
   @Override
   public void periodic() {
     stopIfLimit();
+    SmartDashboard.putNumber("Wrist/Encoder", getEncReading());
   }
 }

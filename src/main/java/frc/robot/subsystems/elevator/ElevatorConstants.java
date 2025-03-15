@@ -57,14 +57,8 @@ public class ElevatorConstants {
   };
 
   static {
-    kElevatorConfig
-      .idleMode(kIdleMode)
-      .smartCurrentLimit(kCurrentLimit)
-      .inverted(kInverted);
+    kElevatorConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kInverted);
 
-    kElevatorConfig
-        .encoder
-        .positionConversionFactor(kPositionConversionFactor)
-        .velocityConversionFactor(kVelocityConversionFactor);
+    kElevatorConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1);
   }
 }
