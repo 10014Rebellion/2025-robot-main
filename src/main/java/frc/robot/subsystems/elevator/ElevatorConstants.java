@@ -1,10 +1,8 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-// import edu.wpi.first.math.util.Units;
 
 public class ElevatorConstants {
   public static int kMotorID = 41;
@@ -12,10 +10,9 @@ public class ElevatorConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kInverted = true;
   public static int kCurrentLimit = 80;
-  public static double kP = 1.5; // TODO: Configure me!
+  public static double kP = 1.5;
   public static double kI = 0.0;
-  public static double kD = 0.08; // TODO: Configure me!
-  public static double kVelocityFF = 0.0; // TODO: Configure me!
+  public static double kD = 0.08;
 
   public static double kMaxAcceleration = 250;
   public static double kMaxVelocity = 500;
@@ -23,11 +20,6 @@ public class ElevatorConstants {
 
   public static double kForwardSoftLimit = 80;
   public static double kReverseSoftLimit = 0;
-
-  // public static double kDrumDiameterM = Units.inchesToMeters(2.635); // Sprocket diameter
-  // public static double kDrumCircumference = kDrumDiameterM * Math.PI;
-
-  // public static double kGearRatio = 25 / 1;
 
   public static double kS = 0.0;
   public static double kG = 0.9;

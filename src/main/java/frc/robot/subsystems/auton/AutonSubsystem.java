@@ -11,12 +11,10 @@ import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.Setpoints;
-import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
@@ -157,7 +155,6 @@ public class AutonSubsystem {
   private SequentialCommandGroup intakeCoral() {
     return new SequentialCommandGroup(
         new ParallelDeadlineGroup(
-            new autoIntakeCoralCommand(mIntake),
             new SequentialCommandGroup(
                 mElevator.setPIDCmd((ElevatorConstants.Setpoints.PREINTAKE)),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
@@ -165,7 +162,6 @@ public class AutonSubsystem {
             mElevator.setPIDCmd((ElevatorConstants.Setpoints.PREINTAKE)),
             mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
         new ParallelCommandGroup(
-            new ClawIntakeCoralCommand(mClaw),
             new SequentialCommandGroup(
                 mElevator.setPIDCmd((ElevatorConstants.Setpoints.POSTINTAKE)),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))));

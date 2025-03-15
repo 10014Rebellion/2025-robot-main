@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -20,15 +19,11 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
-import frc.robot.subsystems.claw.ClawIntakeCoralCommand;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
-import frc.robot.subsystems.intake.IntakeConstants.IntakePositions;
 import frc.robot.subsystems.pivot.PivotSubsystem;
-import frc.robot.subsystems.intake.IntakePIDCommand;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.autoIntakeCoralCommand;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.wrist.WristConstants;
@@ -126,66 +121,7 @@ public class ControlsSubsystem extends SubsystemBase {
                             distanceScoring, () -> VisionConstants.PoseOffsets.LEFT),
                     () -> mDrive.getPose(),
                     mDrive)));
-
-    driverController
-        .rightBumper()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new ParallelDeadlineGroup(
-                    new autoIntakeCoralCommand(mIntake),
-                    new SequentialCommandGroup(
-                        mElevator.setPIDCmd((ElevatorConstants.Setpoints.PREINTAKE)),
-                        mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd((ElevatorConstants.Setpoints.PREINTAKE)),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
-                new ParallelCommandGroup(
-                    new InstantCommand(() -> mIntake.setFunnel(2)),
-                    new ClawIntakeCoralCommand(mClaw),
-                    new SequentialCommandGroup(
-                        mElevator.setPIDCmd((ElevatorConstants.Setpoints.POSTINTAKE)),
-                        mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new IntakePIDCommand(IntakePositions.STOWED, mIntake),
-                new InstantCommand(() -> mIntake.setFunnel(0)),
-                new InstantCommand(() -> mIntake.setIndexer(0)),
-                new InstantCommand(() -> mIntake.setRightRoller(0)),
-                new InstantCommand(() -> mClaw.setClaw(0))));
-    // driverController
-    // .rightBumper()
-    // .whileTrue(
-    // new SequentialCommandGroup(
-    // mWrist.setPIDCmd(WristConstants.Setpoints.L2),
-    // new ClawIntakeCoralCommand(mClaw)))
-    // .whileFalse(
-    // new ParallelCommandGroup(
-    // new ClawFFCommand(mClaw), new InstantCommand(() -> mClaw.setClaw(0))));
-    driverController
-        .leftBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new IntakePIDCommand(IntakePositions.ALGAEINTAKE, mIntake),
-                new InstantCommand(() -> mClaw.setClaw(-1)),
-                new InstantCommand(() -> mIntake.setFunnel(-1)),
-                new InstantCommand(() -> mIntake.setIndexer(-1)),
-                new InstantCommand(() -> mIntake.setRightRoller(-2))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> mClaw.setClaw(0)),
-                new InstantCommand(() -> mIntake.setFunnel(0)),
-                new InstantCommand(() -> mIntake.setIndexer(0)),
-                new InstantCommand(() -> mIntake.setRightRoller(0))));
-    // driverController
-    // .b()
-    // .whileTrue(
-    // new ParallelCommandGroup(
-    // mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-    // mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
-    // new InstantCommand(
-    // () -> mClaw.setClaw(ClawConstants.Setpoints.INTAKE_CORAL))))
-    // .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
-
+                    
     driverController
         .x()
         .onTrue(
@@ -195,18 +131,6 @@ public class ControlsSubsystem extends SubsystemBase {
                             new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
                     mDrive)
                 .ignoringDisable(true));
-
-    driverController
-        .y()
-        .whileTrue(
-            new SequentialCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.L3),
-                new ClawIntakeCoralCommand(mClaw)));
-
-    driverController
-        .a()
-        .whileTrue(new InstantCommand(() -> mClaw.setClaw(1)))
-        .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
   }
 
   public void initOperatorButtonboard() {
@@ -232,13 +156,13 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
         .whileTrue(
             new ParallelCommandGroup(
-                new InstantCommand(() -> mPivot.setVoltage(12)),
+                mPivot.setVoltsCmd(12),
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
         .onFalse(mPivot.stopCommand());
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbLetGo)
-        .whileTrue(new InstantCommand(() -> mPivot.setVoltage(-12)))
+        .whileTrue(mPivot.setVoltsCmd(-12))
         .onFalse(mPivot.stopCommand());
 
     operatorButtonboard

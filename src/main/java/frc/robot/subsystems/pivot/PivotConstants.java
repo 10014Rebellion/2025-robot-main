@@ -11,25 +11,35 @@ public class PivotConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
 
   public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
-  public static final double kPositionConversionFactor = 360;
+  public static final double ksetpointConversionFactor = 360;
   public static final double kForwardSoftLimit = 50;
   public static final double kReverseSoftLimit = 0;
 
-  public static final double kP = 1;
+  public static final double kP = 0.01; // TODO: TUNE ME
   public static final double kD = 0;
+  public static final double kMaxVelocity = 0;
+  public static final double kMaxAcceleration = 0;
+
+
   public static final double kTolerance = 0.5;
 
-  public enum Positions {
+  public static final double kS = 0;
+  public static final double kG = 0;
+  public static final double kV = 0;
+  public static final double kA = 0;
+
+
+  public enum Setpoints {
     NORMAL(14),
     CLIMB(40);
-    public final double position;
+    public final double setpoint;
 
-    private Positions(double position) {
-      this.position = position;
+    private Setpoints(double setpoint) {
+      this.setpoint = setpoint;
     }
 
     public double getPos() {
-      return this.position;
+      return this.setpoint;
     }
   };
 

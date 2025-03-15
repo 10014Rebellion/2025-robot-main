@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems.wrist;
 
+import static edu.wpi.first.units.Units.Volt;
+import static edu.wpi.first.units.Units.Volts;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
@@ -24,6 +30,7 @@ public class WristSubsystem extends SubsystemBase {
   private final SparkAbsoluteEncoder mWristEncoder;
   private double mWristSetpoint;
   private Controllers mCurrentController;
+  // private final SysIdRoutine mSysIdRoutine;
 
   private enum Controllers {
     ProfiledPID,
@@ -42,6 +49,22 @@ public class WristSubsystem extends SubsystemBase {
 
     this.mWristSparkMax.configure(
         WristConstants.kWristConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+
+
+    // this.mSysIdRoutine = new SysIdRoutine(
+    //   new SysIdRoutine.Config(
+    //       null, // Default ramp rate
+    //       null, // Default step voltage
+    //       null, // Default timeout
+    //       (state) -> Logger.recordOutput("Wrist/SysIdState", state.toString()) // Log state
+    //   ),
+    //   new SysIdRoutine.Mechanism(
+    //       (voltage) -> setVolts(voltage.in(Volts)), // Provide voltage to motor
+    //       (log) -> {
+    //         log.accept(mWristSparkMax.getAppliedOutput() * 12.0); // Voltage applied
+    //         log.accept(mWristEncoder.getPosition()); // Position
+    //         log.accept(mWristEncoder.getVelocity()); // Velocity
+    //       }, this));
 
     this.setDefaultCommand(enableFFCmd());
   }

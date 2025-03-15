@@ -17,7 +17,6 @@ import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.sensors.BeambreakSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -35,35 +34,35 @@ public class RobotContainer {
   // Axes Multipler
 
   // Subsystems
-  private final DriveSubsystem drive;
-  private final ClawSubsystem claw;
-  private final WristSubsystem wrist;
-  private final VisionSubsystem vision;
-  private final ElevatorSubsystem elevator;
-  private final PivotSubsystem pivot;
-  private final ControlsSubsystem controls;
-  private final BeambreakSubsystem beambreak;
-  private final TelemetrySubsystem telemetry;
-  private final IntakeSubsystem intake;
-  private final LEDSubsystem LEDs;
-  private final AutonSubsystem autons;
+  private final DriveSubsystem mDrive;
+  private final ClawSubsystem mClaw;
+  private final WristSubsystem mWrist;
+  private final VisionSubsystem mVision;
+  private final ElevatorSubsystem mElevator;
+  private final PivotSubsystem mPivot;
+  private final ControlsSubsystem mControls;
+  private final BeambreakSubsystem mBeambreak;
+  private final TelemetrySubsystem mTelemetry;
+  private final IntakeSubsystem mIntake;
+  private final LEDSubsystem mLEDs;
+  private final AutonSubsystem mAutons;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
-    claw = new ClawSubsystem();
-    wrist = new WristSubsystem();
-    elevator = new ElevatorSubsystem();
-    telemetry = new TelemetrySubsystem();
-    intake = new IntakeSubsystem();
-    pivot = new PivotSubsystem();
-    beambreak = new BeambreakSubsystem();
-    LEDs = new LEDSubsystem();
+    mClaw = new ClawSubsystem();
+    mWrist = new WristSubsystem();
+    mElevator = new ElevatorSubsystem();
+    mTelemetry = new TelemetrySubsystem();
+    mIntake = new IntakeSubsystem();
+    mPivot = new PivotSubsystem();
+    mBeambreak = new BeambreakSubsystem();
+    mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
-        drive =
+      mDrive =
             new DriveSubsystem(
                 new GyroIOPigeon2(),
                 new ModuleIOSpark(0),
@@ -73,7 +72,7 @@ public class RobotContainer {
         break;
 
       case SIM:
-        drive =
+      mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIOSim(),
@@ -83,7 +82,7 @@ public class RobotContainer {
         break;
 
       default:
-        drive =
+      mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
                 new ModuleIO() {},
@@ -93,35 +92,35 @@ public class RobotContainer {
         break;
     }
 
-    vision = new VisionSubsystem(drive, () -> drive.getRotation(), () -> drive.getModulePositions());
-    controls = new ControlsSubsystem(drive, vision, elevator, pivot, intake, claw);
-    autons = new AutonSubsystem(drive, wrist, vision, claw, elevator, pivot, intake);
-    autons.configureNamedCommands();
+    mVision = new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
+    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mPivot, mIntake, mClaw);
+    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mPivot, mIntake);
+    mAutons.configureNamedCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
     autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(mDrive));
     autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(mDrive));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        "Drive SysId (Dynamic Forward)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        "Drive SysId (Dynamic Reverse)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    controls.initDriverController();
-    controls.initOperatorButtonboard();
+    mControls.initDriverController();
+    mControls.initOperatorButtonboard();
   }
 
   public Command getAutonomousCommand() {
