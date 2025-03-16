@@ -210,6 +210,8 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void updateTelemetry() {
+    boolean isConnected = mCameraList.get(0).isConnected() && mCameraList.get(1).isConnected();
+    Logger.recordOutput("Robot/Vision/Cams Connected", isConnected);
     Logger.recordOutput("Robot/Vision/EstimatedPose", mDriveSubsystem.getPose());
     // for (PoseCamera camera : mCameraList) {
     //   Logger.recordOutput("Vision/Pose/" + camera.getCameraName(),

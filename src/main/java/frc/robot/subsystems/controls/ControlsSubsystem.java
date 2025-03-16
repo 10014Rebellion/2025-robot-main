@@ -85,6 +85,35 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initDriverController() {
+
+    driverController
+        .rightBumper()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+                // mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                mIntake.setIndexerCmd(4.5),
+                mIntake.setRollerCmd(8)))
+        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+    driverController
+        .leftBumper()
+        .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
+        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+    ;
+    driverController
+        .y()
+        .whileTrue(
+            new ParallelCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
+                new ParallelCommandGroup(
+                    mClaw.intakeCoralCmd(),
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE))));
+    driverController.a().whileTrue(mClaw.intakeCoralCmd());
+  }
+
+  public void initDrivebase() {
     mDrive.setDefaultCommand(
         DriveCommands.joystickDrive(
             mDrive,
@@ -125,35 +154,9 @@ public class ControlsSubsystem extends SubsystemBase {
                             new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
                     mDrive)
                 .ignoringDisable(true));
-
-    driverController
-        .rightBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
-                // mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                mIntake.setIndexerCmd(1.5),
-                mIntake.setRollerCmd(8)))
-        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
-    driverController
-        .leftBumper()
-        .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
-        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
-    ;
-    driverController
-        .y()
-        .whileTrue(
-            new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
-                new ParallelCommandGroup(
-                    mClaw.intakeCoralCmd(),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE))));
-    driverController.a().whileTrue(mClaw.intakeCoralCmd());
   }
 
-  public void tuningDrive() {
+  public void initTuningDrive() {
     mDrive.setDefaultCommand(
         DriveCommands.joystickDrive(
             mDrive,

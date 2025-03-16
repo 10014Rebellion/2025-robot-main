@@ -45,7 +45,7 @@ public class ClawSubsystem extends SubsystemBase {
         () ->
             setClaw(
                 ClawConstants.RollerSpeed
-                    .INTAKE_CORAL), // Start the command by setting the claw to coral speed
+                    .INTAKE_ALGAE), // Start the command by setting the claw to coral speed
         () -> {
           if (getBeamBreak()) setClaw(0.0); // if we detect a coral, stop the roller
           else setClaw(ClawConstants.RollerSpeed.INTAKE_CORAL); // if we dont, try and intake

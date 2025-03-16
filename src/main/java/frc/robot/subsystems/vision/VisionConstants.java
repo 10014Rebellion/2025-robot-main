@@ -100,14 +100,14 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-14.55), // X: inches forward
-                      Units.inchesToMeters(11.75), // Y: inches left
-                      Units.inchesToMeters(9.675) // Z: inches above ground
+                      Units.inchesToMeters(-13.409), // X: inches forward
+                      Units.inchesToMeters(12.908), // Y: inches left
+                      Units.inchesToMeters(12.77) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(52.5) // Yaw: (angled inward)
+                      Units.degreesToRadians(60) // Yaw: (angled inward)
                       ))),
 
           // Front Right Camera (Mounted near FR swerve module)
@@ -115,14 +115,14 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.55), // X: inches forward
-                      Units.inchesToMeters(11.75), // Y: inches right (negative)
+                      Units.inchesToMeters(13.409), // X: inches forward
+                      Units.inchesToMeters(12.908), // Y: inches right (negative)
                       Units.inchesToMeters(10.675) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(127.5) // Yaw: (angled inward)
+                      Units.degreesToRadians(120) // Yaw: (angled inward)
                       ))),
 
           // Rear Left Camera (Mounted near BL swerve module, positions TBD)
