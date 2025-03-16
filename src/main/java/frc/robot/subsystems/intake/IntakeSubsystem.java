@@ -27,8 +27,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private final SparkFlex mIndexerMotor;
 
   // private final DigitalInput mCoralSensor1;
-  private final BeamBreakSensor mCoralSensorFront;
-  private final BeamBreakSensor mCoralSensorBack;
+  private final DigitalInput mCoralSensorFront;
+  private final DigitalInput mCoralSensorBack;
 
   private final DutyCycleEncoder mIntakePivotEncoder;
 
@@ -74,8 +74,8 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Intake Volts", 1);
     SmartDashboard.putNumber("Intake/kG", IntakeConstants.IntakePivot.kG);
 
-    mCoralSensorFront = new BeamBreakSensor(Beambreak.kFrontSensorDIOPort);
-    mCoralSensorBack = new BeamBreakSensor(Beambreak.kBackSensorDIOPort);
+    mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
+    mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -173,11 +173,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public boolean getCoralDetectedFront() {
-    return mCoralSensorFront.isBroken();
+    return !mCoralSensorFront.get();
   }
 
   public boolean getCoralDetectedBack() {
-    return mCoralSensorBack.isBroken();
+    return !mCoralSensorBack.get();
   }
 
   public boolean getCoralDetected() {
