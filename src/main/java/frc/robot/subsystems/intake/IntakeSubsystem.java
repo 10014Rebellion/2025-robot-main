@@ -19,12 +19,16 @@ import frc.robot.subsystems.intake.IntakeConstants.IntakePivot;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeRoller;
 import frc.robot.subsystems.pivot.PivotConstants;
 import frc.robot.subsystems.wrist.WristConstants;
+import frc.robot.util.*;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final SparkFlex mIntakePivotMotor;
   private final SparkFlex mIntakeRollerMotor;
   private final SparkFlex mIndexerMotor;
-  private final DigitalInput mCoralSensor1;
+
+  // private final DigitalInput mCoralSensor1;
+  private final BeamBreakSensor mCoralSensorFront;
+  private final BeamBreakSensor mCoralSensorBack;
 
   private final DutyCycleEncoder mIntakePivotEncoder;
 
@@ -70,7 +74,8 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Intake Volts", 1);
     SmartDashboard.putNumber("Intake/kG", IntakeConstants.IntakePivot.kG);
 
-    mCoralSensor1 = new DigitalInput(Beambreak.kFrontSensorDIOPort);
+    mCoralSensorFront = new BeamBreakSensor(Beambreak.kFrontSensorDIOPort);
+    mCoralSensorBack = new BeamBreakSensor(Beambreak.kBackSensorDIOPort);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -167,8 +172,16 @@ public class IntakeSubsystem extends SubsystemBase {
     return measurement;
   }
 
+  public boolean getCoralDetectedFront() {
+    return mCoralSensorFront.isBroken();
+  }
+
+  public boolean getCoralDetectedBack() {
+    return mCoralSensorBack.isBroken();
+  }
+
   public boolean getCoralDetected() {
-    return !mCoralSensor1.get();
+    return getCoralDetectedFront() && getCoralDetectedBack();
   }
 
   public InstantCommand setRollerCmd(double pVoltage) {
