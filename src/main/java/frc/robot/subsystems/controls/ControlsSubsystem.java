@@ -7,6 +7,7 @@ package frc.robot.subsystems.controls;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ControlsSubsystem extends SubsystemBase {
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -207,6 +209,22 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             DriveCommands.joystickDrive(
                 mDrive, () -> 0, () -> 0, () -> -1, () -> mSwerveFieldOriented));
+
+    driverController
+        .a()
+        .whileTrue(
+            new GoToPose(
+                () -> {
+                  Pose2d curPose = mDrive.getPose();
+                  Pose2d visionPose = mVision.getPoseInFrontOfAprilTag(21, 16);
+                  Pose2d newPose =
+                      new Pose2d(
+                          visionPose.getTranslation(), new Rotation2d(Units.degreesToRadians(45)));
+                  Logger.recordOutput("Debugging/Tuning Setpoint", newPose);
+                  return newPose;
+                },
+                () -> mDrive.getPose(),
+                mDrive));
   }
 
   public void initOperatorButtonboard() {

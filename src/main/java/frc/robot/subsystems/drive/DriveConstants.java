@@ -98,10 +98,10 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Whole Bot PID
-  public static final double drivebaseDriveKp = 0.3;
-  public static final double drivebaseDriveKd = 0.01;
+  public static final double drivebaseDriveKp = 3;
+  public static final double drivebaseDriveKd = 0.001;
 
-  public static final double drivebaseThetaKp = 2.8;
+  public static final double drivebaseThetaKp = 2.0;
   public static final double drivebaseThetaKd = 0.0;
 
   // Turn motor configuration
