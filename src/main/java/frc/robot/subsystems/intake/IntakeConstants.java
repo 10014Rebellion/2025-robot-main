@@ -42,7 +42,7 @@ public class IntakeConstants {
   public static class IntakePivot {
     public static int kPivotID = 53;
     public static int kEncoderPort = 0;
-    public static double kEncoderOffsetDeg = 130;
+    public static double kEncoderOffsetDeg = -105.0;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;

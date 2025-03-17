@@ -139,7 +139,7 @@ public class WristSubsystem extends SubsystemBase {
   public double getEncReading() {
     double encoderMeasurement =
         (getRawEncReading() * WristConstants.kPositionConversionFactor)
-            - WristConstants.kEncoderOffsetDeg;
+            + WristConstants.kEncoderOffsetDeg;
     if (encoderMeasurement > WristConstants.kPositionConversionFactor / 2.0)
       encoderMeasurement -= WristConstants.kPositionConversionFactor;
     return encoderMeasurement;

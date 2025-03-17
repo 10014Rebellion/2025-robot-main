@@ -23,7 +23,7 @@ public class WristConstants {
   public static double kForwardSoftLimit = 90;
   public static double kReverseSoftLimit = -85;
 
-  public static double kEncoderOffsetDeg = 145;
+  public static double kEncoderOffsetDeg = 132.8; // 81.9;
   public static boolean kEncoderInverted = true;
 
   public static double kPositionConversionFactor = 360.0;

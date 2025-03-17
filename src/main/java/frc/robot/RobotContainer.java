@@ -122,7 +122,7 @@ public class RobotContainer {
     mControls.initDriverController();
     // mControls.initTuningDrive();
     mControls.initOperatorButtonboard();
-    // mControls.initDrivebase();
+    mControls.initDrivebase();
   }
 
   public Command getAutonomousCommand() {
