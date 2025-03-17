@@ -21,7 +21,7 @@ public class WristConstants {
   public static double kTolerance = 5;
 
   public static double kForwardSoftLimit = 90;
-  public static double kReverseSoftLimit = -85;
+  public static double kReverseSoftLimit = -89;
 
   public static double kEncoderOffsetDeg = 132.8; // 81.9;
   public static boolean kEncoderInverted = true;
@@ -38,7 +38,7 @@ public class WristConstants {
 
   public enum Setpoints {
     BOTTOM(0),
-    INTAKE(-85),
+    INTAKE(-87),
     L1(-27),
     L2(56),
     L3(56),

@@ -22,6 +22,7 @@ import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -93,10 +94,14 @@ public class ControlsSubsystem extends SubsystemBase {
                 new SequentialCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
-                // mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
                 mIntake.setIndexerCmd(4.5),
                 mIntake.setRollerCmd(8)))
-        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+        .whileFalse(
+            new ParallelCommandGroup(
+                mIntake.setVoltsIntakePivotCmd(0),
+                mIntake.setIndexerCmd(0),
+                mIntake.setRollerCmd(0)));
     driverController
         .leftBumper()
         .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
@@ -250,9 +255,9 @@ public class ControlsSubsystem extends SubsystemBase {
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL2)
         .whileTrue(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L2)));
+            new SequentialCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.L2),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL1)

@@ -53,14 +53,14 @@ public class GoToPose extends Command {
     drivekD.initDefault(DriveConstants.drivebaseDriveKd);
     thetakP.initDefault(DriveConstants.drivebaseThetaKp);
     thetakD.initDefault(DriveConstants.drivebaseThetaKd);
-    driveMaxVelocity.initDefault(1.25);
+    driveMaxVelocity.initDefault(1.0);
     driveMaxAcceleration.initDefault(2.0);
     thetaMaxVelocity.initDefault(Math.toRadians(360.0));
     thetaMaxAcceleration.initDefault(8.0);
     driveTolerance.initDefault(0.005);
     thetaTolerance.initDefault(Math.toRadians(0.2));
-    ffMinRadius.initDefault(0.05);
-    ffMaxRadius.initDefault(0.1);
+    ffMinRadius.initDefault(0.0);
+    ffMaxRadius.initDefault(0.0);
   }
 
   private Supplier<Translation2d> linearFF = () -> Translation2d.kZero;
