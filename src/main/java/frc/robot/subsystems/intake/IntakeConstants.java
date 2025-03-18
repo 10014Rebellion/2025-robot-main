@@ -16,6 +16,9 @@ public class IntakeConstants {
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static int kCurrentLimit = 60;
 
+    public static int kIntakeVolts = 3;
+    public static int kOuttakeVolts = -3;
+
     public static final SparkMaxConfig kIndexerConfig = new SparkMaxConfig();
 
     static {

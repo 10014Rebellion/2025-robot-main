@@ -28,7 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // private final DigitalInput mCoralSensor1;
   private final DigitalInput mCoralSensorFront;
-  private final DigitalInput mCoralSensorBack;
+  // private final DigitalInput mCoralSensorBack;
 
   private final DutyCycleEncoder mIntakePivotEncoder;
 
@@ -75,7 +75,7 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/kG", IntakeConstants.IntakePivot.kG);
 
     mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
-    mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
+    // mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -135,6 +135,20 @@ public class IntakeSubsystem extends SubsystemBase {
     mIndexerMotor.setVoltage(pVoltage);
   }
 
+  public FunctionalCommand setIndexCoralCmd() {
+    return new FunctionalCommand(
+        () -> {},
+        () -> {
+          setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+        },
+        (interrupted) -> {
+          setVoltsIndexer(0.25);
+        },
+        () -> {
+          return getCoralDetected();
+        });
+  }
+
   private double filterVoltageIntakePivot(double pVoltage) {
     return filterToLimitsIntakePivot(MathUtil.clamp(pVoltage, -12.0, 12.0));
   }
@@ -176,12 +190,12 @@ public class IntakeSubsystem extends SubsystemBase {
     return !mCoralSensorFront.get();
   }
 
-  public boolean getCoralDetectedBack() {
-    return !mCoralSensorBack.get();
-  }
+  // public boolean getCoralDetectedBack() {
+  //   return !mCoralSensorBack.get();
+  // }
 
   public boolean getCoralDetected() {
-    return getCoralDetectedFront() && getCoralDetectedBack();
+    return getCoralDetectedFront(); // && getCoralDetectedBack();
   }
 
   public InstantCommand setRollerCmd(double pVoltage) {

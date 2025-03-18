@@ -78,7 +78,7 @@ public class ModuleIOSparkPIDF implements ModuleIO {
             MotorType.kBrushless);
     driveEncoder = driveSpark.getEncoder();
     turnEncoder = turnSpark.getAbsoluteEncoder();
-    
+
     // Configure drive motor
     var driveConfig = new SparkFlexConfig();
     driveConfig
@@ -104,15 +104,14 @@ public class ModuleIOSparkPIDF implements ModuleIO {
         driveSpark,
         5,
         () ->
-        driveSpark.configure(
-            driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-            tryUntilOk(driveSpark, 5, () -> driveEncoder.setPosition(0.0));
+            driveSpark.configure(
+                driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    tryUntilOk(driveSpark, 5, () -> driveEncoder.setPosition(0.0));
 
-            
-            // Configure turn motor
-            var turnConfig = new SparkMaxConfig();
+    // Configure turn motor
+    var turnConfig = new SparkMaxConfig();
     turnConfig
-    .inverted(turnInverted)
+        .inverted(turnInverted)
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(turnMotorCurrentLimit)
         .voltageCompensation(12.0);
@@ -137,19 +136,19 @@ public class ModuleIOSparkPIDF implements ModuleIO {
         () ->
             turnSpark.configure(
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-                
+
     driveController = new PIDController(driveKp, 0.0, driveKd);
     turnController = new PIDController(turnKp, 0.0, turnKd);
 
     // Create odometry queues
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     drivePositionQueue =
-    SparkOdometryThread.getInstance().registerSignal(driveSpark, driveEncoder::getPosition);
+        SparkOdometryThread.getInstance().registerSignal(driveSpark, driveEncoder::getPosition);
     turnPositionQueue =
         SparkOdometryThread.getInstance().registerSignal(turnSpark, turnEncoder::getPosition);
-    }
+  }
 
-    @Override
+  @Override
   public void updateInputs(ModuleIOInputs inputs) {
     // Update drive inputs
     sparkStickyFault = false;
@@ -209,14 +208,14 @@ public class ModuleIOSparkPIDF implements ModuleIO {
     driveSpark.setVoltage(pidOutput + ffVolts);
   }
 
-    @Override
+  @Override
   public void setTurnPosition(Rotation2d rotation) {
     double setpoint =
         MathUtil.inputModulus(
             rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
-    
+
     double pidOutput = turnController.calculate(turnEncoder.getPosition(), setpoint);
-    
+
     turnSpark.setVoltage(pidOutput);
   }
 }

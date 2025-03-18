@@ -74,8 +74,12 @@ public class PivotSubsystem extends SubsystemBase {
         });
   }
 
+  public InstantCommand forceSetVoltsCmd(double pVoltage) {
+    return new InstantCommand(() -> mPivotMotor.setVoltage(pVoltage));
+  }
+
   public void setVolts(double pVoltage) {
-    mPivotMotor.setVoltage(filterVoltage(pVoltage));
+    mPivotMotor.setVoltage(pVoltage); // filterVoltage(pVoltage));
   }
 
   public InstantCommand stopCommand() {

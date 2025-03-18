@@ -11,19 +11,12 @@ public class AutoFunnelCoralCommand extends Command {
 
   @Override
   public void execute() {
-    // If coral is not in indexer we set to high speed
-    if (!mIntakeSubsystem.getCoralDetectedBack() && !mIntakeSubsystem.getCoralDetectedFront()) {
-      mIntakeSubsystem.setVoltsIndexer(3); // TODO: Tune this
-    }
-    // If coral is past the first sensor but not at second sensor we set to medium speed
-    else if (mIntakeSubsystem.getCoralDetectedBack() && !mIntakeSubsystem.getCoralDetectedFront()) {
-      mIntakeSubsystem.setVoltsIndexer(2); // TODO: Tune this
-    }
+    mIntakeSubsystem.setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
   }
 
   @Override
   public void end(boolean interrupted) {
-    mIntakeSubsystem.setVoltsIndexer(0);
+    mIntakeSubsystem.setVoltsIndexer(0.1);
   }
 
   @Override

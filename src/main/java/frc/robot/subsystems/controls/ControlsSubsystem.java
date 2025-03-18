@@ -92,12 +92,14 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController
         .rightBumper()
         .whileTrue(
+            
             new ParallelCommandGroup(
                 new SequentialCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+                mIntake.setIndexCoralCmd(),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                mIntake.setIndexerCmd(3.0),
+                // mIntake.setIndexerCmd(3.0),
                 mIntake.setRollerCmd(8)))
         .whileFalse(
             new ParallelCommandGroup(
@@ -248,13 +250,13 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
         .whileTrue(
             new ParallelCommandGroup(
-                mPivot.setVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
+                mPivot.forceSetVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
         .onFalse(mPivot.stopCommand());
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbLetGo)
-        .whileTrue(mPivot.setVoltsCmd(-12))
-        .onFalse(mPivot.stopCommand());
+        .whileTrue(new InstantCommand(() -> mPivot.setVolts(-12)))
+        .whileFalse(new InstantCommand(() -> mPivot.setVolts(0)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL4)

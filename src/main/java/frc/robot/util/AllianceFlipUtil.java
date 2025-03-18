@@ -26,11 +26,11 @@ public class AllianceFlipUtil {
     }
   }
 
-  /** Flips a translation to the correct side of the field based on the current alliance color.
-*/
+  /** Flips a translation to the correct side of the field based on the current alliance color. */
   public static Translation2d apply(Translation2d translation) {
     if (shouldFlip()) {
-      return new Translation2d(apply(translation.getX()), Constants.kFieldWidthMeters - translation.getY());
+      return new Translation2d(
+          apply(translation.getX()), Constants.kFieldWidthMeters - translation.getY());
     } else {
       return translation;
     }
