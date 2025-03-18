@@ -83,11 +83,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         },
         () -> {
           double encoderReading = getEncReading();
-          double calculatedPID = mElevatorFF.calculate(encoderReading, 0.0);
+          double calculatedPID =
+              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
           double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
           setVolts(calculatedPID + calculatedFF);
         },
-        (interrupted) -> setVolts(mElevatorFF.calculate(getEncReading(), 0)),
+        (interrupted) -> setVolts(mElevatorFF.calculate(0.0, 0)),
         () -> isPIDAtGoal(),
         this);
   }

@@ -21,11 +21,13 @@ public class ClawConstants {
 
   public enum RollerSpeed {
     INTAKE_CORAL(4),
+    HOLD_CORAL(0.5),
     INTAKE_ALGAE(12),
     HOLD_ALGAE(0.5),
     OUTTAKE_REEF(-0.25),
     OUTTAKE_BARGE(-8),
     OUTTAKE_PROCESSOR(-6),
+    OUTTAKE_L1(-3),
     EJECT_CORAL(-3);
 
     public final double setVolts;

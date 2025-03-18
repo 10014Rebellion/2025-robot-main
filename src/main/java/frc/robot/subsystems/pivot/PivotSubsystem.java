@@ -88,6 +88,9 @@ public class PivotSubsystem extends SubsystemBase {
 
   public double getEncReading() {
     double encoderMeasurement = getRawEncReading() * PivotConstants.kPositionConversionFactor;
+    if (encoderMeasurement > 180) {
+      encoderMeasurement -= 360;
+    }
     return encoderMeasurement;
   }
 

@@ -97,7 +97,7 @@ public class ControlsSubsystem extends SubsystemBase {
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                mIntake.setIndexerCmd(4.5),
+                mIntake.setIndexerCmd(3.0),
                 mIntake.setRollerCmd(8)))
         .whileFalse(
             new ParallelCommandGroup(
@@ -332,7 +332,7 @@ public class ControlsSubsystem extends SubsystemBase {
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kEjectAlgaeToBarge)
-        .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get()))
+        .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_L1.get()))
         .whileFalse(new InstantCommand(() -> mClaw.setClaw(0)));
 
     operatorButtonboard

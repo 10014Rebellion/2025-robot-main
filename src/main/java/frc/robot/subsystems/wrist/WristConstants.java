@@ -20,10 +20,10 @@ public class WristConstants {
   public static double kMaxVelocity = 1000;
   public static double kTolerance = 5;
 
-  public static double kForwardSoftLimit = 90;
+  public static double kForwardSoftLimit = 135;
   public static double kReverseSoftLimit = -89;
 
-  public static double kEncoderOffsetDeg = 132.8; // 81.9;
+  public static double kEncoderOffsetDeg = -149.0; // 81.9;
   public static boolean kEncoderInverted = true;
 
   public static double kPositionConversionFactor = 360.0;
@@ -42,14 +42,16 @@ public class WristConstants {
     L1(-27),
     L2(56),
     L3(56),
-    L4(56),
+    L4(65),
+    REVERSEL4(135),
     SCORE(15),
     BARGE(70),
     L2ALGAE(-12),
     L3ALGAE(-12),
     HOLD_ALGAE(14),
     CLIMB(45),
-    GROUNDINTAKE(-17.5);
+    GROUNDINTAKE(-20),
+    GROUNDALGAE(-35);
 
     public final double setpoint;
 
