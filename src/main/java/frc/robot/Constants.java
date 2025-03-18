@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -11,6 +13,12 @@ public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = true; // CHANGE THIS IF YOU WANT TO ENABLE TUNING PID
+
+
+  public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
+  public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
+  public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
 
   public static enum Mode {
     /** Running on a real robot. */

@@ -1,7 +1,12 @@
 package frc.robot.subsystems.auton;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -20,6 +25,9 @@ import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.util.AllianceFlipUtil;
+
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class AutonSubsystem {
@@ -202,4 +210,32 @@ public class AutonSubsystem {
         return linearPoseOffsets.L4;
     }
   }
+
+  ///////////////// PATH CREATION LOGIC \\\\\\\\\\\\\\\\\\\\\\
+  public Command followFirstChoreoPath(String pathName, Rotation2d startingRotation) {
+    PathPlannerPath path = getTraj(pathName).get();
+    double totalTimeSeconds = path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
+
+    return new SequentialCommandGroup(
+        new InstantCommand(() -> {
+            mDrive.setPose(AllianceFlipUtil.apply(new Pose2d(path.getPathPoses().get(0).getTranslation(), startingRotation)));
+        }), 
+        AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5));
+}
+
+public Command followChoreoPath(String pathName) {
+    PathPlannerPath path = getTraj(pathName).get();
+    path.getIdealTrajectory(DriveSubsystem.robotConfig);
+    double totalTimeSeconds = path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
+    return AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5);
+}
+
+public Optional<PathPlannerPath> getTraj(String pathName) {
+    try {
+        return Optional.of(PathPlannerPath.fromChoreoTrajectory(pathName));
+    } catch(Exception e) {
+        e.printStackTrace();
+        return Optional.empty();
+    }
+}
 }
