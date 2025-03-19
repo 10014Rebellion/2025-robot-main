@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SS-C2"
+            "pathName": "SS-C3"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C2-SCORE"
+            "pathName": "C3-HP"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "C2-PS"
+            "pathName": "HP-C4"
           }
         },
         {

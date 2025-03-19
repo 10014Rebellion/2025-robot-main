@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -92,20 +93,27 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController
         .rightBumper()
         .whileTrue(
-            
-            new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
-                mIntake.setIndexCoralCmd(),
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                // mIntake.setIndexerCmd(3.0),
-                mIntake.setRollerCmd(8)))
+            new SequentialCommandGroup(
+                new ParallelDeadlineGroup(
+                    new ParallelCommandGroup(
+                        mIntake.setIndexCoralCmd(),
+                        new SequentialCommandGroup(
+                            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                            mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
+                    mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                    mIntake.setRollerCmd(8)),
+                new ParallelCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                    mClaw.intakeCoralCmd()),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
         .whileFalse(
             new ParallelCommandGroup(
-                mIntake.setVoltsIntakePivotCmd(0),
+                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED),
                 mIntake.setIndexerCmd(0),
-                mIntake.setRollerCmd(0)));
+                mIntake.setRollerCmd(0),
+                mElevator.enableFFCmd(),
+                mWrist.enableFFCmd()));
     driverController
         .leftBumper()
         .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
@@ -250,13 +258,13 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
         .whileTrue(
             new ParallelCommandGroup(
-                mPivot.forceSetVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
+                mPivot.setVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
         .onFalse(mPivot.stopCommand());
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbLetGo)
-        .whileTrue(new InstantCommand(() -> mPivot.setVolts(-12)))
-        .whileFalse(new InstantCommand(() -> mPivot.setVolts(0)));
+        .whileTrue(mPivot.setVoltsCmd(-12))
+        .whileFalse(mPivot.setVoltsCmd(0));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL4)

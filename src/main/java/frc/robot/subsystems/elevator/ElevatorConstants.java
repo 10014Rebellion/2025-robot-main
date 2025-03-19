@@ -28,12 +28,14 @@ public class ElevatorConstants {
 
   public static double kPositionConversionFactor = 1.21875; // 1.0 / kDrumCircumference
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+  public static double kHighCutoff = 45;
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
 
   public enum Setpoints {
     BOTTOM(0),
-    PREINTAKE(35),
+    HPINTAKE(2),
+    PREINTAKE(40),
     POSTINTAKE(23),
     GROUNDINTAKE(0.5),
     GROUNDALGAE(15),
@@ -42,6 +44,7 @@ public class ElevatorConstants {
     L3(37.5),
     L4(78),
     SCORE(20),
+    REVERSESCORE(70),
     BARGE(80),
     L2ALGAE(44.5),
     L3ALGAE(67.5),

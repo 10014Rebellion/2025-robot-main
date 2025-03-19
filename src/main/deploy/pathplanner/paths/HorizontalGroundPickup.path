@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.1675,
-        "y": 2.5039999999999996
+        "x": 5.382,
+        "y": 2.64
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.043465265410792,
-        "y": 2.7210607855311144
+        "x": 4.466216631241908,
+        "y": 2.0857564547373455
       },
       "isLocked": false,
-      "linkedName": "C2-SCORE-START"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.031000000000001,
-        "y": 2.74775
+        "x": 1.6063524590163931,
+        "y": 1.141956967213115
       },
       "prevControl": {
-        "x": 5.192485560366543,
-        "y": 2.5569034286577206
+        "x": 2.667861680062022,
+        "y": 1.4530573511122962
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C2-SCORE-END"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -40.236358309273804
   },
   "reversed": false,
-  "folder": "SCORE",
+  "folder": "Debugging",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 29.999999999999996
   },
   "useDefaultConstraints": true
 }

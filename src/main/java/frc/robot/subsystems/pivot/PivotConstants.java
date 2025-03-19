@@ -27,7 +27,7 @@ public class PivotConstants {
   public static final double kTolerance = 0.5;
 
   public static final double kS = 0;
-  public static final double kG = 0;
+  public static final double kG = 0.2;
   public static final double kV = 0;
   public static final double kA = 0;
 
@@ -48,6 +48,6 @@ public class PivotConstants {
   static {
     kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kInverted);
 
-    kPivotConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1);
+    kPivotConfig.encoder.positionConversionFactor(1).velocityConversionFactor(1).inverted(true);
   }
 }

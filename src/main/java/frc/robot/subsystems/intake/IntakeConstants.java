@@ -60,7 +60,7 @@ public class IntakeConstants {
 
     public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
 
-    public static double kTolerance = 1;
+    public static double kTolerance = 3;
     public static double kP = 0.08;
     public static double kD = 0;
     public static double kMaxVelocity = 0;
@@ -70,7 +70,7 @@ public class IntakeConstants {
     public static double kReverseSoftLimit = 0.0; // TO DO: CONFIGURE ME!
 
     public static double kS = 0.0;
-    public static double kG = 0.1;
+    public static double kG = 0.3;
     public static double kV = 0.0;
     public static double kA = 0.0;
 

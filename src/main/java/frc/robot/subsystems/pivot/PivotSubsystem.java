@@ -79,7 +79,7 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   public void setVolts(double pVoltage) {
-    mPivotMotor.setVoltage(pVoltage); // filterVoltage(pVoltage));
+    mPivotMotor.setVoltage(filterVoltage(pVoltage));
   }
 
   public InstantCommand stopCommand() {
@@ -87,7 +87,7 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   private double filterVoltage(double pVoltage) {
-    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return (MathUtil.clamp(pVoltage, -12.0, 12.0));
   }
 
   public double getEncReading() {
@@ -102,20 +102,20 @@ public class PivotSubsystem extends SubsystemBase {
     return mPivotEncoder.getPosition();
   }
 
-  private boolean isOutOfBounds(double pInput) {
-    return (pInput > 0 && getEncReading() >= PivotConstants.kForwardSoftLimit)
-        || (pInput < 0 && getEncReading() <= PivotConstants.kReverseSoftLimit);
-  }
+  // private boolean isOutOfBounds(double pInput) {
+  //   return (pInput > 0 && getEncReading() >= PivotConstants.kForwardSoftLimit)
+  //       || (pInput < 0 && getEncReading() <= PivotConstants.kReverseSoftLimit);
+  // }
 
-  private double filterToLimits(double pInput) {
-    return isOutOfBounds(pInput) ? 0.0 : pInput;
-  }
+  // private double filterToLimits(double pInput) {
+  //   return isOutOfBounds(pInput) ? 0.0 : pInput;
+  // }
 
-  private void stopIfLimit() {
-    if (isOutOfBounds(getMotorOutput())) {
-      setVolts(0);
-    }
-  }
+  // private void stopIfLimit() {
+  //   if (isOutOfBounds(getMotorOutput())) {
+  //     setVolts(0);
+  //   }
+  // }
 
   public double getMotorOutput() {
     return mPivotMotor.getAppliedOutput();
@@ -123,7 +123,7 @@ public class PivotSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    stopIfLimit();
+    // stopIfLimit();
     SmartDashboard.putNumber("Pivot/Voltage", mPivotMotor.getBusVoltage());
     SmartDashboard.putNumber("Pivot/Position", getEncReading());
   }

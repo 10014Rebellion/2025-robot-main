@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -13,7 +14,7 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSparkPIDF;
+import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.pivot.PivotSubsystem;
@@ -64,10 +65,10 @@ public class RobotContainer {
         mDrive =
             new DriveSubsystem(
                 new GyroIOPigeon2(),
-                new ModuleIOSparkPIDF(0),
-                new ModuleIOSparkPIDF(1),
-                new ModuleIOSparkPIDF(2),
-                new ModuleIOSparkPIDF(3));
+                new ModuleIOSpark(0),
+                new ModuleIOSpark(1),
+                new ModuleIOSpark(2),
+                new ModuleIOSpark(3));
         break;
 
       case SIM:
@@ -98,6 +99,7 @@ public class RobotContainer {
     mAutons.configureNamedCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    SmartDashboard.putData(autoChooser.getSendableChooser());
 
     // Set up SysId routines
     autoChooser.addOption(

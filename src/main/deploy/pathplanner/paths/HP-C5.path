@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.53675,
-        "y": 1.9579999999999995
+        "x": 1.51125,
+        "y": 0.8367499999999995
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.532998854647416,
-        "y": 2.2153625408006734
+        "x": 2.0429505510271238,
+        "y": 1.7012590561824585
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP"
     },
     {
       "anchor": {
-        "x": 5.1675,
-        "y": 2.5039999999999996
+        "x": 3.65625,
+        "y": 2.9817499999999995
       },
       "prevControl": {
-        "x": 6.20435034799916,
-        "y": 2.2149938010586694
+        "x": 2.9025957237760442,
+        "y": 2.293951195086719
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C2-SCORE-START"
+      "linkedName": "C5-SCORE-START"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -29.604450746004957
   },
   "reversed": false,
-  "folder": "STARTING",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 132.64670313389178
+    "rotation": -125.78897345918334
   },
   "useDefaultConstraints": true
 }

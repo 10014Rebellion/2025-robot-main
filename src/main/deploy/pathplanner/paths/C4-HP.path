@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.074,
-        "y": 3.849
+        "x": 3.94875,
+        "y": 2.815999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.0005,
-        "y": 4.1419999999999995
+        "x": 3.396309461546117,
+        "y": 1.985072525070342
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "C4-SCORE-START"
     },
     {
       "anchor": {
-        "x": 7.771,
-        "y": 4.064
+        "x": 1.51125,
+        "y": 0.8367499999999995
       },
       "prevControl": {
-        "x": 7.205500000000001,
-        "y": 4.4052500000000006
+        "x": 2.1527557997477795,
+        "y": 1.5282060603844831
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "HP"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 130.00600000000003
+    "rotation": -125.78897345918334
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -30.9637565320736
   },
   "useDefaultConstraints": true
 }

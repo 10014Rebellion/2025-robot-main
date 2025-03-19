@@ -58,6 +58,17 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
+  public FunctionalCommand scoreCoralCmd() {
+    return new FunctionalCommand(
+        () -> setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF),
+        () -> {
+          setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF);
+        },
+        (interrupted) -> setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF),
+        () -> !getBeamBreak(),
+        this);
+  }
+
   public boolean getBeamBreak() {
     return !mBeamBreak.get();
   }

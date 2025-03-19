@@ -82,7 +82,6 @@ public class WristSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());
         },
         () -> {
-          double encoderReading = getEncReading();
           double calculatedFF =
               mWristFF.calculate(
                   Math.toRadians(mWristProfiledPID.getSetpoint().position),

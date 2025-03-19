@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -209,7 +210,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void updateSpeedMultipliers() {
-    if (SmartDashboard.getNumber("Elevator/Position", 0) >= 40) {
+    if (SmartDashboard.getNumber("Elevator/Position", 0) >= ElevatorConstants.kHighCutoff) {
       this.mDriveSpeedMultiplier = DriveConstants.kLowSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kLowSPeedRot;
     } else {
