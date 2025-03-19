@@ -26,7 +26,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.25
+            "waitTime": 0.125
           }
         },
         {
@@ -55,50 +55,95 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "parallel",
                 "data": {
-                  "pathName": "L1-C6"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L1-C5R"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReverseL4"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.125
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReverseL4"
+                  "name": "ReverseScore"
                 }
               }
             ]
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReverseScore"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C4-L2"
+                  "pathName": "C5R-L2"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "LolipopReady"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L2-C6R"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReverseL4"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.125
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReverseScore"
                 }
               }
             ]

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.9335,
-        "y": 2.748309426229507
+        "x": 4.914,
+        "y": 2.7769999999999992
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.641,
-        "y": 1.63625
+        "x": 4.621499999999999,
+        "y": 1.664940573770492
       },
       "isLocked": false,
       "linkedName": "C2-SCORE-START"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.054604099077242
+    "rotation": 31.534791905188264
   },
   "useDefaultConstraints": true
 }

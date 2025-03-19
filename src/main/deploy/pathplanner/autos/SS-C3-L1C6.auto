@@ -97,25 +97,6 @@
           "data": {
             "name": "ScoreCoral"
           }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "C6-L2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LolipopReady"
-                }
-              }
-            ]
-          }
         }
       ]
     }

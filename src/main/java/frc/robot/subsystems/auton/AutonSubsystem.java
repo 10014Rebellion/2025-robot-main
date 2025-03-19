@@ -84,11 +84,13 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ReadyFunnel", readyFunnelSubsystem());
   }
 
-  private ParallelCommandGroup lolipopReady() {
-    return new ParallelCommandGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
-        new SequentialCommandGroup(new WaitCommand(0.25), mClaw.intakeCoralCmd()));
+  private SequentialCommandGroup lolipopReady() {
+    return new SequentialCommandGroup(
+    new WaitCommand(0.1),
+    new ParallelCommandGroup(
+      mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
+      mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
+      new SequentialCommandGroup(new WaitCommand(0.25), mClaw.intakeCoralCmd())));
   }
 
   private SequentialCommandGroup scoreProcessor() {
