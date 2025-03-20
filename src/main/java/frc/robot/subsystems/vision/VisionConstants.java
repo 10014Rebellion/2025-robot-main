@@ -2,6 +2,10 @@ package frc.robot.subsystems.vision;
 
 import static java.util.Map.entry;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -12,6 +16,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
@@ -70,88 +76,105 @@ public class VisionConstants {
 
   // Vision measurement standard deviations
   public static final Matrix<N3, N1> kVisionSingleTagStandardDeviations = VecBuilder.fill(1, 1, 2);
-  public static final Matrix<N3, N1> kVisionMultiTagStandardDeviations =
-      VecBuilder.fill(0.5, 0.5, 1);
+  public static final Matrix<N3, N1> kVisionMultiTagStandardDeviations = VecBuilder.fill(0.5, 0.5, 1);
 
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  // Load the official 2025 AprilTag field layout
-  public static final AprilTagFieldLayout kAprilTagFieldLayout =
-      AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+  private static final String CUSTOM_JSON_PATH = "apriltags/andymark/2025-no-barge.json";
+
+  public static AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+
+  static {
+    try {
+      Path customPath = Path.of("/home/lvuser/deploy", CUSTOM_JSON_PATH);
+      if (Files.exists(customPath)) {
+        kAprilTagFieldLayout = new AprilTagFieldLayout(customPath);
+      }
+    } catch (IOException e) {
+      DriverStation.reportError("Unable to load custom AprilTag JSON: " + e.getMessage(), true);
+    }
+  }
 
   /**
    * Map of camera positions relative to the robot's center.
    *
-   * <p>- **Translation3d (X, Y, Z)**: - X: Forward (+) / Backward (-) relative to the center of the
-   * bot - Y: Left (+) / Right (-) relative to the center of the bot - Z: Up (+) / Down (-) relative
+   * <p>
+   * - **Translation3d (X, Y, Z)**: - X: Forward (+) / Backward (-) relative to
+   * the center of the
+   * bot - Y: Left (+) / Right (-) relative to the center of the bot - Z: Up (+) /
+   * Down (-) relative
    * to the ground, most likely wont be inside the ground
    *
-   * <p>- **Rotation3d (Roll, Pitch, Yaw)**: - Roll (X-axis rotation): Side tilt (it will prolly be
-   * 0 unless we do some crazy stuff) - Pitch (Y-axis rotation): Camera looking up/down (Negative =
-   * up, yeah ik its weird, blame WPILIB not me) - Yaw (Z-axis rotation): Camera turning left/right.
-   * Imagine a birds eye view of the bot, 0deg is north, 90 is west, -90 is east, and 180 is south
+   * <p>
+   * - **Rotation3d (Roll, Pitch, Yaw)**: - Roll (X-axis rotation): Side tilt (it
+   * will prolly be
+   * 0 unless we do some crazy stuff) - Pitch (Y-axis rotation): Camera looking
+   * up/down (Negative =
+   * up, yeah ik its weird, blame WPILIB not me) - Yaw (Z-axis rotation): Camera
+   * turning left/right.
+   * Imagine a birds eye view of the bot, 0deg is north, 90 is west, -90 is east,
+   * and 180 is south
    */
-  public static final Map<String, Transform3d> cameraPositions =
-      Map.ofEntries(
+  public static final Map<String, Transform3d> cameraPositions = Map.ofEntries(
 
-          // Front Left Camera (Mounted near FL swerve module)
-          entry(
-              FRONT_LEFT_CAM,
-              new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(-13.409), // X: inches forward
-                      Units.inchesToMeters(12.908), // Y: inches left
-                      Units.inchesToMeters(12.77) // Z: inches above ground
-                      ),
-                  new Rotation3d(
-                      Units.degreesToRadians(0), // Roll: No side tilt
-                      Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(60) // Yaw: (angled inward)
-                      ))),
+      // Front Left Camera (Mounted near FL swerve module)
+      entry(
+          FRONT_LEFT_CAM,
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters(-13.409), // X: inches forward
+                  Units.inchesToMeters(12.908), // Y: inches left
+                  Units.inchesToMeters(12.77) // Z: inches above ground
+              ),
+              new Rotation3d(
+                  Units.degreesToRadians(0), // Roll: No side tilt
+                  Units.degreesToRadians(0), // Pitch: No upward tilt
+                  Units.degreesToRadians(60) // Yaw: (angled inward)
+              ))),
 
-          // Front Right Camera (Mounted near FR swerve module)
-          entry(
-              FRONT_RIGHT_CAM,
-              new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(13.409), // X: inches forward
-                      Units.inchesToMeters(12.908), // Y: inches right (negative)
-                      Units.inchesToMeters(10.675) // Z: inches above ground
-                      ),
-                  new Rotation3d(
-                      Units.degreesToRadians(0), // Roll: No side tilt
-                      Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(120) // Yaw: (angled inward)
-                      ))),
+      // Front Right Camera (Mounted near FR swerve module)
+      entry(
+          FRONT_RIGHT_CAM,
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters(13.409), // X: inches forward
+                  Units.inchesToMeters(12.908), // Y: inches right (negative)
+                  Units.inchesToMeters(10.675) // Z: inches above ground
+              ),
+              new Rotation3d(
+                  Units.degreesToRadians(0), // Roll: No side tilt
+                  Units.degreesToRadians(0), // Pitch: No upward tilt
+                  Units.degreesToRadians(120) // Yaw: (angled inward)
+              ))),
 
-          // Rear Left Camera (Mounted near BL swerve module, positions TBD)
-          entry(
-              BACK_LEFT_CAM,
-              new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(0), // X: TBD
-                      Units.inchesToMeters(0), // Y: TBD
-                      Units.inchesToMeters(0) // Z: TBD
-                      ),
-                  new Rotation3d(
-                      Units.degreesToRadians(0), // Roll: No side tilt
-                      Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(0) // Yaw: TBD
-                      ))),
+      // Rear Left Camera (Mounted near BL swerve module, positions TBD)
+      entry(
+          BACK_LEFT_CAM,
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters(0), // X: TBD
+                  Units.inchesToMeters(0), // Y: TBD
+                  Units.inchesToMeters(0) // Z: TBD
+              ),
+              new Rotation3d(
+                  Units.degreesToRadians(0), // Roll: No side tilt
+                  Units.degreesToRadians(0), // Pitch: No upwards tilt
+                  Units.degreesToRadians(0) // Yaw: TBD
+              ))),
 
-          // Rear Right Camera (Mounted near BR swerve module, positions TBD)
-          entry(
-              BACK_RIGHT_CAM,
-              new Transform3d(
-                  new Translation3d(
-                      Units.inchesToMeters(0), // X: TBD
-                      Units.inchesToMeters(0), // Y: TBD
-                      Units.inchesToMeters(0) // Z: TBD
-                      ),
-                  new Rotation3d(
-                      Units.degreesToRadians(0), // Roll: No side tilt
-                      Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(0) // Yaw: TBD
-                      ))));
+      // Rear Right Camera (Mounted near BR swerve module, positions TBD)
+      entry(
+          BACK_RIGHT_CAM,
+          new Transform3d(
+              new Translation3d(
+                  Units.inchesToMeters(0), // X: TBD
+                  Units.inchesToMeters(0), // Y: TBD
+                  Units.inchesToMeters(0) // Z: TBD
+              ),
+              new Rotation3d(
+                  Units.degreesToRadians(0), // Roll: No side tilt
+                  Units.degreesToRadians(0), // Pitch: No upwards tilt
+                  Units.degreesToRadians(0) // Yaw: TBD
+              ))));
 }
