@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.914,
-        "y": 2.7769999999999992
+        "x": 4.878995901639344,
+        "y": 2.748309426229507
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.605676229508196,
-        "y": 2.2304405737704918
+        "x": 4.570672131147541,
+        "y": 2.2017499999999997
       },
       "isLocked": false,
-      "linkedName": "C2-SCORE-START"
+      "linkedName": "C3"
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP"
+      "linkedName": "SouthHP"
     }
   ],
   "rotationTargets": [],
@@ -45,10 +45,10 @@
     "rotation": -125.78897345918334
   },
   "reversed": false,
-  "folder": null,
+  "folder": "South Side HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 31.534791905188264
+    "rotation": 29.999999999999996
   },
   "useDefaultConstraints": true
 }

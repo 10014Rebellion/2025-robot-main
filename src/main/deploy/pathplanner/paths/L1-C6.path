@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -91.12330271407538
+    "rotation": -91.1233027140754
   },
   "reversed": false,
-  "folder": null,
+  "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 71.56505117707799

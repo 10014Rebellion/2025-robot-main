@@ -17,11 +17,11 @@
     {
       "anchor": {
         "x": 3.1882500000000005,
-        "y": 3.7617499999999997
+        "y": 3.762
       },
       "prevControl": {
         "x": 2.1882500000000005,
-        "y": 3.7617499999999997
+        "y": 3.762
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 41.785211418523616

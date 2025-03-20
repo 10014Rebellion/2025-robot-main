@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.94875,
-        "y": 2.815999999999999
+        "x": 1.8341188524590164,
+        "y": 5.877100409836065
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.396309461546117,
-        "y": 1.985072525070342
+        "x": 1.7061072622451823,
+        "y": 5.45231351278623
       },
       "isLocked": false,
-      "linkedName": "C4"
+      "linkedName": "NL3"
     },
     {
       "anchor": {
-        "x": 1.51125,
-        "y": 0.8367499999999995
+        "x": 3.20775,
+        "y": 3.9567499999999995
       },
       "prevControl": {
-        "x": 2.1527557997477795,
-        "y": 1.5282060603844831
+        "x": 2.0379098360655736,
+        "y": 4.1149077868852455
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SouthHP"
+      "linkedName": "C6"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.78897345918334
+    "rotation": -91.1233027140754
   },
   "reversed": false,
-  "folder": "South Side HP",
+  "folder": "North Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -30.9637565320736
+    "rotation": 96.51295697165385
   },
   "useDefaultConstraints": true
 }

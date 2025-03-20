@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.0,
-        "y": 5.741
+        "x": 7.144672131147541,
+        "y": 5.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.7458815981288325,
-        "y": 5.648089020968213
+        "x": 5.887116797996535,
+        "y": 5.2
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NorthStart"
     },
     {
       "anchor": {
-        "x": 5.190676229508196,
-        "y": 5.577407786885245
+        "x": 5.071,
+        "y": 5.2
       },
       "prevControl": {
-        "x": 6.372312450009821,
-        "y": 5.644118980378143
+        "x": 6.254517866759354,
+        "y": 5.2
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C10-SCORE-START"
+      "linkedName": "C10"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.66114620198938
+    "rotation": 150.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "North Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -150.0
+    "rotation": 150.0
   },
   "useDefaultConstraints": true
 }

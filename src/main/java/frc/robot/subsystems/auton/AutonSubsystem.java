@@ -67,7 +67,7 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
 
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
-    NamedCommands.registerCommand("HPCoralIntake", HPCoralIntake());
+    NamedCommands.registerCommand("ReadyHP", readyFunnelSubsystem());
 
     NamedCommands.registerCommand("ScoreToPoseC10L2", GoToPose(10, 2));
     NamedCommands.registerCommand("ScoreToPoseC3L2", GoToPose(3, 2));
@@ -81,7 +81,7 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
-    NamedCommands.registerCommand("ReadyFunnel", readyFunnelSubsystem());
+    NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
   }
 
   private SequentialCommandGroup lolipopReady() {
@@ -167,7 +167,7 @@ public class AutonSubsystem {
   // AUTONS>>")));
   // }
   // }
-  private SequentialCommandGroup readyFunnelSubsystem() {
+  private SequentialCommandGroup HPCoralIntake() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
             mIntake.setIndexCoralCmd(),
@@ -186,9 +186,11 @@ public class AutonSubsystem {
         mWrist.setPIDCmd(intToWristPos(level)), mElevator.setPIDCmd(intToElevatorPos(level)));
   }
 
-  private ParallelRaceGroup scoreCoral() {
-    return new ParallelRaceGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd());
+  private SequentialCommandGroup scoreCoral() {
+    return new SequentialCommandGroup(
+        new WaitCommand(0.125),
+        new ParallelRaceGroup(
+            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
   }
 
   private SequentialCommandGroup intakeCoral() {
@@ -208,7 +210,7 @@ public class AutonSubsystem {
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
   }
 
-  private ParallelCommandGroup HPCoralIntake() {
+  private ParallelCommandGroup readyFunnelSubsystem() {
     return new ParallelCommandGroup(
         mIntake.setIndexCoralCmd(),
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HPINTAKE),

@@ -3,16 +3,19 @@
   "robotLength": 0.965,
   "holonomicMode": true,
   "pathFolders": [
+    "Center Start",
     "MoveToPose",
-    "Debugging",
-    "Pushing",
-    "SouthPaths"
+    "North Side Lolipop",
+    "North Side HP",
+    "North Start",
+    "South Side HP",
+    "South Side Lolipop",
+    "South Start"
   ],
   "autoFolders": [
-    "DEBUGGING",
-    "MOVETOPOSEPATHS",
-    "WIP",
-    "WORKING AUTONS"
+    "HP Autons",
+    "Lolipop Autons",
+    "Push Autons"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,

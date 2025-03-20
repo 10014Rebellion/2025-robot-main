@@ -12,7 +12,7 @@
         "y": 1.0512500000000014
       },
       "isLocked": false,
-      "linkedName": "HP"
+      "linkedName": "SouthHP"
     },
     {
       "anchor": {
@@ -25,26 +25,13 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C4-SCORE-START"
+      "linkedName": "C4"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "ReadyFunnel",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "ReadyScoreSubsystemsL4",
-      "waypointRelativePos": 0.7492805755395676,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.0,
@@ -58,7 +45,7 @@
     "rotation": -30.9637565320736
   },
   "reversed": false,
-  "folder": null,
+  "folder": "South Side HP",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -125.78897345918334

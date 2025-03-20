@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SS-C3"
+                  "pathName": "NS-C10"
                 }
               },
               {
@@ -36,28 +36,54 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C3-HP"
+                  "pathName": "C10-L3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHP"
+                  "name": "LolipopReady"
                 }
               }
             ]
           }
         },
         {
-          "type": "wait",
+          "type": "sequential",
           "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeHP"
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L3-C7R"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReverseL4"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.125
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReverseScore"
+                }
+              }
+            ]
           }
         },
         {
@@ -67,84 +93,60 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP-C4"
+                  "pathName": "C7R-L2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyScoreSubsystemsL4"
+                  "name": "LolipopReady"
                 }
               }
             ]
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ScoreCoral"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "parallel",
                 "data": {
-                  "pathName": "C4-HP"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "L2Alt-C6R"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReverseL4"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.125
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyHP"
+                  "name": "ReverseScore"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeHP"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "HP-C5"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReadyScoreSubsystemsL4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ScoreCoral"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "HP Autons",
+  "folder": "Lolipop Autons",
   "choreoAuto": false
 }

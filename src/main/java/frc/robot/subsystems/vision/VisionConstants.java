@@ -97,9 +97,12 @@ public class VisionConstants {
   }
 
   /**
-   * EXTREMELY IMPORTANT NOTE: The FrontLeft FrontRight, BackLeft, BackRight naming scheme is all relative to the scoring side being the front of the bot (the side where the coral is scored on the reef), BUT the values put into the Transform 3d is assuming the side perpendicular to the elevator (battery side) is the front
-   * 
-   * Map of camera positions relative to the robot's center.
+   * EXTREMELY IMPORTANT NOTE: The FrontLeft FrontRight, BackLeft, BackRight naming scheme is all
+   * relative to the scoring side being the front of the bot (the side where the coral is scored on
+   * the reef), BUT the values put into the Transform 3d is assuming the side perpendicular to the
+   * elevator (battery side) is the front
+   *
+   * <p>Map of camera positions relative to the robot's center.
    *
    * <p>- **Translation3d (X, Y, Z)**: - X: Forward (+) / Backward (-) relative to the center of the
    * bot - Y: Left (+) / Right (-) relative to the center of the bot - Z: Up (+) / Down (-) relative

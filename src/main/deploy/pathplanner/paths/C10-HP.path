@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.94875,
-        "y": 2.815999999999999
+        "x": 5.071,
+        "y": 5.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.396309461546117,
-        "y": 1.985072525070342
+        "x": 5.2985655737704915,
+        "y": 5.76921106557377
       },
       "isLocked": false,
-      "linkedName": "C4"
+      "linkedName": "C10"
     },
     {
       "anchor": {
-        "x": 1.51125,
-        "y": 0.8367499999999995
+        "x": 1.5943647540983608,
+        "y": 7.279661885245901
       },
       "prevControl": {
-        "x": 2.1527557997477795,
-        "y": 1.5282060603844831
+        "x": 2.361577868852459,
+        "y": 6.860092213114753
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SouthHP"
+      "linkedName": "NorthHP"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.78897345918334
+    "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": "South Side HP",
+  "folder": "North Side HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -30.9637565320736
+    "rotation": 150.0
   },
   "useDefaultConstraints": true
 }

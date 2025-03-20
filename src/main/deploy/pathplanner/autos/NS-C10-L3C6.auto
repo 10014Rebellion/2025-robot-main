@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SS-C3"
+                  "pathName": "NS-C10"
                 }
               },
               {
@@ -36,26 +36,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C3-L1"
+                  "pathName": "C10-L3"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.1
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "LolipopReady"
-                      }
-                    }
-                  ]
+                  "name": "LolipopReady"
                 }
               }
             ]
@@ -68,7 +55,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "L1-C6"
+                  "pathName": "L3-C6"
                 }
               },
               {

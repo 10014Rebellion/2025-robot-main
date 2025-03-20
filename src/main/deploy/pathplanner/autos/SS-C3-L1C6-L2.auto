@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "ScoreCoral"
@@ -87,12 +81,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "ScoreCoral"
@@ -121,6 +109,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "WORKING AUTONS",
+  "folder": "Lolipop Autons",
   "choreoAuto": false
 }
