@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
@@ -90,7 +89,7 @@ public class AutonSubsystem {
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
-            new SequentialCommandGroup(new WaitCommand(0.25), mClaw.intakeCoralCmd())));
+            new SequentialCommandGroup(new WaitCommand(0.1), mClaw.intakeCoralCmd())));
   }
 
   private SequentialCommandGroup scoreProcessor() {
@@ -188,8 +187,8 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreCoral() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.125),
-        new ParallelRaceGroup(
+        new WaitCommand(0.25),
+        new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
   }
 

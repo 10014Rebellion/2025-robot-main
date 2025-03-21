@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.144672131147541,
-        "y": 2.748309426229507
+        "x": 7.2,
+        "y": 2.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.0889500979379605,
-        "y": 2.748309426229507
+        "x": 6.144277966790419,
+        "y": 2.2
       },
       "isLocked": false,
       "linkedName": "SouthStart"
     },
     {
       "anchor": {
-        "x": 4.878995901639344,
-        "y": 2.748309426229507
+        "x": 4.855,
+        "y": 2.796
       },
       "prevControl": {
-        "x": 5.593244530362722,
-        "y": 2.748309426229507
+        "x": 5.358480585843914,
+        "y": 2.2085998698469
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
+    "maxVelocity": 1.5,
     "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -48,7 +48,7 @@
   "folder": "South Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
