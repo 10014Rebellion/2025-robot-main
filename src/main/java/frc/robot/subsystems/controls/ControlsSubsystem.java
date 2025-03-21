@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
@@ -102,6 +103,7 @@ public class ControlsSubsystem extends SubsystemBase {
                             mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
                     mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
                     mIntake.setRollerCmd(8)),
+                new WaitCommand(0.1),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
@@ -258,13 +260,20 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbPullUp)
         .whileTrue(
             new ParallelCommandGroup(
-                mPivot.setVoltsCmd(12), mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)))
-        .onFalse(mPivot.stopCommand());
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4),
+                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbLetGo)
-        .whileTrue(mPivot.setVoltsCmd(-12))
-        .whileFalse(mPivot.setVoltsCmd(0));
+        .whileTrue(
+            new SequentialCommandGroup(
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+                mClaw.scoreCoralCmd(),
+                new ParallelDeadlineGroup(
+                    new WaitCommand(0.25),
+                    mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_CORAL.get()))));
+    // .whileFalse();
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kSetScoreL4)
@@ -347,10 +356,7 @@ public class ControlsSubsystem extends SubsystemBase {
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kGoToBarge)
-        .whileTrue(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.BARGE)));
+        .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
   }
 
   private void levelToElevator(IntSupplier level) {

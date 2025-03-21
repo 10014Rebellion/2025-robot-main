@@ -58,6 +58,17 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
+  public FunctionalCommand scoreCoralCmd(ClawConstants.RollerSpeed speed) {
+    return new FunctionalCommand(
+        () -> setClaw(speed),
+        () -> {
+          setClaw(speed);
+        },
+        (interrupted) -> setClaw(speed),
+        () -> !getBeamBreak(),
+        this);
+  }
+
   public FunctionalCommand scoreCoralCmd() {
     return new FunctionalCommand(
         () -> setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF),
