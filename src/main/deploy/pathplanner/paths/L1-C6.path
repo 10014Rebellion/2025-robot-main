@@ -9,19 +9,19 @@
       "prevControl": null,
       "nextControl": {
         "x": 1.3439016393442624,
-        "y": 2.8758586065573764
+        "y": 2.875858606557377
       },
       "isLocked": false,
       "linkedName": "Loli1"
     },
     {
       "anchor": {
-        "x": 3.20775,
-        "y": 3.9567499999999995
+        "x": 3.208,
+        "y": 3.957
       },
       "prevControl": {
-        "x": 1.8525,
-        "y": 3.4692499999999997
+        "x": 1.8527500000000003,
+        "y": 3.4695
       },
       "nextControl": null,
       "isLocked": false,
