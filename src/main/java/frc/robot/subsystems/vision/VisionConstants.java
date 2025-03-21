@@ -27,7 +27,7 @@ public class VisionConstants {
   public enum PoseOffsets {
     LEFT(kDistBetweenBranchesCenter / 2.0 + Units.inchesToMeters(2)),
     CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 + Units.inchesToMeters(2));
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(0));
 
     public final double offset;
 
@@ -40,7 +40,7 @@ public class VisionConstants {
     }
   };
 
-  public static double kScoringDistance = Units.inchesToMeters(0.25);
+  public static double kScoringDistance = Units.inchesToMeters(0.0);
 
   public enum linearPoseOffsets {
     L4(Units.inchesToMeters(10)),

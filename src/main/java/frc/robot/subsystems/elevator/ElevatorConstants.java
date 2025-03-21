@@ -42,7 +42,7 @@ public class ElevatorConstants {
     L1(45),
     L2(10),
     L3(37.5),
-    L4(78),
+    L4(80),
     SCORE(20),
     REVERSESCORE(70),
     BARGE(80),
