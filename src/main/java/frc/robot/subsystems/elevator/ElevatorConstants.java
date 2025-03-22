@@ -39,16 +39,17 @@ public class ElevatorConstants {
     POSTINTAKE(23),
     GROUNDINTAKE(0.5),
     GROUNDALGAE(15),
+    NORM_LOLI_L4(80),
     L1(45),
     L2(10),
     L3(37.5),
     L4(80),
-    ReverseL4(83),
+    ReverseL4(85),
     SCORE(20),
     REVERSESCORE(60),
     BARGE(80),
-    L2ALGAE(44.5),
-    L3ALGAE(67.5),
+    L2ALGAE(61),
+    L3ALGAE(83),
     HOLD_ALGAE(7);
 
     public final double setpoint;

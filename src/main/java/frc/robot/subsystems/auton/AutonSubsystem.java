@@ -81,7 +81,14 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
+    NamedCommands.registerCommand("LolipopScoreReady", lolipopScoreReady());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
+  }
+
+  private SequentialCommandGroup lolipopScoreReady() {
+    return new SequentialCommandGroup(
+        mWrist.setPIDCmd(WristConstants.Setpoints.NORM_LOLI_L4),
+        mElevator.setPIDCmd(ElevatorConstants.Setpoints.NORM_LOLI_L4));
   }
 
   private SequentialCommandGroup lolipopReady() {
@@ -108,11 +115,10 @@ public class AutonSubsystem {
 
   private ParallelCommandGroup reverseScoreL4() {
     return new ParallelCommandGroup(
+        mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
         mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF),
         new WaitCommand(0.1)
-            .andThen(
-                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE)));
+            .andThen(mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE)));
   }
 
   private ParallelCommandGroup holdAlgae() {

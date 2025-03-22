@@ -266,13 +266,10 @@ public class ControlsSubsystem extends SubsystemBase {
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbLetGo)
         .whileTrue(
-            new SequentialCommandGroup(
+            new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-                mClaw.scoreCoralCmd(),
-                new ParallelDeadlineGroup(
-                    new WaitCommand(0.25),
-                    mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_CORAL.get()))));
+                new WaitCommand(0.1).andThen(mClaw.scoreReverseCoralCmd())));
     // .whileFalse();
 
     operatorButtonboard
@@ -309,12 +306,12 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.INTAKE_ALGAE))))
-        .onFalse(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get())));
+    // .onFalse(
+    //     new ParallelCommandGroup(
+    //         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+    //         mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+    //         new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kAlgaePickupL3)
@@ -322,12 +319,12 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.INTAKE_ALGAE))))
-        .onFalse(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-                new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get())));
+    // .onFalse(
+    //     new ParallelCommandGroup(
+    //         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+    //         mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+    //         new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE))));
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kPickup)
         .whileTrue(
