@@ -25,9 +25,9 @@ public class VisionConstants {
   // public static final double kDistOffset = Units.inchesToMeters(2);
 
   public enum PoseOffsets {
-    LEFT(kDistBetweenBranchesCenter / 2.0 + Units.inchesToMeters(2)),
+    LEFT(kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(2)),
     CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(0));
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(-2));
 
     public final double offset;
 
