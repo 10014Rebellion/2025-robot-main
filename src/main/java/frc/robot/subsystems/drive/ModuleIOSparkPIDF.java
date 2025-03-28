@@ -140,6 +140,8 @@ public class ModuleIOSparkPIDF implements ModuleIO {
     driveController = new PIDController(driveKp, 0.0, driveKd);
     turnController = new PIDController(turnKp, 0.0, turnKd);
 
+    turnController.enableContinuousInput(turnPIDMinInput, turnPIDMaxInput);
+
     // Create odometry queues
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
     drivePositionQueue =

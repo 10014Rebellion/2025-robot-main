@@ -17,7 +17,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.sensors.BeambreakSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -39,7 +38,6 @@ public class RobotContainer {
   private final WristSubsystem mWrist;
   private final VisionSubsystem mVision;
   private final ElevatorSubsystem mElevator;
-  private final PivotSubsystem mPivot;
   private final ControlsSubsystem mControls;
   private final BeambreakSubsystem mBeambreak;
   private final TelemetrySubsystem mTelemetry;
@@ -51,12 +49,11 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
+    mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
-    mTelemetry = new TelemetrySubsystem();
     mIntake = new IntakeSubsystem();
-    mPivot = new PivotSubsystem();
     mBeambreak = new BeambreakSubsystem();
     mLEDs = new LEDSubsystem();
 
@@ -68,7 +65,8 @@ public class RobotContainer {
                 new ModuleIOSpark(0),
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
-                new ModuleIOSpark(3));
+                new ModuleIOSpark(3),
+                mTelemetry);
         break;
 
       case SIM:
@@ -78,7 +76,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                new ModuleIOSim());
+                new ModuleIOSim(),
+                mTelemetry);
         break;
 
       default:
@@ -88,14 +87,15 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIO() {},
+                mTelemetry);
         break;
     }
 
     mVision =
         new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
-    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mPivot, mIntake, mClaw);
-    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mPivot, mIntake);
+    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw);
+    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
     mAutons.configureNamedCommands();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

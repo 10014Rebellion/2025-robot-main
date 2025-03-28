@@ -21,7 +21,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -36,7 +35,6 @@ public class AutonSubsystem {
   private final VisionSubsystem mVision;
   private final ClawSubsystem mClaw;
   private final ElevatorSubsystem mElevator;
-  private final PivotSubsystem mPivot;
   private final IntakeSubsystem mIntake;
   private final WristSubsystem mWrist;
 
@@ -46,14 +44,12 @@ public class AutonSubsystem {
       VisionSubsystem pVision,
       ClawSubsystem pClaw,
       ElevatorSubsystem pElevator,
-      PivotSubsystem pPivot,
       IntakeSubsystem pIntake) {
     this.mDrive = pDrive;
     this.mWrist = pWrist;
     this.mVision = pVision;
     this.mClaw = pClaw;
     this.mElevator = pElevator;
-    this.mPivot = pPivot;
     this.mIntake = pIntake;
   }
 

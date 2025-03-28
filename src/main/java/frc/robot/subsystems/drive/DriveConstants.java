@@ -129,7 +129,7 @@ public class DriveConstants {
 
   public static final double robotMassKg = 61.9;
   public static final double robotMOI = 6.883; // TODO: CONFIGURE ME MAY BE 5.39
-  public static final double wheelCOF = 1.2; // TODO: CONFIGURE ME
+  public static final double wheelCOF = 1.6;
 
   public static final double kVortexFreeSpeed = 5.33;
   public static final double kMaxLinearSpeedMPS = kVortexFreeSpeed;

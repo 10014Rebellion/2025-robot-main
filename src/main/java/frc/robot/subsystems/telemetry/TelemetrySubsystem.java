@@ -4,19 +4,26 @@
 
 package frc.robot.subsystems.telemetry;
 
-import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.sensors.Potentiometer;
 
 public class TelemetrySubsystem extends SubsystemBase {
+  Field2d mField = new Field2d();
 
-  HttpCamera frontRight =
-      new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1182/stream.mjpg");
-  HttpCamera frontLeft =
-      new HttpCamera("PhotonVisionCamera", "http://10.100.14.99:1184/stream.mjpg");
+  public TelemetrySubsystem() {
+    SmartDashboard.putData("RobotPose", mField);
+  }
 
-  public TelemetrySubsystem() {}
+  public void add(String label, double value) {
+    SmartDashboard.putNumber(label, value);
+  }
+
+  public void add(Pose2d pose) {
+    mField.setRobotPose(pose);
+  }
 
   @Override
   public void periodic() {

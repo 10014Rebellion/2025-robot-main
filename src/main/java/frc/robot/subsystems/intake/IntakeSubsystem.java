@@ -17,7 +17,6 @@ import frc.robot.subsystems.intake.IntakeConstants.Beambreak;
 import frc.robot.subsystems.intake.IntakeConstants.Indexer;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePivot;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeRoller;
-import frc.robot.subsystems.pivot.PivotConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.util.*;
 
@@ -54,7 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
             new Constraints(IntakePivot.kMaxVelocity, IntakePivot.kMaxAcceleration));
     this.mIntakePivotProfiledPID.setTolerance(IntakeConstants.IntakePivot.kTolerance);
     this.mIntakePivotFF =
-        new ArmFeedforward(IntakePivot.kS, PivotConstants.kG, IntakePivot.kV, IntakePivot.kA);
+        new ArmFeedforward(IntakePivot.kS, IntakePivot.kG, IntakePivot.kV, IntakePivot.kA);
 
     mIntakePivotMotor.configure(
         IntakePivot.kPivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);

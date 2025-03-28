@@ -27,7 +27,6 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
@@ -56,21 +55,18 @@ public class ControlsSubsystem extends SubsystemBase {
   private final ElevatorSubsystem mElevator;
   private final IntakeSubsystem mIntake;
   private final ClawSubsystem mClaw;
-  private final PivotSubsystem mPivot;
 
   public ControlsSubsystem(
       DriveSubsystem pDrive,
       VisionSubsystem pVision,
       WristSubsystem pWrist,
       ElevatorSubsystem pElevator,
-      PivotSubsystem pPivot,
       IntakeSubsystem pIntake,
       ClawSubsystem pClaw) {
     this.mDrive = pDrive;
     this.mVision = pVision;
     this.mWrist = pWrist;
     this.mElevator = pElevator;
-    this.mPivot = pPivot;
     this.mIntake = pIntake;
     this.mClaw = pClaw;
 
@@ -120,7 +116,6 @@ public class ControlsSubsystem extends SubsystemBase {
         .leftBumper()
         .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
         .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
-    ;
     driverController
         .y()
         .whileTrue(
