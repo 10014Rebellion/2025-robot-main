@@ -137,9 +137,15 @@ public class ControlsSubsystem extends SubsystemBase {
     mDrive.setDefaultCommand(
         DriveCommands.joystickDrive(
             mDrive,
-            () -> -driverController.getLeftY(),
-            () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX(),
+            () ->
+                -Math.pow(driverController.getLeftY(), 2)
+                    * Math.signum(driverController.getLeftY()),
+            () ->
+                -Math.pow(driverController.getLeftX(), 2)
+                    * Math.signum(driverController.getLeftX()),
+            () ->
+                -Math.pow(driverController.getRightX(), 2)
+                    * Math.signum(driverController.getRightX()),
             () -> mSwerveFieldOriented));
 
     driverController

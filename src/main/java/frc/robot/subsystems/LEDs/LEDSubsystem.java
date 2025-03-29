@@ -59,7 +59,7 @@ public class LEDSubsystem extends SubsystemBase {
       WristSubsystem wristSubsystem,
       DriveSubsystem driveSubsystem) {
     new Trigger(() -> clawSubsystem.getBeamBreak())
-        .whileTrue(new InstantCommand(() -> setColor(LEDConstants.ledColor.PURPLE.getColor())))
+        .whileTrue(new InstantCommand(() -> setColor(LEDConstants.ledColor.YELLOW.getColor())))
         .whileFalse(new InstantCommand(() -> setColor(!Robot.gIsBlueAlliance ? 60 : 120)));
 
     new Trigger(

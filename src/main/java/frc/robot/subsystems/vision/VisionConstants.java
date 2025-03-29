@@ -22,12 +22,12 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 public class VisionConstants {
 
   public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13);
-  // public static final double kDistOffset = Units.inchesToMeters(2);
+  public static final double kDistOffset = Units.inchesToMeters(1.5);
 
   public enum PoseOffsets {
-    LEFT(kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(2)),
+    LEFT(kDistBetweenBranchesCenter / 2.0 + kDistOffset),
     CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - Units.inchesToMeters(-2));
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 + kDistOffset);
 
     public final double offset;
 
@@ -65,8 +65,8 @@ public class VisionConstants {
   public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
   public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
 
-  public static final double kRobotYLength = Units.inchesToMeters(37.0);
-  public static final double kRobotXLength = Units.inchesToMeters(35.5);
+  public static final double kRobotYLength = Units.inchesToMeters(35.5);
+  public static final double kRobotXLength = Units.inchesToMeters(37.0);
 
   // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -121,14 +121,14 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-13.409), // X: inches forward
-                      Units.inchesToMeters(12.908), // Y: inches left
+                      Units.inchesToMeters(12.908), // X: inches forward
+                      Units.inchesToMeters(13.409), // Y: inches left
                       Units.inchesToMeters(12.77) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(60) // Yaw: (angled inward)
+                      Units.degreesToRadians(-30) // Yaw: (angled inward)
                       ))),
 
           // Front Right Camera (Mounted near FR swerve module)
@@ -136,14 +136,14 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(13.409), // X: inches forward
-                      Units.inchesToMeters(12.908), // Y: inches left
+                      Units.inchesToMeters(12.908), // X: inches forward
+                      Units.inchesToMeters(-13.409), // Y: inches right
                       Units.inchesToMeters(12.77) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upward tilt
-                      Units.degreesToRadians(120) // Yaw: (angled inward)
+                      Units.degreesToRadians(30) // Yaw: (angled inward)
                       ))),
 
           // Rear Left Camera (Mounted near BL swerve module)
@@ -151,14 +151,14 @@ public class VisionConstants {
               BACK_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-13.127), // X: inches back
-                      Units.inchesToMeters(-13.503), // Y: inches right
+                      Units.inchesToMeters(-13.503), // X: inches back
+                      Units.inchesToMeters(13.127), // Y: inches left
                       Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(-75) // Yaw: 15 degrees angled inwards
+                      Units.degreesToRadians(-165) // Yaw: 15 degrees angled inwards
                       ))),
 
           // Rear Right Camera (Mounted near BR swerve module)
@@ -166,13 +166,13 @@ public class VisionConstants {
               BACK_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(13.127), // X: inches forward
-                      Units.inchesToMeters(-13.503), // Y: inches right
+                      Units.inchesToMeters(-13.503), // X: inches forward
+                      Units.inchesToMeters(-13.127), // Y: inches right
                       Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(-105) // Yaw: 15 degrees angled inwards
+                      Units.degreesToRadians(165) // Yaw: 15 degrees angled inwards
                       ))));
 }

@@ -9,8 +9,8 @@ public class BeambreakSubsystem extends SubsystemBase {
   private final DigitalInput mBeamBreakHangLeft;
 
   public BeambreakSubsystem() {
-    mBeamBreakHangRight = new DigitalInput(3);
-    mBeamBreakHangLeft = new DigitalInput(4);
+    mBeamBreakHangRight = new DigitalInput(9);
+    mBeamBreakHangLeft = new DigitalInput(8);
   }
 
   public boolean hasCageLeft() {

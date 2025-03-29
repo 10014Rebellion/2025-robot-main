@@ -15,7 +15,8 @@ public class LEDConstants {
     RED(60),
     BLUE(120),
     PURPLE(90),
-    GREEN(20);
+    GREEN(20),
+    YELLOW(50);
 
     public final int color;
 

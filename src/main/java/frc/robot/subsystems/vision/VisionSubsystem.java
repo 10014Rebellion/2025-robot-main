@@ -97,6 +97,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public Pose2d getReefScoringPose(
       int pTagID, double pDistanceInches, Supplier<PoseOffsets> pOffset) {
+    System.out.println("Pose offset left: " + pOffset.get().getOffsetM());
     return getPoseInFrontOfAprilTag(
         pTagID, Units.inchesToMeters(pDistanceInches), pOffset.get().getOffsetM());
   }
@@ -153,7 +154,7 @@ public class VisionSubsystem extends SubsystemBase {
                     0,
                     0,
                     new Rotation2d(
-                        Math.toRadians(-90.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
+                        Math.toRadians(0.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
     Logger.recordOutput("Robot/Vision/AprilTagSetpoint", targetPose2d);
     return targetPose2d;
   }
@@ -211,12 +212,13 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void updateTelemetry() {
-    boolean isConnected = mCameraList.get(0).isConnected() && mCameraList.get(1).isConnected();
+    boolean isConnected =
+        false; // = mCameraList.get(0).isConnected() && mCameraList.get(1).isConnected();
     Logger.recordOutput("Robot/Vision/Cams Connected", isConnected);
     Logger.recordOutput("Robot/Vision/EstimatedPose", mDriveSubsystem.getPose());
     // for (PoseCamera camera : mCameraList) {
-    //   Logger.recordOutput("Vision/Pose/" + camera.getCameraName(),
-    // camera.getCameraPoseEstimate());
+    //   Logger.recordOutput(
+    //       "Vision/Pose/" + camera.getCameraName(), camera.getCameraPoseEstimate().toPose2d());
     // }
   }
 }

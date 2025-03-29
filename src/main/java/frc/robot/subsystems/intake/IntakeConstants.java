@@ -6,7 +6,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IntakeConstants {
   public static class Beambreak {
-    public static int kFrontSensorDIOPort = 5;
+    public static int kFrontSensorDIOPort = 3;
     public static int kBackSensorDIOPort = 6;
   }
 
