@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class defines the runtime mode used by AdvantageKit. The mode is always "real" when running
@@ -20,7 +19,6 @@ public final class Constants {
 
   public static final double kFieldLengthMeters = kFieldLayout.getFieldLength();
   public static final double kFieldWidthMeters = kFieldLayout.getFieldWidth();
-
 
   public static enum Mode {
     /** Running on a real robot. */
