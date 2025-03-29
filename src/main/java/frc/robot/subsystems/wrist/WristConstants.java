@@ -53,7 +53,7 @@ public class WristConstants {
     L3ALGAE(-12),
     HOLD_ALGAE(14),
     CLIMB(45),
-    GROUNDINTAKE(-20),
+    GROUNDINTAKE(-17),
     GROUNDALGAE(-35);
 
     public final double setpoint;

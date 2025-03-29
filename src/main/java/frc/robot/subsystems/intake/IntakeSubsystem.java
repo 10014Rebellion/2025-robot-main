@@ -141,7 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
         },
         (interrupted) ->
             setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
-        () -> isPIDAtGoalIntakePivot(),
+        () -> false, // isPIDAtGoalIntakePivot(),
         this);
   }
 
@@ -207,7 +207,7 @@ public class IntakeSubsystem extends SubsystemBase {
           setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
         },
         (interrupted) -> {
-          setVoltsIndexer(0.25);
+          setVoltsIndexer(1.0);
         },
         () -> {
           return getCoralDetected();

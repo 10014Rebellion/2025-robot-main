@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.855,
-        "y": 2.796
+        "x": 4.96,
+        "y": 2.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.5625,
-        "y": 1.6839405737704927
+        "x": 4.6674999999999995,
+        "y": 1.6879405737704927
       },
       "isLocked": false,
       "linkedName": "C3"
     },
     {
       "anchor": {
-        "x": 1.5584016393442621,
-        "y": 1.9691086065573769
+        "x": 1.62,
+        "y": 2.27
       },
       "prevControl": {
-        "x": 2.5893442622950817,
-        "y": 1.7053790983606563
+        "x": 3.125299183493221,
+        "y": 2.27
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 71.56505117707799
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 117.83644365937397
   },
   "useDefaultConstraints": false
 }

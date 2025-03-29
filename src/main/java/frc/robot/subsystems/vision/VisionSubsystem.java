@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.MiscUtils;
 import frc.robot.util.PoseCamera;
 import java.util.ArrayList;
@@ -156,6 +157,7 @@ public class VisionSubsystem extends SubsystemBase {
                     new Rotation2d(
                         Math.toRadians(0.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
     Logger.recordOutput("Robot/Vision/AprilTagSetpoint", targetPose2d);
+    Logger.recordOutput("Robot/Vision/AltAprilTagSetpoint", AllianceFlipUtil.apply(targetPose2d));
     return targetPose2d;
   }
 
@@ -216,6 +218,8 @@ public class VisionSubsystem extends SubsystemBase {
         false; // = mCameraList.get(0).isConnected() && mCameraList.get(1).isConnected();
     Logger.recordOutput("Robot/Vision/Cams Connected", isConnected);
     Logger.recordOutput("Robot/Vision/EstimatedPose", mDriveSubsystem.getPose());
+    Logger.recordOutput(
+        "Robot/Vision/AltEstimatedPose", AllianceFlipUtil.apply(mDriveSubsystem.getPose()));
     // for (PoseCamera camera : mCameraList) {
     //   Logger.recordOutput(
     //       "Vision/Pose/" + camera.getCameraName(), camera.getCameraPoseEstimate().toPose2d());

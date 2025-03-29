@@ -111,9 +111,9 @@ public class ControlsSubsystem extends SubsystemBase {
                     .setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
                     .andThen(mIntake.enableFFCmd()),
                 mIntake.setIndexerCmd(0),
-                mIntake.setRollerCmd(0),
-                mElevator.enableFFCmd(),
-                mWrist.enableFFCmd()));
+                mIntake.setRollerCmd(0)));
+    // mElevator.enableFFCmd(),
+    // mWrist.enableFFCmd()));
     driverController
         .leftBumper()
         .whileTrue(
@@ -313,7 +313,8 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get())));
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
+        .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()));
     // .onFalse(
     //     new ParallelCommandGroup(
     //         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
@@ -326,7 +327,8 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_BARGE.get())));
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
+        .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()));
     // .onFalse(
     //     new ParallelCommandGroup(
     //         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),

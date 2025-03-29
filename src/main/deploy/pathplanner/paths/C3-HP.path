@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.855,
-        "y": 2.796
+        "x": 4.96,
+        "y": 2.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.546676229508197,
-        "y": 2.2494405737704923
+        "x": 4.651676229508197,
+        "y": 2.2534405737704923
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -48,7 +48,7 @@
   "folder": "South Side HP",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 117.83644365937397
   },
   "useDefaultConstraints": true
 }

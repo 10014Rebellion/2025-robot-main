@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5584016393442621,
-        "y": 1.9691086065573769
+        "x": 1.62,
+        "y": 2.27
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.558401639344262,
-        "y": 1.9691086065573773
+        "x": 2.62,
+        "y": 2.2700000000000005
       },
       "isLocked": false,
       "linkedName": "Loli1"
     },
     {
       "anchor": {
-        "x": 3.824,
-        "y": 2.964
+        "x": 3.79,
+        "y": 2.92
       },
       "prevControl": {
-        "x": 3.239,
-        "y": 2.19375
+        "x": 3.306391154314771,
+        "y": 2.082364908283446
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 149.88626684901755
+    "rotation": -119.99999999999999
   },
   "reversed": false,
   "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 71.56505117707799
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

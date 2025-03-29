@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
-import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.RollerSpeed;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -91,9 +90,9 @@ public class AutonSubsystem {
     return new SequentialCommandGroup(
         new WaitCommand(0.1),
         new ParallelCommandGroup(
+            mClaw.intakeCoralCmd(),
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
-            mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
-            new SequentialCommandGroup(new WaitCommand(0.1), mClaw.intakeCoralCmd())));
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE)));
   }
 
   private SequentialCommandGroup scoreProcessor() {
@@ -103,18 +102,19 @@ public class AutonSubsystem {
         new InstantCommand(() -> mClaw.setClaw(0)));
   }
 
-  private ParallelCommandGroup reverseL4() {
-    return new ParallelCommandGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4));
+  private SequentialCommandGroup reverseL4() {
+    return new SequentialCommandGroup(
+        new WaitCommand(0.2),
+        new ParallelCommandGroup(
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4),
+            mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4)));
   }
 
   private ParallelCommandGroup reverseScoreL4() {
     return new ParallelCommandGroup(
+        mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
         mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-        mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF),
-        new WaitCommand(0.1)
-            .andThen(mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE)));
+        new WaitCommand(0.1).andThen(mClaw.scoreReverseCoralCmd()));
   }
 
   private ParallelCommandGroup holdAlgae() {

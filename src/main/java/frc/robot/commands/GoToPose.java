@@ -123,6 +123,8 @@ public class GoToPose extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    mDriveSubsystem.isAtPose = withinTolerance(0.05, new Rotation2d(1.0));
+
     // StateDaddy.currentDrive = StateEnums.Drive.Current.MOVING_TO_SETPOINT;
 
     running = true;

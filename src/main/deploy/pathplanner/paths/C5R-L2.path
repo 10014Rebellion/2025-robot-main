@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.8240778688524584,
-        "y": 2.9640881147540985
+        "x": 3.79,
+        "y": 2.92
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.083077868852458,
-        "y": 2.798338114754098
+        "x": 3.0489999999999995,
+        "y": 2.7542499999999994
       },
       "isLocked": false,
       "linkedName": "C5R"
@@ -48,7 +48,7 @@
   "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 149.88626684901755
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": true
 }

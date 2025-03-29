@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.855,
-        "y": 2.796
+        "x": 4.96,
+        "y": 2.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.8289098360655744,
-        "y": 3.8222274590163945
+        "x": 7.933909836065574,
+        "y": 3.8262274590163945
       },
       "isLocked": false,
       "linkedName": "C3"
@@ -48,7 +48,7 @@
   "folder": "South Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 117.83644365937397
   },
   "useDefaultConstraints": true
 }

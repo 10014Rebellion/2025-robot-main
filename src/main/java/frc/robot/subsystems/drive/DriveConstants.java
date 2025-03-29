@@ -23,9 +23,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DriveConstants {
-  public static final double kHighSpeedTrans = 0.9;
-  public static final double kHighSpeedRot = 0.8;
-  public static final double kLowSpeedTrans = .25;
+  public static final double kHighSpeedTrans = 1.0;
+  public static final double kHighSpeedRot = 1.0;
+  public static final double kLowSpeedTrans = .3;
   public static final double kLowSPeedRot = .25;
 
   public static final double maxSpeedMetersPerSec = 4.8;
