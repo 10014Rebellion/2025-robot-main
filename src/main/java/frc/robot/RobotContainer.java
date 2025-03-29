@@ -124,8 +124,9 @@ public class RobotContainer {
   private void configureButtonBindings() {
     mControls.initDriverController();
     // mControls.initTuningDrive();
-    mControls.initOperatorButtonboard();
+    // mControls.initOperatorButtonboard();
     mControls.initDrivebase();
+    // mControls.initTesting();
   }
 
   public Command getAutonomousCommand() {

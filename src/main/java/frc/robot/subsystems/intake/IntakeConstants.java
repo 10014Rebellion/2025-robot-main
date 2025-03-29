@@ -16,7 +16,7 @@ public class IntakeConstants {
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static int kCurrentLimit = 60;
 
-    public static int kIntakeVolts = 3;
+    public static int kIntakeVolts = 2;
     public static int kOuttakeVolts = -3;
 
     public static final SparkMaxConfig kIndexerConfig = new SparkMaxConfig();
@@ -32,8 +32,9 @@ public class IntakeConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static boolean kInverted = false;
+    public static double kIntakeSpeed = 9;
 
-    public static int kRollerCurrentLimit = 80;
+    public static int kRollerCurrentLimit = 60;
 
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 
@@ -44,40 +45,39 @@ public class IntakeConstants {
 
   public static class IntakePivot {
     public static int kPivotID = 53;
-    public static int kEncoderPort = 0;
-    public static double kEncoderOffsetDeg = -120.0;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static boolean kInverted = false;
+    public static boolean kEncoderInverted = true;
 
     public static int kCurrentLimit = 60;
 
     public static double kPositionConversionFactor = 360.0;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60;
 
-    public static double kEncoderOffsetRev = 0;
+    public static double kEncoderOffsetRev = 0.175553;
 
     public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
 
     public static double kTolerance = 3;
-    public static double kP = 0.08;
-    public static double kD = 0;
-    public static double kMaxVelocity = 0;
-    public static double kMaxAcceleration = 0;
+    public static double kP = 0.2;
+    public static double kD = 0.001;
+    public static double kMaxVelocity = 200; // Theoretical max: 1555
+    public static double kMaxAcceleration = 400; // Theoretical max: 16179 deg/s^2
 
-    public static double kForwardSoftLimit = 100.0; // TO DO: CONFIGURE ME!
-    public static double kReverseSoftLimit = 0.0; // TO DO: CONFIGURE ME!
+    public static double kForwardSoftLimit = 90.0; // TO DO: CONFIGURE ME!
+    public static double kReverseSoftLimit = 2.0; // TO DO: CONFIGURE ME!
 
-    public static double kS = 0.0;
-    public static double kG = 0.3;
-    public static double kV = 0.0;
-    public static double kA = 0.0;
+    public static double kS = 0.34;
+    public static double kG = 0.75;
+    public static double kV = 0.43;
+    public static double kA = 0.06;
 
     public enum Setpoints {
-      STOWED(100.0),
-      ALGAEINTAKE(75),
-      INTAKING(0.0);
+      STOWED(90.0),
+      ALGAEINTAKE(70),
+      INTAKING(2.0);
       public final double position;
 
       private Setpoints(double position) {
@@ -91,6 +91,13 @@ public class IntakeConstants {
 
     static {
       kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kInverted);
+      kPivotConfig.absoluteEncoder.inverted(kEncoderInverted);
+      kPivotConfig
+          .absoluteEncoder
+          .positionConversionFactor(kPositionConversionFactor)
+          .velocityConversionFactor(kVelocityConversionFactor)
+          .inverted(kEncoderInverted)
+          .zeroOffset(kEncoderOffsetRev);
     }
   }
 }
