@@ -98,7 +98,7 @@ public class ControlsSubsystem extends SubsystemBase {
                             mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                             mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
                     mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                    mIntake.setRollerCmd(8)),
+                    mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed)),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
@@ -107,14 +107,20 @@ public class ControlsSubsystem extends SubsystemBase {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
         .whileFalse(
             new ParallelCommandGroup(
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED),
+                mIntake
+                    .setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
+                    .andThen(mIntake.enableFFCmd()),
                 mIntake.setIndexerCmd(0),
                 mIntake.setRollerCmd(0),
                 mElevator.enableFFCmd(),
                 mWrist.enableFFCmd()));
     driverController
         .leftBumper()
-        .whileTrue(new ParallelCommandGroup(mIntake.setIndexerCmd(-2), mIntake.setRollerCmd(-8)))
+        .whileTrue(
+            new ParallelCommandGroup(
+                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.ALGAEINTAKE),
+                mIntake.setIndexerCmd(-2),
+                mIntake.setRollerCmd(-8)))
         .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
     driverController
         .y()
@@ -349,6 +355,17 @@ public class ControlsSubsystem extends SubsystemBase {
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kGoToBarge)
         .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
+  }
+
+  public void initTesting() {
+    driverController.povRight().whileTrue(mIntake.setTunablePIDIntakeCommand());
+    driverController.povLeft().whileTrue(mIntake.setTunablePivotCmd());
+
+    driverController.povUp().whileTrue(mIntake.setPivotCmd(3.0));
+    driverController.povDown().whileTrue(mIntake.setPivotCmd(-1.0));
+
+    driverController.rightBumper().whileTrue(mIntake.setRollerCmd(6.0));
+    driverController.leftBumper().whileTrue(mIntake.setRollerCmd(-6.0));
   }
 
   private void levelToElevator(IntSupplier level) {
