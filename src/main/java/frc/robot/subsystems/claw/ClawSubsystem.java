@@ -91,6 +91,8 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
+  // returns true when beambreak is broken (Coral is in the claw)
+  // returns false when beambreak is intact (Coral is not in the claw)
   public boolean getBeamBreak() {
     return !mBeamBreak.get();
   }

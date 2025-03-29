@@ -45,6 +45,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
+  public boolean isAtPose = false;
+
   public double mDriveSpeedMultiplier = kHighSpeedTrans;
   public double mRotationSpeedMultiplier = kHighSpeedRot;
   static final Lock odometryLock = new ReentrantLock();

@@ -55,7 +55,6 @@ public class RobotContainer {
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
     mBeambreak = new BeambreakSubsystem();
-    mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -91,6 +90,8 @@ public class RobotContainer {
                 mTelemetry);
         break;
     }
+
+    mLEDs = new LEDSubsystem(mClaw, mIntake, mElevator, mWrist, mDrive);
 
     mVision =
         new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());

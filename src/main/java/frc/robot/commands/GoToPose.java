@@ -93,7 +93,7 @@ public class GoToPose extends Command {
 
   @Override
   public void initialize() {
-
+    mDriveSubsystem.isAtPose = false;
     Pose2d currentPose = mCurrentPoseSupplier.get();
     ChassisSpeeds fieldVelocity = mDriveSubsystem.getFieldVelocity();
     Translation2d linearFieldVelocity =
@@ -261,6 +261,7 @@ public class GoToPose extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    mDriveSubsystem.isAtPose = true;
     mDriveSubsystem.stop();
     // StateDaddy.currentDrive = StateEnums.Drive.Current.MANUAL;
     running = false;
@@ -275,7 +276,6 @@ public class GoToPose extends Command {
 
   @Override
   public boolean isFinished() {
-
     return withinTolerance(driveTolerance.get(), new Rotation2d(thetaTolerance.get()));
   }
 

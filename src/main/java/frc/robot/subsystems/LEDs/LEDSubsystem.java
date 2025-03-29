@@ -2,12 +2,17 @@ package frc.robot.subsystems.LEDs;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.subsystems.LEDs.LEDConstants.RGBLEDColor;
+import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.wrist.WristSubsystem;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -23,9 +28,16 @@ public class LEDSubsystem extends SubsystemBase {
   private int hueVariation = 180;
   private int startingLED;
 
+  public Trigger hasCoral;
+
   private boolean instantTransition;
 
-  public LEDSubsystem() {
+  public LEDSubsystem(
+      ClawSubsystem clawSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      WristSubsystem wristSubsystem,
+      DriveSubsystem driveSubsystem) {
     led = new AddressableLED(0);
     ledBuffer = new AddressableLEDBuffer(1000); // Update this with the correct lenth later
 
@@ -35,6 +47,29 @@ public class LEDSubsystem extends SubsystemBase {
     led.start();
 
     startingLED = 0;
+
+    initTriggers(clawSubsystem, intakeSubsystem, elevatorSubsystem, wristSubsystem, driveSubsystem);
+    setColor(!Robot.gIsBlueAlliance ? 60 : 120);
+  }
+
+  private void initTriggers(
+      ClawSubsystem clawSubsystem,
+      IntakeSubsystem intakeSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      WristSubsystem wristSubsystem,
+      DriveSubsystem driveSubsystem) {
+    new Trigger(() -> clawSubsystem.getBeamBreak())
+        .whileTrue(new InstantCommand(() -> setColor(LEDConstants.ledColor.PURPLE.getColor())))
+        .whileFalse(new InstantCommand(() -> setColor(!Robot.gIsBlueAlliance ? 60 : 120)));
+
+    new Trigger(
+            () ->
+                driveSubsystem.isAtPose
+                    && elevatorSubsystem.isPIDAtGoal()
+                    && clawSubsystem.getBeamBreak()
+                    && wristSubsystem.isPIDAtGoal())
+        .whileTrue(new InstantCommand(() -> setColor(LEDConstants.ledColor.GREEN.getColor())))
+        .whileFalse(new InstantCommand(() -> setColor(!Robot.gIsBlueAlliance ? 60 : 120)));
   }
 
   public void setStripColor(int red, int green, int blue) {
@@ -172,15 +207,16 @@ public class LEDSubsystem extends SubsystemBase {
     // } else if (ClawConstants.Claw.hasCoral) {
     //   setColor(20);
     // } else setColor(60);
-    if (SmartDashboard.getBoolean("Claw/Beam Break", false)) {
-      setColor(20);
-    } else {
-      if (!Robot.gIsBlueAlliance) {
-        setColor(60);
-      } else {
-        setColor(120);
-      }
-    }
+
+    // if (SmartDashboard.getBoolean("Claw/Beam Break", false)) {
+    //   setColor(20);
+    // } else {
+    //   if (!Robot.gIsBlueAlliance) {
+    //     setColor(60);
+    //   } else {
+    //     setColor(120);
+    //   }
+    // }
     led.setData(ledBuffer);
 
     // rainbowUnicornVomit();

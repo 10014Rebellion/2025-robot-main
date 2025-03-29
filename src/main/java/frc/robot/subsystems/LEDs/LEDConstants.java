@@ -12,18 +12,18 @@ public class LEDConstants {
   }
 
   public enum ledColor {
-    RED(60.0),
+    RED(60),
     BLUE(120),
     PURPLE(90),
     GREEN(20);
 
-    public final double color;
+    public final int color;
 
-    private ledColor(double color) {
+    private ledColor(int color) {
       this.color = color;
     }
 
-    public double getColor() {
+    public int getColor() {
       return this.color;
     }
   };
