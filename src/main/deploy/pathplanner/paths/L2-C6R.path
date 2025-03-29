@@ -45,7 +45,7 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "South Side Lolipop",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 41.785211418523616

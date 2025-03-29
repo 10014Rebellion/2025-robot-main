@@ -129,8 +129,8 @@ public class DriveConstants {
   public static final double kTotalLengthM = Units.inchesToMeters(38);
 
   public static final double robotMassKg = 61.9;
-  public static final double robotMOI = 6.883; // TODO: CONFIGURE ME MAY BE 5.39
-  public static final double wheelCOF = 1.6;
+  public static final double robotMOI = 5.602; // FROM CAD
+  public static final double wheelCOF = 1.6; // FROM SITE
 
   public static final double kVortexFreeSpeed = 5.33;
   public static final double kMaxLinearSpeedMPS = kVortexFreeSpeed;
@@ -152,8 +152,8 @@ public class DriveConstants {
       (kRunningTorque * kMaxSwerveGearReduction) * kGearboxEfficiency;
   public static final double kMaxWheelTorque = kOutputTorque / wheelRadiusMeters;
 
-  public static final double kMaxLinearAccelerationMPSSq = wheelCOF * 9.81; // Mass cancels out
-  public static final double kMaxAngularAccelerationRadPSSq = kMaxWheelTorque / robotMOI;
+  public static final double kMaxLinearAccelerationMPSSq = 15.696; // FROM CHOREO
+  public static final double kMaxAngularAccelerationRadPSSq = 75.326; // FROM CHOREO
 
   public static final double kTurnFreeSpeedRPM = 11000;
   public static final double kMaxTurnAngularRadPS =
