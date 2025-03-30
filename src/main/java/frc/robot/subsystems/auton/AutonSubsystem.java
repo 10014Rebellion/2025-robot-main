@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -76,6 +77,7 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
+    NamedCommands.registerCommand("doesThisWork", doesThisWork());
     NamedCommands.registerCommand("LolipopScoreReady", lolipopScoreReady());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
   }
@@ -88,11 +90,15 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup lolipopReady() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.1),
+        new WaitCommand(0.25),
         new ParallelCommandGroup(
-            mClaw.intakeCoralCmd(),
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
-            mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE)));
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
+            new WaitCommand(0.1).andThen(mClaw.intakeCoralCmd())));
+  }
+
+  private FunctionalCommand doesThisWork() {
+    return mClaw.intakeCoralCmd();
   }
 
   private SequentialCommandGroup scoreProcessor() {
@@ -104,7 +110,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup reverseL4() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.2),
+        new WaitCommand(0.5),
         new ParallelCommandGroup(
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4),
             mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4)));
@@ -192,7 +198,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreCoral() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.25),
+        new WaitCommand(0.125),
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
   }

@@ -20,7 +20,7 @@ public class ClawConstants {
   public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
   public enum RollerSpeed {
-    INTAKE_CORAL(4),
+    INTAKE_CORAL(6.0),
     HOLD_CORAL(0.5),
     INTAKE_ALGAE(12),
     HOLD_ALGAE(4),

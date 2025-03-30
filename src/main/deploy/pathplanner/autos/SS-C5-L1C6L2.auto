@@ -11,13 +11,89 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SS-C3"
+                  "pathName": "SS-C5"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.4
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReadyScoreSubsystemsL4"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C5-L1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ReadyScoreSubsystemsL4"
+                  "name": "LolipopReady"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L1-C6"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReadyScoreSubsystemsL2"
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -36,45 +112,26 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C3-L1"
+                  "pathName": "C6-L2(alt)"
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "LolipopReady"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "parallel",
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "path",
+                      "type": "wait",
                       "data": {
-                        "pathName": "L1-C5R"
+                        "waitTime": 0.4
                       }
                     },
                     {
                       "type": "named",
                       "data": {
-                        "name": "ReverseL4"
+                        "name": "LolipopReady"
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReverseScore"
                 }
               }
             ]
@@ -87,48 +144,35 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C5R-L2"
+                  "pathName": "L2(Alt)-C7"
                 }
               },
               {
-                "type": "named",
+                "type": "sequential",
                 "data": {
-                  "name": "LolipopReady"
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ReadyScoreSubsystemsL2"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "parallel",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "L2-C6R"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ReverseL4"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReverseScore"
-                }
-              }
-            ]
+            "name": "ScoreCoral"
           }
         }
       ]

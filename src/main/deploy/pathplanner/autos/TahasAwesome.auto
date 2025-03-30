@@ -13,20 +13,8 @@
                 "data": {
                   "pathName": "SS-C3"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReadyScoreSubsystemsL4"
-                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ScoreCoral"
           }
         },
         {
@@ -57,20 +45,27 @@
                 "data": {
                   "pathName": "L1-C5R"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReverseL4"
-                }
               }
             ]
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ReverseScore"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C5R-L2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LolipopReady"
+                }
+              }
+            ]
           }
         }
       ]

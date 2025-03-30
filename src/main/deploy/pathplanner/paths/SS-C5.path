@@ -3,54 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.62,
-        "y": 2.27
+        "x": 7.12,
+        "y": 0.775
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3243377483443712,
-        "y": 3.411920529801325
+        "x": 2.6175496688741733,
+        "y": 0.3198675496688746
       },
       "isLocked": false,
-      "linkedName": "Loli1"
+      "linkedName": "FarSouthStart"
     },
     {
       "anchor": {
-        "x": 2.5109271523178815,
-        "y": 3.92
+        "x": 3.66,
+        "y": 3.01
       },
       "prevControl": {
-        "x": 1.8865794392360957,
-        "y": 3.9226209499199833
-      },
-      "nextControl": {
-        "x": 2.8974337748344374,
-        "y": 3.9183774834437086
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.19,
-        "y": 3.92
-      },
-      "prevControl": {
-        "x": 2.6041049155557983,
-        "y": 3.92
+        "x": 2.470943708609272,
+        "y": 1.2394867549668884
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C6"
+      "linkedName": "C5"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 59.99999999999999
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.5,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -63,10 +61,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "South Side Lolipop",
+  "folder": "South Start",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

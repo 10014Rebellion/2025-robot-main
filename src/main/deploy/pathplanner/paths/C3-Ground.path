@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.19,
-        "y": 3.92
+        "x": 4.96,
+        "y": 2.8
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3921885556290126,
-        "y": 3.2505567112792906
+        "x": 5.003228476821192,
+        "y": 1.479387417218544
       },
       "isLocked": false,
-      "linkedName": "C6"
+      "linkedName": "C3"
     },
     {
       "anchor": {
-        "x": 2.497599337748345,
-        "y": 3.92
+        "x": 1.28,
+        "y": 1.6
       },
       "prevControl": {
-        "x": 2.865386328666546,
-        "y": 3.758166519382274
-      },
-      "nextControl": {
-        "x": 2.2687722320753134,
-        "y": 4.0206884090116795
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 1.23825,
-        "y": 3.4595
-      },
-      "prevControl": {
-        "x": 1.6593261589403976,
-        "y": 3.464466887417218
+        "x": 2.950745033112583,
+        "y": 1.6126655629139077
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L2-Working"
+      "linkedName": "SGPickup"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.9548412538722678
+    "rotation": 0.0
   },
   "reversed": false,
-  "folder": "South Side Lolipop",
+  "folder": "South Side Ground",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.1,
-        "y": 4.02
+        "x": 3.19,
+        "y": 3.92
       },
       "prevControl": {
-        "x": 1.9301598360655738,
-        "y": 4.178157786885245
+        "x": 2.0201598360655737,
+        "y": 4.078157786885244
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -91.1233027140754
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "North Side Lolipop",

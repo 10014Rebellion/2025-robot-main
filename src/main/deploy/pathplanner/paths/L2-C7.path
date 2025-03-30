@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.1,
-        "y": 4.3502
+        "x": 3.19,
+        "y": 4.24
       },
       "prevControl": {
-        "x": 2.1,
-        "y": 4.3502
+        "x": 2.19,
+        "y": 4.24
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "South Side Lolipop",
