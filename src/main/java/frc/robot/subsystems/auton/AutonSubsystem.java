@@ -90,7 +90,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup lolipopReady() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.25),
+        new WaitCommand(0.25), //  DO NOT REMOVE
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),

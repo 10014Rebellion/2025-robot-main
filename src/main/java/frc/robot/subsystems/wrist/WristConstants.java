@@ -16,7 +16,7 @@ public class WristConstants {
   public static double kP = 0.13;
   public static double kD = 0.0;
 
-  public static double kMaxAcceleration = 750; // 1000 too fast
+  public static double kMaxAcceleration = 900; // 1000 too fast
   public static double kMaxVelocity = 1000;
   public static double kTolerance = 5;
 

@@ -21,7 +21,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.4
+                        "waitTime": 1.0
                       }
                     },
                     {
@@ -167,6 +167,12 @@
           "type": "named",
           "data": {
             "name": "ScoreCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "C7-GETOUT"
           }
         }
       ]
