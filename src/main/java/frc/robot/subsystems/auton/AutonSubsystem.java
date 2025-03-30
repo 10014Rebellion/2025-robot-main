@@ -199,7 +199,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreCoral() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.125),
+        // new WaitCommand(0.125),
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
   }

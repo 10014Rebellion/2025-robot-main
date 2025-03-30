@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9511589403973515,
-        "y": 2.94544701986755
+        "x": 2.2576986754966892,
+        "y": 3.0653973509933774
       },
       "isLocked": false,
       "linkedName": "C6"
@@ -46,7 +46,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
+      "waypointRelativePos": 0.9952305246422803,
       "rotationDegrees": 90.0
     }
   ],
@@ -85,5 +85,5 @@
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
