@@ -95,6 +95,7 @@ public class AutonSubsystem {
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
             new WaitCommand(0.1).andThen(mClaw.intakeCoralCmd())));
+    // .andThen(mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDPOSTINTAKE)));
   }
 
   private FunctionalCommand doesThisWork() {
