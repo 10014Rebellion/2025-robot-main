@@ -53,6 +53,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         ElevatorConstants.kElevatorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
+
+    SmartDashboard.putNumber("Elevator/Kp", ElevatorConstants.kP);
+    SmartDashboard.putNumber("Elevator/Kd", ElevatorConstants.kD);
+
+    SmartDashboard.putNumber("Elevator/Tunable Setpoint", 0.0);
+
+    SmartDashboard.putNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
+    SmartDashboard.putNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -98,6 +106,39 @@ public class ElevatorSubsystem extends SubsystemBase {
         () -> {},
         () -> {
           setVolts(pVoltage);
+        },
+        (interrupted) -> setVolts(0),
+        () -> false,
+        this);
+  }
+
+  public FunctionalCommand setTunablePIDIntakeCommand() {
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          double newKp = SmartDashboard.getNumber("Elevator/Kp", ElevatorConstants.kP);
+          double newKd = SmartDashboard.getNumber("Elevator/Kd", ElevatorConstants.kD);
+          double pSetpoint = SmartDashboard.getNumber("Elevator/Tunable Setpoint", 0.0);
+
+          double newVel =
+              SmartDashboard.getNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
+          double newAccel =
+              SmartDashboard.getNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
+          mElevatorProfiledPID.setConstraints(new Constraints(newVel, newAccel));
+          mElevatorProfiledPID.setPID(newKp, 0.0, newKd);
+          mElevatorProfiledPID.reset(getEncReading());
+          mElevatorProfiledPID.setGoal(pSetpoint);
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID =
+              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
+
+          setVolts(calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Elevator/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Elevator/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Elevator/FF Output", calculatedFF);
         },
         (interrupted) -> setVolts(0),
         () -> false,

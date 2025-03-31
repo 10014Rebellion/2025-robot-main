@@ -376,6 +376,13 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController.leftBumper().whileTrue(mIntake.setRollerCmd(-6.0));
   }
 
+  public void initElevatorTuning() {
+    driverController.povUp().whileTrue(mElevator.setVoltsCmd(12));
+    driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
+    driverController.povLeft().whileTrue(mWrist.setVoltsCmd(2));
+    driverController.povRight().whileTrue(mWrist.setVoltsCmd(-2));
+  }
+
   private void levelToElevator(IntSupplier level) {
     int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
     // this is atrocious please redo this to work with suppliers ;-;
