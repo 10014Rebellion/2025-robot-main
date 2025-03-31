@@ -279,6 +279,13 @@ public class AutonSubsystem {
         AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5));
   }
 
+  public Command choreoAuton() {
+    return new SequentialCommandGroup(
+      followChoreoPath("SSC-C3"),
+      followChoreoPath("C3-LS")
+    );
+  }
+
   public Command followChoreoPath(String pathName) {
     PathPlannerPath path = getTraj(pathName).get();
     path.getIdealTrajectory(DriveSubsystem.robotConfig);

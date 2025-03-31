@@ -2,7 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.PoseUtils;
 
@@ -16,9 +16,9 @@ public class PoseConstants {
         7.6057252; // Measured from the inside of starting line
 
     public static class Blue {
-      public static final Pose2d kNorthLolipop = new Pose2d(1.2192, 5.8548, Rotation2d.k180deg);
-      public static final Pose2d kMiddleLolipop = new Pose2d(1.2192, 4.026, Rotation2d.k180deg);
-      public static final Pose2d kSouthLolipop = new Pose2d(1.2192, 2.1972, Rotation2d.k180deg);
+      public static final Pose2d kNorthLolipop = new Pose2d(1.2192, 5.8498, Rotation2d.k180deg);
+      public static final Pose2d kMiddleLolipop = new Pose2d(1.2192, 4.021, Rotation2d.k180deg);
+      public static final Pose2d kSouthLolipop = new Pose2d(1.2192, 2.1922, Rotation2d.k180deg);
 
       public static final Pose2d kTag17Pose =
           new Pose2d(4.073905999999999, 3.3012379999999997, Rotation2d.fromDegrees(60));
@@ -52,86 +52,20 @@ public class PoseConstants {
           new Pose2d(7.6057252, 0.7578134, Rotation2d.k180deg);
     }
 
-    public static class Red {
-      public static final Pose2d kNorthLolipop = new Pose2d(16.3288, 5.8548, Rotation2d.kZero);
-      public static final Pose2d kMiddleLolipop = new Pose2d(16.3288, 4.026, Rotation2d.kZero);
-      public static final Pose2d kSouthLolipop = new Pose2d(16.3288, 2.1972, Rotation2d.kZero);
-    }
   }
 
   public static class Bot {
-    public static final double kBackupPose =
-        -1 * ((VisionConstants.kRobotSideLength / 2.0) + VisionConstants.kScoringDistance);
-    public static final Pose2d kC12Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag21Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC1Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag21Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-
-    public static final Pose2d kC2Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag22Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC3Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag22Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-
-    public static final Pose2d kC4Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag17Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC5Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag17Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-
-    public static final Pose2d kC6Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag18Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC7Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag18Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-
-    public static final Pose2d kC8Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag19Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC9Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag19Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-
-    public static final Pose2d kC10Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag20Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.RIGHT.getOffsetM());
-    public static final Pose2d kC11Score =
-        PoseUtils.shiftPose(
-            AndyMarkField.Blue.kTag20Pose,
-            kBackupPose,
-            VisionConstants.PoseOffsets.LEFT.getOffsetM());
-  }
-
-  public static void readPose(String label, Pose2d score) {
-    SmartDashboard.putString(
-        label,
-        "x: " + score.getX() + ", y:" + score.getY() + ", deg:" + score.getRotation().getDegrees());
+    public static final Pose2d kC1Scoring = new Pose2d(5.759196, 3.8227, new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d kC2Scoring = new Pose2d(5.233800226280623, 2.990368969331848, new Rotation2d(Units.degreesToRadians(120)));
+    public static final Pose2d kC3Scoring = new Pose2d(4.947838637951001, 2.825268969331848, new Rotation2d(Units.degreesToRadians(120)));
+    public static final Pose2d kC4Scoring = new Pose2d(3.9648162262806226, 2.863368969331848, new Rotation2d(Units.degreesToRadians(60)));
+    public static final Pose2d kC5Scoring = new Pose2d(3.678854637951001, 3.0284689693318483, new Rotation2d(Units.degreesToRadians(60)));
+    public static final Pose2d kC6Scoring = new Pose2d(3.21945, 3.8989000000000003, new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d kC7Scoring = new Pose2d(3.21945, 4.2291, new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d kC8Scoring = new Pose2d(3.744845773719376, 5.061431030668151, new Rotation2d(Units.degreesToRadians(-60)));
+    public static final Pose2d kC9Scoring = new Pose2d(4.030807362048997, 5.226531030668152, new Rotation2d(Units.degreesToRadians(-60)));
+    public static final Pose2d kC10Scoring = new Pose2d(5.013829773719376, 5.188431030668152, new Rotation2d(Units.degreesToRadians(-120)));
+    public static final Pose2d kC11Scoring = new Pose2d(5.299791362048998, 5.023331030668151, new Rotation2d(Units.degreesToRadians(-120)));
+    public static final Pose2d kC12Scoring = new Pose2d(5.759196, 4.1529, new Rotation2d(Units.degreesToRadians(180)));
   }
 }

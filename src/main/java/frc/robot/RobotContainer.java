@@ -4,7 +4,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.PoseConstants.Bot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.auton.AutonSubsystem;
@@ -50,20 +49,6 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
-
-    PoseConstants.readPose("C1", Bot.kC1Score);
-    PoseConstants.readPose("C2", Bot.kC2Score);
-    PoseConstants.readPose("C3", Bot.kC3Score);
-    PoseConstants.readPose("C4", Bot.kC4Score);
-    PoseConstants.readPose("C5", Bot.kC5Score);
-    PoseConstants.readPose("C6", Bot.kC6Score);
-    PoseConstants.readPose("C7", Bot.kC7Score);
-    PoseConstants.readPose("C8", Bot.kC8Score);
-    PoseConstants.readPose("C9", Bot.kC9Score);
-    PoseConstants.readPose("C10", Bot.kC10Score);
-    PoseConstants.readPose("C11", Bot.kC11Score);
-    PoseConstants.readPose("C12", Bot.kC12Score);
-
     mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
     mWrist = new WristSubsystem();
