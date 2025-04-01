@@ -45,7 +45,7 @@
     "rotation": 96.51295697165385
   },
   "reversed": false,
-  "folder": "North Side Lolipop",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 150.0

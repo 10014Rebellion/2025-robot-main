@@ -65,8 +65,8 @@ public class VisionConstants {
   public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
   public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
 
-  public static final double kRobotYLength = Units.inchesToMeters(35.5);
-  public static final double kRobotXLength = Units.inchesToMeters(37.0);
+  public static final double kRobotSideLength = Units.inchesToMeters(34.5);
+  public static final double kRobotFrontLength = Units.inchesToMeters(37.0);
 
   // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;

@@ -45,7 +45,7 @@
     "rotation": -125.78897345918334
   },
   "reversed": false,
-  "folder": "South Side HP",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 119.99999999999999

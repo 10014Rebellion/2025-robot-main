@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
@@ -118,8 +119,39 @@ public class VisionSubsystem extends SubsystemBase {
         pOffset.getOffsetM());
   }
 
+  public Pose2d getPoseInFrontOfAprilTag(int pTagID, PoseOffsets pOffset) {
+    return getPoseInFrontOfAprilTag(pTagID, VisionConstants.kScoringDistance, pOffset.getOffsetM());
+  }
+
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
+  }
+
+  public Pose2d getBranchPose(int branch) {
+    return getPoseInFrontOfAprilTag(
+        getBranchTag(branch), (branch % 2 == 0) ? PoseOffsets.RIGHT : PoseOffsets.LEFT);
+  }
+
+  public int getBranchTag(int branch) {
+    switch (branch) {
+      case 2:
+      case 3:
+        return 22;
+      case 4:
+      case 5:
+        return 17;
+      case 6:
+      case 7:
+        return 18;
+      case 8:
+      case 9:
+        return 19;
+      case 10:
+      case 11:
+        return 20;
+      default:
+        return 21;
+    }
   }
 
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pXOffsetM, double pYOffsetM) {
@@ -137,7 +169,7 @@ public class VisionSubsystem extends SubsystemBase {
             .getTranslation()
             .plus(
                 new Translation2d(
-                        (VisionConstants.kRobotXLength
+                        (VisionConstants.kRobotSideLength
                             / 2.0), // Offset the robot length so the front is 0 meters away
                         0)
                     .rotateBy(tagPose.getRotation()));
@@ -213,7 +245,26 @@ public class VisionSubsystem extends SubsystemBase {
     return false;
   }
 
+  public static void readPose(String label, Pose2d score) {
+    SmartDashboard.putString(
+        label,
+        "x: " + score.getX() + ", y:" + score.getY() + ", deg:" + score.getRotation().getDegrees());
+  }
+
   public void updateTelemetry() {
+    readPose("C1", getBranchPose(1));
+    readPose("C2", getBranchPose(2));
+    readPose("C3", getBranchPose(3));
+    readPose("C4", getBranchPose(4));
+    readPose("C5", getBranchPose(5));
+    readPose("C6", getBranchPose(6));
+    readPose("C7", getBranchPose(7));
+    readPose("C8", getBranchPose(8));
+    readPose("C9", getBranchPose(9));
+    readPose("C10", getBranchPose(10));
+    readPose("C11", getBranchPose(11));
+    readPose("C12", getBranchPose(12));
+
     boolean isConnected =
         false; // = mCameraList.get(0).isConnected() && mCameraList.get(1).isConnected();
     Logger.recordOutput("Robot/Vision/Cams Connected", isConnected);

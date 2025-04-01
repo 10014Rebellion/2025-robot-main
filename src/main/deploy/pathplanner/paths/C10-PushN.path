@@ -45,7 +45,7 @@
     "rotation": 127.11686068327033
   },
   "reversed": false,
-  "folder": "North Start",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 150.0
