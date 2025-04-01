@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TelemetrySubsystem extends SubsystemBase {
   Field2d mField = new Field2d();
+  // FieldObject2d obj = new FieldObject2d("a");
 
   public TelemetrySubsystem() {
     SmartDashboard.putData("RobotPose", mField);
@@ -25,6 +26,5 @@ public class TelemetrySubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-  }
+  public void periodic() {}
 }
