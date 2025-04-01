@@ -63,8 +63,8 @@ public class IntakeConstants {
     public static double kTolerance = 3;
     public static double kP = 0.2;
     public static double kD = 0.001;
-    public static double kMaxVelocity = 200; // Theoretical max: 1555
-    public static double kMaxAcceleration = 400; // Theoretical max: 16179 deg/s^2
+    public static double kMaxVelocity = 300; // Theoretical max: 1555
+    public static double kMaxAcceleration = 500; // Theoretical max: 16179 deg/s^2
 
     public static double kForwardSoftLimit = 90.0; // TO DO: CONFIGURE ME!
     public static double kReverseSoftLimit = 2.0; // TO DO: CONFIGURE ME!

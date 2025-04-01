@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.sensors.Potentiometer;
 
 public class TelemetrySubsystem extends SubsystemBase {
   Field2d mField = new Field2d();
@@ -27,6 +26,5 @@ public class TelemetrySubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Potentiometer Reading", Potentiometer.getPotentiometer());
   }
 }

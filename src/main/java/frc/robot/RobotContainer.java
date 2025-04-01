@@ -17,7 +17,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.sensors.BeambreakSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
@@ -39,7 +38,6 @@ public class RobotContainer {
   private final VisionSubsystem mVision;
   private final ElevatorSubsystem mElevator;
   private final ControlsSubsystem mControls;
-  private final BeambreakSubsystem mBeambreak;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
   private final LEDSubsystem mLEDs;
@@ -54,7 +52,6 @@ public class RobotContainer {
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
-    mBeambreak = new BeambreakSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -126,7 +123,7 @@ public class RobotContainer {
     // // mControls.initTuningDrive();
     // mControls.initOperatorButtonboard();
     // mControls.initDrivebase();
-    // mControls.initTesting();
+    mControls.initIntakeTuning();
     // mControls.initElevatorTuning();
   }
 

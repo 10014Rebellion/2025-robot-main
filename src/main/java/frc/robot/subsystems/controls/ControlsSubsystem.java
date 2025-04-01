@@ -365,12 +365,15 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
   }
 
-  public void initTesting() {
+  public void initIntakeTuning() {
     driverController.povRight().whileTrue(mIntake.setTunablePIDIntakeCommand());
-    driverController.povLeft().whileTrue(mIntake.setTunablePivotCmd());
+    driverController
+        .povLeft()
+        .whileTrue(mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING));
+    // driverController.povLeft().whileTrue(mIntake.setTunablePivotCmd());
 
     driverController.povUp().whileTrue(mIntake.setPivotCmd(3.0));
-    driverController.povDown().whileTrue(mIntake.setPivotCmd(-1.0));
+    driverController.povDown().whileTrue(mIntake.setPivotCmd(-1));
 
     driverController.rightBumper().whileTrue(mIntake.setRollerCmd(6.0));
     driverController.leftBumper().whileTrue(mIntake.setRollerCmd(-6.0));
