@@ -7,13 +7,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
+import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.RollerSpeed;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -77,7 +77,6 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
-    NamedCommands.registerCommand("doesThisWork", doesThisWork());
     NamedCommands.registerCommand("LolipopScoreReady", lolipopScoreReady());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
   }
@@ -90,16 +89,11 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup lolipopReady() {
     return new SequentialCommandGroup(
-        new WaitCommand(0.25), //  DO NOT REMOVE
+        new WaitCommand(0.1),
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
-            new WaitCommand(0.1).andThen(mClaw.intakeCoralCmd())));
-    // .andThen(mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDPOSTINTAKE)));
-  }
-
-  private FunctionalCommand doesThisWork() {
-    return mClaw.intakeCoralCmd();
+            new SequentialCommandGroup(new WaitCommand(0.1), mClaw.intakeCoralCmd())));
   }
 
   private SequentialCommandGroup scoreProcessor() {
@@ -109,19 +103,18 @@ public class AutonSubsystem {
         new InstantCommand(() -> mClaw.setClaw(0)));
   }
 
-  private SequentialCommandGroup reverseL4() {
-    return new SequentialCommandGroup(
-        new WaitCommand(0.5),
-        new ParallelCommandGroup(
-            mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4),
-            mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4)));
+  private ParallelCommandGroup reverseL4() {
+    return new ParallelCommandGroup(
+        mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+        mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4));
   }
 
   private ParallelCommandGroup reverseScoreL4() {
     return new ParallelCommandGroup(
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
         mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-        new WaitCommand(0.1).andThen(mClaw.scoreReverseCoralCmd()));
+        mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF),
+        new WaitCommand(0.1)
+            .andThen(mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE)));
   }
 
   private ParallelCommandGroup holdAlgae() {
@@ -199,7 +192,7 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup scoreCoral() {
     return new SequentialCommandGroup(
-        // new WaitCommand(0.125),
+        new WaitCommand(0.25),
         new ParallelCommandGroup(
             mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
   }
@@ -284,6 +277,13 @@ public class AutonSubsystem {
                       new Pose2d(path.getPathPoses().get(0).getTranslation(), startingRotation)));
             }),
         AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5));
+  }
+
+  public Command choreoAuton() {
+    return new SequentialCommandGroup(
+      followChoreoPath("SSC-C3"),
+      followChoreoPath("C3-LS")
+    );
   }
 
   public Command followChoreoPath(String pathName) {
