@@ -6,7 +6,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ClimbConstants {
   public class Grabber {
-    public static int kMotorID = 0; // TODO: Tune this
+    public static int kMotorID = 62;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
@@ -37,7 +37,7 @@ public class ClimbConstants {
   }
 
   public class Pulley {
-    public static int kMotorID = 0; // TODO: Tune this
+    public static int kMotorID = 61;
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;

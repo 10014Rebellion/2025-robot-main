@@ -49,21 +49,40 @@ public class PoseConstants {
       public static final Pose2d kSouthStartOuter =
           new Pose2d(7.6057252, 0.7578134, Rotation2d.k180deg);
     }
-
   }
 
   public static class Bot {
-    public static final Pose2d kC1Scoring = new Pose2d(5.759196, 3.8227, new Rotation2d(Units.degreesToRadians(180)));
-    public static final Pose2d kC2Scoring = new Pose2d(5.233800226280623, 2.990368969331848, new Rotation2d(Units.degreesToRadians(120)));
-    public static final Pose2d kC3Scoring = new Pose2d(4.947838637951001, 2.825268969331848, new Rotation2d(Units.degreesToRadians(120)));
-    public static final Pose2d kC4Scoring = new Pose2d(3.9648162262806226, 2.863368969331848, new Rotation2d(Units.degreesToRadians(60)));
-    public static final Pose2d kC5Scoring = new Pose2d(3.678854637951001, 3.0284689693318483, new Rotation2d(Units.degreesToRadians(60)));
-    public static final Pose2d kC6Scoring = new Pose2d(3.21945, 3.8989000000000003, new Rotation2d(Units.degreesToRadians(0)));
-    public static final Pose2d kC7Scoring = new Pose2d(3.21945, 4.2291, new Rotation2d(Units.degreesToRadians(0)));
-    public static final Pose2d kC8Scoring = new Pose2d(3.744845773719376, 5.061431030668151, new Rotation2d(Units.degreesToRadians(-60)));
-    public static final Pose2d kC9Scoring = new Pose2d(4.030807362048997, 5.226531030668152, new Rotation2d(Units.degreesToRadians(-60)));
-    public static final Pose2d kC10Scoring = new Pose2d(5.013829773719376, 5.188431030668152, new Rotation2d(Units.degreesToRadians(-120)));
-    public static final Pose2d kC11Scoring = new Pose2d(5.299791362048998, 5.023331030668151, new Rotation2d(Units.degreesToRadians(-120)));
-    public static final Pose2d kC12Scoring = new Pose2d(5.759196, 4.1529, new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d kC1Scoring =
+        new Pose2d(5.759196, 3.8227, new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d kC2Scoring =
+        new Pose2d(
+            5.233800226280623, 2.990368969331848, new Rotation2d(Units.degreesToRadians(120)));
+    public static final Pose2d kC3Scoring =
+        new Pose2d(
+            4.947838637951001, 2.825268969331848, new Rotation2d(Units.degreesToRadians(120)));
+    public static final Pose2d kC4Scoring =
+        new Pose2d(
+            3.9648162262806226, 2.863368969331848, new Rotation2d(Units.degreesToRadians(60)));
+    public static final Pose2d kC5Scoring =
+        new Pose2d(
+            3.678854637951001, 3.0284689693318483, new Rotation2d(Units.degreesToRadians(60)));
+    public static final Pose2d kC6Scoring =
+        new Pose2d(3.21945, 3.8989000000000003, new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d kC7Scoring =
+        new Pose2d(3.21945, 4.2291, new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d kC8Scoring =
+        new Pose2d(
+            3.744845773719376, 5.061431030668151, new Rotation2d(Units.degreesToRadians(-60)));
+    public static final Pose2d kC9Scoring =
+        new Pose2d(
+            4.030807362048997, 5.226531030668152, new Rotation2d(Units.degreesToRadians(-60)));
+    public static final Pose2d kC10Scoring =
+        new Pose2d(
+            5.013829773719376, 5.188431030668152, new Rotation2d(Units.degreesToRadians(-120)));
+    public static final Pose2d kC11Scoring =
+        new Pose2d(
+            5.299791362048998, 5.023331030668151, new Rotation2d(Units.degreesToRadians(-120)));
+    public static final Pose2d kC12Scoring =
+        new Pose2d(5.759196, 4.1529, new Rotation2d(Units.degreesToRadians(180)));
   }
 }

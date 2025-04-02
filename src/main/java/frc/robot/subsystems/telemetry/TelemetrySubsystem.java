@@ -25,6 +25,10 @@ public class TelemetrySubsystem extends SubsystemBase {
     mField.setRobotPose(pose);
   }
 
+  public Field2d getField() {
+    return mField;
+  }
+
   @Override
   public void periodic() {}
 }

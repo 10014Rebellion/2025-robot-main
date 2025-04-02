@@ -280,10 +280,7 @@ public class AutonSubsystem {
   }
 
   public Command choreoAuton() {
-    return new SequentialCommandGroup(
-      followChoreoPath("SSC-C3"),
-      followChoreoPath("C3-LS")
-    );
+    return new SequentialCommandGroup(followChoreoPath("SSC-C3"), followChoreoPath("C3-LS"));
   }
 
   public Command followChoreoPath(String pathName) {

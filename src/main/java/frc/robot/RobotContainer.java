@@ -130,4 +130,16 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
+
+  public DriveSubsystem getDrivetrain() {
+    return mDrive;
+  }
+
+  public TelemetrySubsystem getTelemetry() {
+    return mTelemetry;
+  }
+
+  public Command getPathPlannerAuto() {
+    return autoChooser.get();
+  }
 }

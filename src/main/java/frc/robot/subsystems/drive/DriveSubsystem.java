@@ -207,6 +207,10 @@ public class DriveSubsystem extends SubsystemBase {
     updateTelem();
   }
 
+  public ChassisSpeeds getCurrentRobotChassisSpeeds() {
+    return getChassisSpeeds();
+  }
+
   private void updateTelem() {
     mTelemetry.add(getPose());
   }
