@@ -11,22 +11,28 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TelemetrySubsystem extends SubsystemBase {
   Field2d mField = new Field2d();
-  // FieldObject2d obj = new FieldObject2d("a");
+  Field2d mAutonPreviewField = new Field2d();
 
-  public TelemetrySubsystem() {
-    SmartDashboard.putData("RobotPose", mField);
-  }
+  public TelemetrySubsystem() {}
 
   public void add(String label, double value) {
     SmartDashboard.putNumber(label, value);
   }
 
-  public void add(Pose2d pose) {
+  public void updateFieldPose(Pose2d pose) {
     mField.setRobotPose(pose);
+  }
+
+  public void updateAutonFieldPose(Pose2d pose) {
+    mAutonPreviewField.setRobotPose(pose);
   }
 
   public Field2d getField() {
     return mField;
+  }
+
+  public Field2d getAutonPreviewField() {
+    return mAutonPreviewField;
   }
 
   @Override

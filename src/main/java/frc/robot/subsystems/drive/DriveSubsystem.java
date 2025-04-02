@@ -212,7 +212,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void updateTelem() {
-    mTelemetry.add(getPose());
+    mTelemetry.updateFieldPose(getPose());
   }
 
   public static SwerveModuleState[] zeroStates() {

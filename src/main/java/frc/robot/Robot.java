@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.util.Elastic;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -39,8 +40,15 @@ public class Robot extends LoggedRobot {
   Optional<Alliance> ally = DriverStation.getAlliance();
   Optional<Alliance> newAlly;
 
+  private static void updateAlliance() {
+    gIsBlueAlliance =
+        DriverStation.getAlliance().isPresent()
+            ? DriverStation.getAlliance().get().equals(Alliance.Blue)
+            : true;
+  }
+
   public Robot() {
-    gIsBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+    updateAlliance();
 
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -106,7 +114,9 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    SmartDashboard.putBoolean("Alliance Color", gIsBlueAlliance);
+    updateAlliance();
+
+    SmartDashboard.putBoolean("Alliance", gIsBlueAlliance);
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
@@ -152,7 +162,14 @@ public class Robot extends LoggedRobot {
             }
           }
 
-          robotContainer.getTelemetry().getField().getObject("path").setPoses(poses);
+          robotContainer.getTelemetry().getAutonPreviewField().getObject("path").setPoses(poses);
+          robotContainer
+              .getTelemetry()
+              .updateAutonFieldPose(
+                  new Pose2d(
+                      poses.get(0).getX(),
+                      poses.get(0).getY(),
+                      gIsBlueAlliance ? Rotation2d.k180deg : Rotation2d.kZero));
         } catch (IOException e) {
           e.printStackTrace();
         } catch (Exception e) {
@@ -164,8 +181,9 @@ public class Robot extends LoggedRobot {
         }
       }
     }
-    Pose2d pose = robotContainer.getDrivetrain().getPose();
-    robotContainer.getTelemetry().add(pose);
+    // Pose2d pose = robotContainer.getDrivetrain().getPose();
+    // robotContainer.getTelemetry().add(pose);
+    SmartDashboard.putData(robotContainer.getTelemetry().getAutonPreviewField());
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -177,6 +195,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    Elastic.selectTab("Autonomous");
   }
 
   /** This function is called periodically during autonomous. */
@@ -193,6 +213,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    Elastic.selectTab("Teleoperated");
   }
 
   /** This function is called periodically during operator control. */

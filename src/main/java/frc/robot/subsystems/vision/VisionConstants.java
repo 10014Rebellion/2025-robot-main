@@ -158,7 +158,7 @@ public class VisionConstants {
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(-165) // Yaw: 15 degrees angled inwards
+                      Units.degreesToRadians(165) // Yaw: 15 degrees angled inwards
                       ))),
 
           // Rear Right Camera (Mounted near BR swerve module)
@@ -173,6 +173,6 @@ public class VisionConstants {
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(165) // Yaw: 15 degrees angled inwards
+                      Units.degreesToRadians(-165) // Yaw: 15 degrees angled inwards
                       ))));
 }
