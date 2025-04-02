@@ -9,9 +9,9 @@
         "containers": [
           {
             "title": "Auton Chooser",
-            "x": 640.0,
+            "x": 704.0,
             "y": 448.0,
-            "width": 256.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -52,10 +52,10 @@
           },
           {
             "title": "MatchTime",
-            "x": 256.0,
+            "x": 192.0,
             "y": 0.0,
-            "width": 320.0,
-            "height": 192.0,
+            "width": 384.0,
+            "height": 256.0,
             "type": "Match Time",
             "properties": {
               "topic": "/AdvantageKit/DriverStation/MatchTime",
@@ -67,14 +67,48 @@
             }
           },
           {
-            "title": "RobotPose",
-            "x": 704.0,
+            "title": "Cradle Has Coral",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/Coral Detected",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "Claw Has Coral",
+            "x": 0.0,
             "y": 0.0,
-            "width": 832.0,
-            "height": 384.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Claw/Beam Break",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "Checkmark",
+              "false_icon": "X"
+            }
+          },
+          {
+            "title": "Field",
+            "x": 576.0,
+            "y": 0.0,
+            "width": 960.0,
+            "height": 448.0,
             "type": "Field",
             "properties": {
-              "topic": "/SmartDashboard/RobotPose",
+              "topic": "/SmartDashboard/Field",
               "period": 0.06,
               "field_game": "Reefscape",
               "robot_width": 0.85,
@@ -85,6 +119,23 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
             }
+          },
+          {
+            "title": "Alliance",
+            "x": 576.0,
+            "y": 448.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Alliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4285025455,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
           }
         ]
       }
@@ -93,7 +144,58 @@
       "name": "Autonomous",
       "grid_layout": {
         "layouts": [],
-        "containers": []
+        "containers": [
+          {
+            "title": "Field",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 768.0,
+            "height": 384.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06,
+              "field_game": "Reefscape",
+              "robot_width": 0.9398,
+              "robot_length": 0.8763,
+              "show_other_objects": true,
+              "show_trajectories": true,
+              "field_rotation": 0.0,
+              "robot_color": 4294198070,
+              "trajectory_color": 4294967295
+            }
+          },
+          {
+            "title": "Auton Chooser",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/SendableChooser[1]",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Alliance",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Alliance",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4285025455,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
       }
     }
   ]
