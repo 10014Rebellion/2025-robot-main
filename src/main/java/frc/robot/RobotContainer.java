@@ -8,6 +8,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.ControlsSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.GyroIO;
@@ -42,6 +43,7 @@ public class RobotContainer {
   private final IntakeSubsystem mIntake;
   private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
+  private final ClimbSubsystem mCLimb;
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -52,6 +54,7 @@ public class RobotContainer {
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
+    mCLimb = new ClimbSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -92,7 +95,7 @@ public class RobotContainer {
 
     mVision =
         new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
-    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw);
+    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
     mAutons.configureNamedCommands();
     // Set up auto routines

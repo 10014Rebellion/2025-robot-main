@@ -24,7 +24,7 @@ public class ControlsConstants {
     public static final int kSetScoreL1 = 11;
 
     // Climbing
-    public static final int kClimbLetGo = 12;
-    public static final int kClimbPullUp = 8;
+    public static final int kClimbDescend = 12;
+    public static final int kClimbAscend = 8;
   }
 }

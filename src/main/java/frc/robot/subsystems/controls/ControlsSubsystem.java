@@ -22,6 +22,9 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.climb.ClimbConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbConstants.Grabber.VoltageSetpoints;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -55,6 +58,7 @@ public class ControlsSubsystem extends SubsystemBase {
   private final ElevatorSubsystem mElevator;
   private final IntakeSubsystem mIntake;
   private final ClawSubsystem mClaw;
+  private final ClimbSubsystem mClimb;
 
   public ControlsSubsystem(
       DriveSubsystem pDrive,
@@ -62,13 +66,15 @@ public class ControlsSubsystem extends SubsystemBase {
       WristSubsystem pWrist,
       ElevatorSubsystem pElevator,
       IntakeSubsystem pIntake,
-      ClawSubsystem pClaw) {
+      ClawSubsystem pClaw,
+      ClimbSubsystem pClimb) {
     this.mDrive = pDrive;
     this.mVision = pVision;
     this.mWrist = pWrist;
     this.mElevator = pElevator;
     this.mIntake = pIntake;
     this.mClaw = pClaw;
+    this.mClimb = pClimb;
 
     levelSetpointInt = () -> 2;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
@@ -86,7 +92,13 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initDriverController() {
-
+    driverController
+        .povUp()
+        .whileTrue(
+            new InstantCommand(
+                () -> mClimb.setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())
+            )
+        );
     driverController
         .rightBumper()
         .whileTrue(
@@ -264,19 +276,20 @@ public class ControlsSubsystem extends SubsystemBase {
                 mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.setClawCmd(-0.5)));
 
     operatorButtonboard
-        .button(ControlsConstants.Buttonboard.kClimbPullUp)
+        .button(ControlsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4),
-                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4)));
+            new SequentialCommandGroup(
+                mClimb.setGrabberVoltsCmd(0),
+                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)
+            )
+            
+        );
 
     operatorButtonboard
-        .button(ControlsConstants.Buttonboard.kClimbLetGo)
+        .button(ControlsConstants.Buttonboard.kClimbDescend)
         .whileTrue(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-                new WaitCommand(0.1).andThen(mClaw.scoreReverseCoralCmd())));
+            mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND)
+        );
     // .whileFalse();
 
     operatorButtonboard
