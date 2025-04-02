@@ -24,7 +24,6 @@ import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
-import frc.robot.subsystems.climb.ClimbConstants.Grabber.VoltageSetpoints;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -92,13 +91,13 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initDriverController() {
-    driverController
-        .povUp()
-        .whileTrue(
-            new InstantCommand(
-                () -> mClimb.setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())
-            )
-        );
+    // driverController
+    //     .povUp()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 mClimb.setGrabberVolts(
+    //                     ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
     driverController
         .rightBumper()
         .whileTrue(
@@ -279,17 +278,12 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
             new SequentialCommandGroup(
-                mClimb.setGrabberVoltsCmd(0),
-                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)
-            )
-            
-        );
+                // mClimb.setGrabberVoltsCmd(0),
+                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(
-            mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND)
-        );
+        .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
     // .whileFalse();
 
     operatorButtonboard

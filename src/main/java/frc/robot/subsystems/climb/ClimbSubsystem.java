@@ -4,16 +4,13 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax mClimbMotor;
-  private final SparkMax mGrabberMotor;
+  // private final SparkMax mGrabberMotor;
   private boolean mHasExtended;
-  private Timer mExtendTimer;
 
   private double kExtendTime;
 
@@ -24,49 +21,34 @@ public class ClimbSubsystem extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    mGrabberMotor =
-        new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
-    mGrabberMotor.configure(
-        ClimbConstants.Grabber.kClimbConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    // mGrabberMotor =
+    //     new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
+    // mGrabberMotor.configure(
+    //     ClimbConstants.Grabber.kClimbConfig,
+    //     ResetMode.kResetSafeParameters,
+    //     PersistMode.kPersistParameters);
 
     mHasExtended = false;
-    mExtendTimer.stop();
-    mExtendTimer.reset();
-    mExtendTimer.stop();
   }
 
-  public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
-    return setGrabberVoltsCmd(pVolts.getVolts());
-  }
+  // public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
+  //   return setGrabberVoltsCmd(pVolts.getVolts());
+  // }
 
-  public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
-    return new FunctionalCommand(
-        () -> {},
-        () -> {
-          setGrabberVolts(pVolts);
-        },
-        (interrupted) -> setGrabberVolts(0),
-        () -> false,
-        this);
-  }
+  // public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
+  //   return new FunctionalCommand(
+  //       () -> {},
+  //       () -> {
+  //         setGrabberVolts(pVolts);
+  //       },
+  //       (interrupted) -> setGrabberVolts(0),
+  //       () -> false,
+  //       this);
+  // }
 
-  public FunctionalCommand setExtendCmd() {
-    return new FunctionalCommand(
-        () -> {mExtendTimer.start();},
-        () -> {
-          setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND);
-          mHasExtended = (mExtendTimer.get() == kExtendTime);
-        },
-        (interrupted) -> {setPulleyVolts(0); mExtendTimer.stop();},
-        () -> mHasExtended,
-        this);
-  }
-
-  public void setGrabberVolts(double pVolts) {
-    mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
-  }
+  // public void setGrabberVolts(double pVolts) {
+  //   mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
+  // }
 
   public FunctionalCommand setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints pVolts) {
     return setPulleyVoltsCmd(pVolts.getVolts());
