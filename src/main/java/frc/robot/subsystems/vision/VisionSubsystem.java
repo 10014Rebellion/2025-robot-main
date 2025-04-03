@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,13 +35,14 @@ public class VisionSubsystem extends SubsystemBase {
         new String[] {
           VisionConstants.FRONT_LEFT_CAM,
           VisionConstants.FRONT_RIGHT_CAM,
-          VisionConstants.BACK_LEFT_CAM,
+          // VisionConstants.BACK_LEFT_CAM,
           VisionConstants.BACK_RIGHT_CAM
         };
 
     // HttpCamera frontLeftCam = new HttpCamera(getName(), "");
     // HttpCamera frontRightCam = new HttpCamera(getName(), "");
-    HttpCamera backLeftCam = new HttpCamera("BackLeftCam", "http://10.100.14.98:1182/stream.mjpg");
+    // HttpCamera backLeftCam = new HttpCamera("BackLeftCam",
+    // "http://10.100.14.98:1182/stream.mjpg");
 
     for (String name : cameraNames) {
       poseCameras.add(
@@ -141,7 +141,7 @@ public class VisionSubsystem extends SubsystemBase {
             .getTranslation()
             .plus(
                 new Translation2d(
-                        (VisionConstants.kRobotXLength
+                        (VisionConstants.kRobotYLength
                             / 2.0), // Offset the robot length so the front is 0 meters away
                         0)
                     .rotateBy(tagPose.getRotation()));

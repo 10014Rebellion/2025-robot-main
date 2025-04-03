@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.564241803278687,
-        "y": 2.2328381147540983
+        "x": 7.181,
+        "y": 2.233
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.508519770069106,
-        "y": 2.2328381147540983
+        "x": 6.125277966790419,
+        "y": 2.233
       },
       "isLocked": false,
       "linkedName": "SouthStart"

@@ -20,6 +20,9 @@ public class ClawSubsystem extends SubsystemBase {
   public ClawSubsystem() {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
     this.mBeamBreak = new DigitalInput(ClawConstants.kBeamBreakDIOPort);
+
+    this.setDefaultCommand(holdCoralCmd());
+
     mClawSparkMax.configure(
         ClawConstants.kClawConfig,
         ResetMode.kResetSafeParameters,
@@ -38,6 +41,15 @@ public class ClawSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> setClaw(pVoltage),
         () -> setClaw(pVoltage),
+        (interrupted) -> setClaw(0.0),
+        () -> false,
+        this);
+  }
+
+  public FunctionalCommand holdCoralCmd() {
+    return new FunctionalCommand(
+        () -> setClaw(ClawConstants.RollerSpeed.HOLD_CORAL),
+        () -> setClaw(ClawConstants.RollerSpeed.HOLD_CORAL),
         (interrupted) -> setClaw(0.0),
         () -> false,
         this);

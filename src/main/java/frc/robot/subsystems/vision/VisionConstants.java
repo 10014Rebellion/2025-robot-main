@@ -65,8 +65,10 @@ public class VisionConstants {
   public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
   public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
 
-  public static final double kRobotYLength = Units.inchesToMeters(35.5);
-  public static final double kRobotXLength = Units.inchesToMeters(37.0);
+  public static final double kRobotYLength =
+      Units.inchesToMeters(35.0); // Climb Side / Elevator Side 0.889m
+  public static final double kRobotXLength =
+      Units.inchesToMeters(37.0); // Scoring Side / Intake Side 0.9398m
 
   // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -151,8 +153,8 @@ public class VisionConstants {
               BACK_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-13.503), // X: inches back
-                      Units.inchesToMeters(13.127), // Y: inches left
+                      Units.inchesToMeters(-13.51), // X: inches back
+                      Units.inchesToMeters(13.599), // Y: inches left
                       Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(
@@ -166,8 +168,8 @@ public class VisionConstants {
               BACK_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-13.503), // X: inches forward
-                      Units.inchesToMeters(-13.127), // Y: inches right
+                      Units.inchesToMeters(-13.51), // X: inches forward
+                      Units.inchesToMeters(-13.599), // Y: inches right
                       Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(

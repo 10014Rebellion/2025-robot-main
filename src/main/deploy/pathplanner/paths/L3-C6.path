@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.8341188524590164,
-        "y": 5.877100409836065
+        "x": 1.63,
+        "y": 5.975
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7061072622451823,
-        "y": 5.45231351278623
+        "x": 1.5019884097861658,
+        "y": 5.550213102950164
       },
       "isLocked": false,
       "linkedName": "NL3"
@@ -48,7 +48,7 @@
   "folder": "North Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 96.51295697165385
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.071,
-        "y": 5.2
+        "x": 5.03,
+        "y": 5.22
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.947848360655737,
-        "y": 3.9470799180327862
+        "x": 7.906848360655737,
+        "y": 3.967079918032786
       },
       "isLocked": false,
       "linkedName": "C10"
@@ -48,7 +48,7 @@
   "folder": "North Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 150.0
+    "rotation": -120.6575983293032
   },
   "useDefaultConstraints": true
 }

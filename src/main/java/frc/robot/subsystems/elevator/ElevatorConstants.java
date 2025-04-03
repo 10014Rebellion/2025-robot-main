@@ -50,7 +50,9 @@ public class ElevatorConstants {
     BARGE(80),
     L2ALGAE(61),
     L3ALGAE(83),
-    HOLD_ALGAE(7);
+    HOLD_ALGAE(7),
+    PreClimb(40),
+    Climb(5);
 
     public final double setpoint;
 

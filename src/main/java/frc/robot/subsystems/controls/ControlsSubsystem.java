@@ -91,13 +91,13 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initDriverController() {
-    // driverController
-    //     .povUp()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () ->
-    //                 mClimb.setGrabberVolts(
-    //                     ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
+    driverController
+        .povUp()
+        .whileTrue(
+            new InstantCommand(
+                () ->
+                    mClimb.setGrabberVolts(
+                        ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
     driverController
         .rightBumper()
         .whileTrue(
@@ -277,8 +277,12 @@ public class ControlsSubsystem extends SubsystemBase {
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
-            new SequentialCommandGroup(
-                // mClimb.setGrabberVoltsCmd(0),
+            new ParallelCommandGroup(
+                new SequentialCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PreClimb),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb)),
+                mClimb.setGrabberVoltsCmd(0),
                 mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)));
 
     operatorButtonboard

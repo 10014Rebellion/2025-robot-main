@@ -98,7 +98,7 @@ public class IntakeSubsystem extends SubsystemBase {
         },
         () -> {
           double calculatedOutput =
-              mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0);
+              mIntakePivotFF.calculate(Math.toRadians(getEncoderReading() - 10.0), 0.0);
           setVoltsIntakePivot(calculatedOutput);
         },
         (interrupted) -> setVoltsIntakePivot(0),
@@ -131,7 +131,7 @@ public class IntakeSubsystem extends SubsystemBase {
           double encoderReading = getEncoderReading();
           double calculatedFF =
               mIntakePivotFF.calculate(
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position),
+                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
                   Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
           double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
           setVoltsIntakePivot(calculatedPID + calculatedFF);

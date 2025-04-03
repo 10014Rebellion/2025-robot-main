@@ -30,13 +30,26 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "C3-L1"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "C3-L1"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 3.0
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -90,6 +103,37 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "L2-C6R"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReverseL4"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ReverseScore"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "LolipopReady"
           }
         }
       ]
