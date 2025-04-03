@@ -278,16 +278,29 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
             new ParallelCommandGroup(
-                new SequentialCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PreClimb),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb)),
-                mClimb.setGrabberVoltsCmd(0),
-                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)));
+                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
+        .whileTrue(
+            new ParallelCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
+                new WaitCommand(0.2)
+                    .andThen(mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF))));
+    // mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
+    //         new ParallelCommandGroup(
+    //             new SequentialCommandGroup(
+    //                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PreClimb),
+    //                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
+    //                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb)),
+    //             mClimb.setGrabberVoltsCmd(0),
+    //             mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)));
+
+    // operatorButtonboard
+    //     .button(ControlsConstants.Buttonboard.kClimbDescend)
+    //     .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
     // .whileFalse();
 
     operatorButtonboard

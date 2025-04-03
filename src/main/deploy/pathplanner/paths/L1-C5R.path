@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.63,
+        "x": 1.5,
         "y": 2.18
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6300000000000003,
+        "x": 2.5,
         "y": 2.1800000000000006
       },
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -119.99999999999999
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "South Side Lolipop",

@@ -8,62 +8,76 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5024999999999995,
-        "y": 3.2054999999999993
+        "x": 2.5,
+        "y": 2.1800000000000006
       },
       "isLocked": false,
       "linkedName": "L1"
     },
     {
       "anchor": {
-        "x": 2.5109271523178815,
-        "y": 3.92
+        "x": 3.3052499999999996,
+        "y": 2.3967499999999995
       },
       "prevControl": {
-        "x": 1.8865794392360957,
-        "y": 3.9226209499199833
+        "x": 3.186179212864811,
+        "y": 2.1769270083658063
       },
       "nextControl": {
-        "x": 2.8974337748344374,
-        "y": 3.9183774834437086
+        "x": 3.4320000000000004,
+        "y": 2.6307500000000004
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.19,
-        "y": 3.92
+        "x": 3.66,
+        "y": 3.01
       },
       "prevControl": {
-        "x": 2.6041049155557983,
-        "y": 3.92
+        "x": 3.535,
+        "y": 2.79349364905389
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C6"
+      "linkedName": "C5"
     }
   ],
   "rotationTargets": [
     {
       "waypointRelativePos": 1.0,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 59.99999999999999
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 1.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 2.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAngularVelocity": 480.0,
+    "maxAngularAcceleration": 650.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "South Side Lolipop",
@@ -71,5 +85,5 @@
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

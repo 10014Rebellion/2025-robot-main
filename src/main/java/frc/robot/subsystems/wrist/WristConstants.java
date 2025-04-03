@@ -44,7 +44,7 @@ public class WristConstants {
     L2(56),
     L3(56),
     L4(65),
-    REVERSEL4(140),
+    REVERSEL4(135),
     NORM_LOLI_L4(65),
 
     SCORE(10),
