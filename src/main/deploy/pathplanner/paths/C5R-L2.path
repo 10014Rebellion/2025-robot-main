@@ -8,27 +8,48 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4043046357615894,
-        "y": 2.9187913907284773
+        "x": 2.7931352459016394,
+        "y": 1.885194672131147
       },
       "isLocked": false,
       "linkedName": "C5R"
     },
     {
       "anchor": {
-        "x": 1.73,
-        "y": 4.1
+        "x": 1.6063524590163931,
+        "y": 3.287756147540983
       },
       "prevControl": {
-        "x": 3.587456798678759,
-        "y": 4.1
+        "x": 1.778699140837297,
+        "y": 2.98924293811127
+      },
+      "nextControl": {
+        "x": 1.4340057771954895,
+        "y": 3.586269356970696
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.4385245901639343,
+        "y": 3.6114241803278686
+      },
+      "prevControl": {
+        "x": 1.5635245901639343,
+        "y": 3.394917829381759
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "Loli2"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "South Side Lolipop",

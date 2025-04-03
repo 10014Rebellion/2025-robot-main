@@ -9,6 +9,12 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "HoldCoral"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "NS-C10"

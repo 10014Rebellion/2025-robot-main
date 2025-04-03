@@ -22,8 +22,8 @@ public class ClawConstants {
   public enum RollerSpeed {
     INTAKE_CORAL(6.0),
     HOLD_CORAL(0.5),
-    INTAKE_ALGAE(12),
-    HOLD_ALGAE(4),
+    INTAKE_ALGAE(6.0),
+    HOLD_ALGAE(5),
     OUTTAKE_REEF(-0.6),
     REVERSE_REEF(-0.65),
     OUTTAKE_BARGE(-8),

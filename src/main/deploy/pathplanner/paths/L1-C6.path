@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.6133196721311474,
-        "y": 2.3167520491803284
+        "x": 1.63,
+        "y": 2.18
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.317657420475518,
-        "y": 3.4586725789816533
+        "x": 2.6325,
+        "y": 3.2054999999999993
       },
       "isLocked": false,
-      "linkedName": "Loli1"
+      "linkedName": "L1"
     },
     {
       "anchor": {

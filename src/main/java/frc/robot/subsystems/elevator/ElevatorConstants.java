@@ -47,10 +47,10 @@ public class ElevatorConstants {
     ReverseL4(85),
     SCORE(20),
     REVERSESCORE(60),
-    BARGE(80),
+    BARGE(85),
     L2ALGAE(61),
     L3ALGAE(83),
-    HOLD_ALGAE(7),
+    HOLD_ALGAE(3),
     PreClimb(40),
     Climb(5);
 

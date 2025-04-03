@@ -9,6 +9,12 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "HoldCoral"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "SS-C3"
@@ -103,37 +109,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "L2-C6R"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReverseL4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ReverseScore"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LolipopReady"
           }
         }
       ]

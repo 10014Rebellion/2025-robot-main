@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "HoldCoral"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -126,6 +132,12 @@
                 "type": "named",
                 "data": {
                   "name": "ReverseScore"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LolipopReady"
                 }
               }
             ]

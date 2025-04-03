@@ -74,6 +74,7 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ReadyAlgaeL2", readyAlgaeL2());
 
     NamedCommands.registerCommand("HoldAlgae", holdAlgae());
+    NamedCommands.registerCommand("HoldCoral", holdCoral());
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
@@ -85,6 +86,10 @@ public class AutonSubsystem {
     return new SequentialCommandGroup(
         mWrist.setPIDCmd(WristConstants.Setpoints.NORM_LOLI_L4),
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.NORM_LOLI_L4));
+  }
+
+  private InstantCommand holdCoral() {
+    return new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_CORAL));
   }
 
   private SequentialCommandGroup lolipopReady() {
