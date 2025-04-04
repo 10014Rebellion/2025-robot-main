@@ -9,8 +9,8 @@
         "containers": [
           {
             "title": "Auton Chooser",
-            "x": 704.0,
-            "y": 448.0,
+            "x": 128.0,
+            "y": 256.0,
             "width": 192.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -22,8 +22,8 @@
           },
           {
             "title": "FMSInfo",
-            "x": 1152.0,
-            "y": 448.0,
+            "x": 0.0,
+            "y": 384.0,
             "width": 384.0,
             "height": 128.0,
             "type": "FMSInfo",
@@ -34,8 +34,8 @@
           },
           {
             "title": "Voltage",
-            "x": 896.0,
-            "y": 448.0,
+            "x": 320.0,
+            "y": 256.0,
             "width": 256.0,
             "height": 128.0,
             "type": "Voltage View",
@@ -79,8 +79,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "Checkmark",
-              "false_icon": "X"
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
@@ -96,8 +96,8 @@
               "data_type": "boolean",
               "true_color": 4283215696,
               "false_color": 4294198070,
-              "true_icon": "Checkmark",
-              "false_icon": "X"
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
@@ -122,8 +122,8 @@
           },
           {
             "title": "Alliance",
-            "x": 576.0,
-            "y": 448.0,
+            "x": 0.0,
+            "y": 256.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Boolean Box",
@@ -132,7 +132,7 @@
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4285025455,
-              "false_color": 4294198070,
+              "false_color": 4288087561,
               "true_icon": "None",
               "false_icon": "None"
             }
@@ -147,10 +147,10 @@
         "containers": [
           {
             "title": "Field",
-            "x": 768.0,
+            "x": 448.0,
             "y": 0.0,
-            "width": 768.0,
-            "height": 384.0,
+            "width": 896.0,
+            "height": 576.0,
             "type": "Field",
             "properties": {
               "topic": "/SmartDashboard/Field",
@@ -167,8 +167,8 @@
           },
           {
             "title": "Auton Chooser",
-            "x": 768.0,
-            "y": 384.0,
+            "x": 128.0,
+            "y": 128.0,
             "width": 256.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
@@ -180,9 +180,9 @@
           },
           {
             "title": "Alliance",
-            "x": 1024.0,
-            "y": 384.0,
-            "width": 192.0,
+            "x": 832.0,
+            "y": 576.0,
+            "width": 256.0,
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
@@ -193,6 +193,72 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "FMSInfo",
+            "x": 448.0,
+            "y": 576.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "FMSInfo",
+            "properties": {
+              "topic": "/FMSInfo",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Voltage",
+            "x": 1088.0,
+            "y": 576.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/AdvantageKit/PowerDistribution/Voltage",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 4.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tuning",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "PivotKg",
+            "x": 640.0,
+            "y": 192.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/PivotKg",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Pivot Position",
+            "x": 512.0,
+            "y": 192.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/Pivot Position",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
             }
           }
         ]
