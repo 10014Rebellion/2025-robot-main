@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.GoToPose;
@@ -58,6 +59,7 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ReadyScoreSubsystemsL2", readyScoreSubsystems(2));
     NamedCommands.registerCommand("ReadyScoreSubsystemsL3", readyScoreSubsystems(3));
     NamedCommands.registerCommand("ReadyScoreSubsystemsL4", readyScoreSubsystems(4));
+    NamedCommands.registerCommand("", null);
     NamedCommands.registerCommand("ReverseL4", reverseL4());
     NamedCommands.registerCommand("ReverseScore", reverseScoreL4());
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
@@ -76,6 +78,9 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("HoldAlgae", holdAlgae());
     NamedCommands.registerCommand("HoldCoral", holdCoral());
 
+    NamedCommands.registerCommand("DeployIntake", deployIntake());
+    NamedCommands.registerCommand("ActivateIntake", activateIntake());
+
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("LolipopReady", lolipopReady());
     NamedCommands.registerCommand("LolipopScoreReady", lolipopScoreReady());
@@ -90,6 +95,30 @@ public class AutonSubsystem {
 
   private InstantCommand holdCoral() {
     return new InstantCommand(() -> mClaw.setClaw(ClawConstants.RollerSpeed.HOLD_CORAL));
+  }
+
+  private ParallelRaceGroup deployIntake() {
+    return new ParallelRaceGroup(
+        new SequentialCommandGroup(
+            new WaitCommand(0.3),
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+            mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+        mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING));
+  }
+
+  private SequentialCommandGroup activateIntake() {
+    return new ParallelRaceGroup(
+            mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
+            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+            new SequentialCommandGroup(
+                mIntake.setIndexCoralCmd(),
+                new WaitCommand(0.1),
+                new ParallelCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
+                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                    mClaw.intakeCoralCmd()),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
+        .andThen(new InstantCommand(() -> mIntake.setVoltsIntakeRoller(0)));
   }
 
   private SequentialCommandGroup lolipopReady() {

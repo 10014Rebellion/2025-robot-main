@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -91,13 +92,13 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initDriverController() {
-    driverController
-        .povUp()
-        .whileTrue(
-            new InstantCommand(
-                () ->
-                    mClimb.setGrabberVolts(
-                        ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
+    // driverController
+    //     .povUp()
+    //     .whileTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 mClimb.setGrabberVolts(
+    //                     ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
     driverController
         .rightBumper()
         .whileTrue(
@@ -255,6 +256,40 @@ public class ControlsSubsystem extends SubsystemBase {
                 },
                 () -> mDrive.getPose(),
                 mDrive));
+
+    driverController
+        .y()
+        .whileTrue(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> mDrive.setPose(new Pose2d(2.126, 2.180, Rotation2d.kZero))),
+                new GoToPose(
+                    () -> new Pose2d(1.678, 2.180, new Rotation2d(Units.degreesToRadians(0))),
+                    () -> mDrive.getPose(),
+                    mDrive),
+                new ParallelRaceGroup(
+                    new SequentialCommandGroup(
+                        new WaitCommand(0.3),
+                        mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                        mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+                    mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING)),
+                new GoToPose(
+                    () -> new Pose2d(1.163, 2.180, new Rotation2d(Units.degreesToRadians(0))),
+                    () -> mDrive.getPose(),
+                    mDrive),
+                new ParallelRaceGroup(
+                        mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
+                        mIntake.setPIDIntakePivotCmd(
+                            IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                        new SequentialCommandGroup(
+                            mIntake.setIndexCoralCmd(),
+                            new WaitCommand(0.1),
+                            new ParallelCommandGroup(
+                                mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
+                                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                                mClaw.intakeCoralCmd()),
+                            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
+                    .andThen(new InstantCommand(() -> mIntake.setVoltsIntakeRoller(0)))));
   }
 
   public void initOperatorButtonboard() {
@@ -274,33 +309,31 @@ public class ControlsSubsystem extends SubsystemBase {
             new SequentialCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.setClawCmd(-0.5)));
 
+    // operatorButtonboard
+    //     .button(ControlsConstants.Buttonboard.kClimbAscend)
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+    //             mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4)));
+
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
+            // new ParallelCommandGroup(
+            //     mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
+            //     mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
+            //     new WaitCommand(0.2)
+            //         .andThen(mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF))));
+            // mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
             new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4)));
+                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
+                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
+                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(
-            new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE),
-                new WaitCommand(0.2)
-                    .andThen(mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF))));
-    // mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
-    //         new ParallelCommandGroup(
-    //             new SequentialCommandGroup(
-    //                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PreClimb),
-    //                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
-    //                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb)),
-    //             mClimb.setGrabberVoltsCmd(0),
-    //             mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND)));
-
-    // operatorButtonboard
-    //     .button(ControlsConstants.Buttonboard.kClimbDescend)
-    //     .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
+        .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
     // .whileFalse();
 
     operatorButtonboard

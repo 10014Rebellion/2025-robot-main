@@ -12,7 +12,7 @@ public class ClimbConstants {
     public static IdleMode kIdleMode = IdleMode.kBrake;
     public static boolean kMotorInverted = false;
 
-    public static int kCurrentLimit = 80;
+    public static int kCurrentLimit = 60;
 
     public static final SparkMaxConfig kClimbConfig = new SparkMaxConfig();
 
@@ -41,9 +41,9 @@ public class ClimbConstants {
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
-    public static boolean kMotorInverted = false;
+    public static boolean kMotorInverted = true;
 
-    public static int kCurrentLimit = 80;
+    public static int kCurrentLimit = 60;
 
     public static final SparkMaxConfig kClimbConfig = new SparkMaxConfig();
 

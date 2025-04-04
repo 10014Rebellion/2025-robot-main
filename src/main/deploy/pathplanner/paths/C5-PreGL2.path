@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.5,
-        "y": 5.81
+        "x": 3.66,
+        "y": 3.01
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4470286885245907,
-        "y": 5.953852459016392
+        "x": 2.972950819672131,
+        "y": 1.5015881147540984
       },
       "isLocked": false,
-      "linkedName": "L3"
+      "linkedName": "C5"
     },
     {
       "anchor": {
-        "x": 3.296618852459016,
-        "y": 5.829149590163934
+        "x": 1.8820696721311476,
+        "y": 2.8801741803278684
       },
       "prevControl": {
-        "x": 3.171618852459016,
-        "y": 6.045655941110043
+        "x": 2.007069672131147,
+        "y": 2.6636678293817595
       },
       "nextControl": {
-        "x": 3.421618852459016,
-        "y": 5.6126432392178245
+        "x": 1.7570696721311476,
+        "y": 3.0966805312739782
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.73,
-        "y": 5.09
+        "x": 1.379,
+        "y": 3.755
       },
       "prevControl": {
-        "x": 3.605,
-        "y": 5.306506350946109
+        "x": 1.5187994614132994,
+        "y": 3.5128602299614005
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C8"
+      "linkedName": "Pre-GL2"
     }
   ],
   "rotationTargets": [
@@ -50,21 +50,7 @@
       "rotationDegrees": -59.99999999999999
     }
   ],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.0,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 2.0,
-        "maxAcceleration": 1.5,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -80,10 +66,10 @@
     "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "North Side Lolipop",
+  "folder": "South Side Lolipop",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

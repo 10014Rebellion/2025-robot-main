@@ -52,7 +52,7 @@ public class WristConstants {
     L2ALGAE(-24),
     L3ALGAE(-12),
     HOLD_ALGAE(0),
-    CLIMB(45),
+    CLIMB(-15),
     GROUNDINTAKE(-20),
     GROUNDPOSTINTAKE(-10),
     GROUNDALGAE(-35);

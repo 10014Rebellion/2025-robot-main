@@ -33,10 +33,9 @@ public class VisionSubsystem extends SubsystemBase {
     List<PoseCamera> poseCameras = new ArrayList<>();
     String[] cameraNames =
         new String[] {
-          VisionConstants.FRONT_LEFT_CAM,
-          VisionConstants.FRONT_RIGHT_CAM,
+          VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM,
           // VisionConstants.BACK_LEFT_CAM,
-          VisionConstants.BACK_RIGHT_CAM
+          // VisionConstants.BACK_RIGHT_CAM
         };
 
     // HttpCamera frontLeftCam = new HttpCamera(getName(), "");

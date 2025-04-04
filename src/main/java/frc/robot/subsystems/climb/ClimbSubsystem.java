@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax mClimbMotor;
-  private final SparkMax mGrabberMotor;
-  private boolean mHasExtended;
+  // private final SparkMax mGrabberMotor;
+  // private boolean mHasExtended;
 
-  private double kExtendTime;
+  // private double kExtendTime;
 
   public ClimbSubsystem() {
     mClimbMotor = new SparkMax(ClimbConstants.Pulley.kMotorID, ClimbConstants.Pulley.kMotorType);
@@ -21,33 +21,33 @@ public class ClimbSubsystem extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    mGrabberMotor =
-        new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
-    mGrabberMotor.configure(
-        ClimbConstants.Grabber.kClimbConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    // mGrabberMotor =
+    //     new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
+    // mGrabberMotor.configure(
+    //     ClimbConstants.Grabber.kClimbConfig,
+    //     ResetMode.kResetSafeParameters,
+    //     PersistMode.kPersistParameters);
 
-    mHasExtended = false;
+    // mHasExtended = false;
   }
 
-  public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
-    return setGrabberVoltsCmd(pVolts.getVolts());
-  }
+  // public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
+  //   return setGrabberVoltsCmd(pVolts.getVolts());
+  // }
 
-  public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
-    return new FunctionalCommand(
-        () -> {},
-        () -> {
-          setGrabberVolts(pVolts);
-        },
-        (interrupted) -> setGrabberVolts(0),
-        () -> false);
-  }
+  // public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
+  //   return new FunctionalCommand(
+  //       () -> {},
+  //       () -> {
+  //         setGrabberVolts(pVolts);
+  //       },
+  //       (interrupted) -> setGrabberVolts(0),
+  //       () -> false);
+  // }
 
-  public void setGrabberVolts(double pVolts) {
-    mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
-  }
+  // public void setGrabberVolts(double pVolts) {
+  //   mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
+  // }
 
   public FunctionalCommand setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints pVolts) {
     return setPulleyVoltsCmd(pVolts.getVolts());
