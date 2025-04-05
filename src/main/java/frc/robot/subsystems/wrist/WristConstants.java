@@ -12,7 +12,7 @@ public class WristConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kMotorInverted = true;
 
-  public static int kCurrentLimit = 80;
+  public static int kCurrentLimit = 60; // CHANGED: 80
   public static double kP = 0.13;
   public static double kD = 0.0;
 

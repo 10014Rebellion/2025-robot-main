@@ -32,7 +32,7 @@ public class IntakeConstants {
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kCoast;
     public static boolean kInverted = false;
-    public static double kIntakeSpeed = 9;
+    public static double kIntakeSpeed = 12;
 
     public static int kRollerCurrentLimit = 60;
 

@@ -120,7 +120,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileFalse(
             new ParallelCommandGroup(
                 mIntake
-                    .setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
+                    .setEndablePIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
                     .andThen(mIntake.enableFFCmd()),
                 mIntake.setIndexerCmd(0),
                 mIntake.setRollerCmd(0)));

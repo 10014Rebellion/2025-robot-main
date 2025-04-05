@@ -9,7 +9,7 @@ public class ElevatorConstants {
   public static MotorType kMotorType = MotorType.kBrushless;
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kInverted = true;
-  public static int kCurrentLimit = 80;
+  public static int kCurrentLimit = 60; // CHANGED: 80
   public static double kP = 1.95;
   public static double kI = 0.0;
   public static double kD = 0.09;

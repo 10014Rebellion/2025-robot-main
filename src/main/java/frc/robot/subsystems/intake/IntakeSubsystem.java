@@ -145,6 +145,41 @@ public class IntakeSubsystem extends SubsystemBase {
         this);
   }
 
+  public FunctionalCommand setEndablePIDIntakePivotCmd(IntakePivot.Setpoints pSetpoint) {
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
+          double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
+          double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
+          mIntakePivotFF =
+              new ArmFeedforward(
+                  IntakeConstants.IntakePivot.kS,
+                  newKg,
+                  IntakeConstants.IntakePivot.kV,
+                  IntakeConstants.IntakePivot.kA);
+          mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
+          mIntakePivotProfiledPID.reset(getEncoderReading());
+          mIntakePivotProfiledPID.setGoal(pSetpoint.getPos());
+        },
+        () -> {
+          double encoderReading = getEncoderReading();
+          double calculatedFF =
+              mIntakePivotFF.calculate(
+                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
+                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
+          double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
+          setVoltsIntakePivot(calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Intake/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Intake/FF Output", calculatedFF);
+        },
+        (interrupted) ->
+            setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
+        () -> isPIDAtGoalIntakePivot(),
+        this);
+  }
+
   public FunctionalCommand setTunablePIDIntakeCommand() {
     return new FunctionalCommand(
         () -> {
