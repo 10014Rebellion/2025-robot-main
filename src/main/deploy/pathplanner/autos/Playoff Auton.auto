@@ -58,7 +58,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.41
+                        "waitTime": 1.0
                       }
                     },
                     {
@@ -74,19 +74,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "PreGL1-GL1"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "ActivateIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PreGL1-GL1"
                 }
               }
             ]
@@ -163,19 +163,19 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "PreGL2-GL2"
-                }
-              },
               {
                 "type": "named",
                 "data": {
                   "name": "ActivateIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PreGL2-GL2"
                 }
               }
             ]

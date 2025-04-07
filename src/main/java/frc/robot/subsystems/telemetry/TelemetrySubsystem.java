@@ -13,7 +13,9 @@ public class TelemetrySubsystem extends SubsystemBase {
   Field2d mField = new Field2d();
   Field2d mAutonPreviewField = new Field2d();
 
-  public TelemetrySubsystem() {}
+  public TelemetrySubsystem() {
+    SmartDashboard.putData("FieldPose", mField);
+  }
 
   public void add(String label, double value) {
     SmartDashboard.putNumber(label, value);

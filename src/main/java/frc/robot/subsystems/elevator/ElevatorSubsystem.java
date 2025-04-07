@@ -112,7 +112,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         this);
   }
 
-  public FunctionalCommand setTunablePIDIntakeCommand() {
+  public FunctionalCommand setTunablePIDCommand() {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;

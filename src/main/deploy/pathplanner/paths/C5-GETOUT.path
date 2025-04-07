@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3970000000000002,
-        "y": 2.6017499999999996
+        "x": 3.4684228263369925,
+        "y": 2.681250398414949
       },
       "isLocked": false,
       "linkedName": "C5"
     },
     {
       "anchor": {
-        "x": 1.5,
-        "y": 2.18
+        "x": 3.164754098360655,
+        "y": 2.196875
       },
       "prevControl": {
-        "x": 2.1376986754966882,
-        "y": 2.1757284768211926
+        "x": 3.289754098360655,
+        "y": 2.4133813509461097
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "L1"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
   "folder": "South Side Lolipop",
