@@ -444,12 +444,12 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController
         .axisMagnitudeGreaterThan(1, 0.2)
         .whileTrue(mElevator.setVoltsCmd(driverController.getLeftY() * 8));
-    driverController
-        .povUp()
-        .whileTrue(mElevator.setVoltsCmd(12)); // mElevator.setTunablePIDCommand());
-    driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
-    driverController.povLeft().whileTrue(mWrist.setVoltsCmd(2));
-    driverController.povRight().whileTrue(mWrist.setVoltsCmd(-2));
+    driverController.povUp().whileTrue(mElevator.setTunablePIDCommand());
+    // driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
+    driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd());
+    driverController.povRight().whileTrue(mWrist.setTunablePIDCmd());
+    driverController.x().whileTrue(mWrist.setVoltsCmd(-2));
+    driverController.b().whileTrue(mWrist.setVoltsCmd(2));
   }
 
   private void levelToElevator(IntSupplier level) {

@@ -150,7 +150,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   private double filterVoltage(double pVoltage) {
-    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return filterToLimits(MathUtil.clamp(pVoltage, -12, 12.0));
   }
 
   public double getRawEncReading() {

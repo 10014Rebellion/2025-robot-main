@@ -53,6 +53,12 @@ public class WristSubsystem extends SubsystemBase {
         PersistMode.kNoPersistParameters);
 
     this.setDefaultCommand(enableFFCmd());
+
+    SmartDashboard.putNumber("Wrist/Kp", WristConstants.kP);
+    SmartDashboard.putNumber("Wrist/Kd", WristConstants.kD);
+
+    SmartDashboard.putNumber("Wrist/Tunable Setpoint", 0.0);
+    SmartDashboard.putNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -71,6 +77,37 @@ public class WristSubsystem extends SubsystemBase {
 
   public boolean isPIDAtGoal() {
     return mCurrentController.equals(Controllers.ProfiledPID) && mWristProfiledPID.atGoal();
+  }
+
+  public FunctionalCommand setTunablePIDCmd() {
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          double newKp = SmartDashboard.getNumber("Wrist/Kp", WristConstants.kP);
+          double newKd = SmartDashboard.getNumber("Wrist/Kd", WristConstants.kD);
+          double pSetpoint = SmartDashboard.getNumber("Wrist/Tunable Setpoint", 0.0);
+
+          double newVel = SmartDashboard.getNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
+          double newAccel =
+              SmartDashboard.getNumber("Wrist/Max Accel", WristConstants.kMaxAcceleration);
+          mWristProfiledPID.setConstraints(new Constraints(newVel, newAccel));
+          mWristProfiledPID.setPID(newKp, 0.0, newKd);
+          mWristProfiledPID.reset(getEncReading());
+          mWristProfiledPID.setGoal(pSetpoint);
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID = mWristFF.calculate(mWristProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedFF = mWristProfiledPID.calculate(encoderReading);
+
+          setVolts(calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Wrist/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Wrist/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
+        },
+        (interrupted) -> setVolts(0),
+        () -> false,
+        this);
   }
 
   public FunctionalCommand setPIDCmd(WristConstants.Setpoints pSetpoint) {
