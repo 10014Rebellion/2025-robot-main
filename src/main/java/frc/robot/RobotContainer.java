@@ -1,10 +1,6 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
@@ -21,7 +17,6 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,9 +39,6 @@ public class RobotContainer {
   private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mCLimb;
-
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
 
   public RobotContainer() {
     mTelemetry = new TelemetrySubsystem();
@@ -97,41 +89,22 @@ public class RobotContainer {
         new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
     mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
-    mAutons.configureNamedCommands();
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-    SmartDashboard.putData(autoChooser.getSendableChooser());
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(mDrive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(mDrive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    // mControls.initDriverController();
-    // mControls.initOperatorButtonboard();
-    // mControls.initDrivebase();
+    mControls.initDriverController();
+    mControls.initOperatorButtonboard();
+    mControls.initDrivebase();
     // // mControls.initTuningDrive();
     // mControls.initIntakeTuning();
-    mControls.initElevatorTuning();
+    // mControls.initElevatorTuning();
+    // mControls.initWristTuning();
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return mAutons.getChosenAuton();
   }
 
   public DriveSubsystem getDrivetrain() {
@@ -143,6 +116,6 @@ public class RobotContainer {
   }
 
   public Command getPathPlannerAuto() {
-    return autoChooser.get();
+    return mAutons.getChosenAuton();
   }
 }

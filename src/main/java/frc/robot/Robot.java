@@ -214,7 +214,7 @@ public class Robot extends LoggedRobot {
       autonomousCommand.cancel();
     }
 
-    Elastic.selectTab("Teleoperated");
+    // Elastic.selectTab("Teleoperated");
   }
 
   /** This function is called periodically during operator control. */

@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -19,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
   private final ProfiledPIDController mWristProfiledPID;
-  private final ArmFeedforward mWristFF;
+  private ArmFeedforward mWristFF;
   private final DutyCycleEncoder mWristEncoder;
   private Controllers mCurrentController;
 
@@ -54,20 +55,23 @@ public class WristSubsystem extends SubsystemBase {
 
     this.setDefaultCommand(enableFFCmd());
 
-    SmartDashboard.putNumber("Wrist/Kp", WristConstants.kP);
-    SmartDashboard.putNumber("Wrist/Kd", WristConstants.kD);
+    SmartDashboard.putNumber("Wrist/kP", WristConstants.kP);
+    SmartDashboard.putNumber("Wrist/kD", WristConstants.kD);
+    SmartDashboard.putNumber("Wrist/kG", WristConstants.kG);
 
     SmartDashboard.putNumber("Wrist/Tunable Setpoint", 0.0);
     SmartDashboard.putNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
+    SmartDashboard.putNumber("Wrist/Max Accel", WristConstants.kMaxAcceleration);
   }
 
   public FunctionalCommand enableFFCmd() {
+
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.Feedforward;
         },
         () -> {
-          double calculatedOutput = mWristFF.calculate(getEncReading(), 0);
+          double calculatedOutput = mWristFF.calculate(Units.degreesToRadians(getEncReading()), 0);
           setVolts(calculatedOutput);
         },
         (interrupted) -> setVolts(0),
@@ -83,21 +87,27 @@ public class WristSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
-          double newKp = SmartDashboard.getNumber("Wrist/Kp", WristConstants.kP);
-          double newKd = SmartDashboard.getNumber("Wrist/Kd", WristConstants.kD);
+          double newKp = SmartDashboard.getNumber("Wrist/kP", WristConstants.kP);
+          double newKd = SmartDashboard.getNumber("Wrist/kD", WristConstants.kD);
           double pSetpoint = SmartDashboard.getNumber("Wrist/Tunable Setpoint", 0.0);
 
           double newVel = SmartDashboard.getNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
           double newAccel =
               SmartDashboard.getNumber("Wrist/Max Accel", WristConstants.kMaxAcceleration);
+          double newkG = SmartDashboard.getNumber("Wrist/kG", WristConstants.kG);
           mWristProfiledPID.setConstraints(new Constraints(newVel, newAccel));
           mWristProfiledPID.setPID(newKp, 0.0, newKd);
           mWristProfiledPID.reset(getEncReading());
           mWristProfiledPID.setGoal(pSetpoint);
+
+          mWristFF = new ArmFeedforward(0.0, newkG, 0.0);
         },
         () -> {
           double encoderReading = getEncReading();
-          double calculatedPID = mWristFF.calculate(mWristProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedPID =
+              mWristFF.calculate(
+                  Units.degreesToRadians(mWristProfiledPID.getSetpoint().position),
+                  Units.degreesToRadians(mWristProfiledPID.getSetpoint().velocity));
           double calculatedFF = mWristProfiledPID.calculate(encoderReading);
 
           setVolts(calculatedPID + calculatedFF);
@@ -114,9 +124,9 @@ public class WristSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
+          SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());
           mWristProfiledPID.reset(getEncReading());
           mWristProfiledPID.setGoal(pSetpoint.getPos());
-          SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());
         },
         () -> {
           double calculatedFF =

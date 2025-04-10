@@ -371,7 +371,7 @@ public class ControlsSubsystem extends SubsystemBase {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
-        .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()))
+        // .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()))
         .onFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
@@ -399,6 +399,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kPickup)
         .whileTrue(
             new SequentialCommandGroup(
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
                 new ParallelCommandGroup(
                     mClaw.intakeCoralCmd(),
@@ -408,13 +409,13 @@ public class ControlsSubsystem extends SubsystemBase {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)));
 
-    operatorButtonboard.axisLessThan(1, -0.5).whileTrue(mElevator.setVoltsCmd(3));
+    operatorButtonboard.axisLessThan(1, -0.5).whileTrue(mElevator.setVoltsCmd(5));
 
     operatorButtonboard.axisGreaterThan(1, 0.5).whileTrue(mElevator.setVoltsCmd(-3));
 
-    operatorButtonboard.axisGreaterThan(0, 0.5).whileTrue(mWrist.setVoltsCmd(2));
+    operatorButtonboard.axisGreaterThan(0, 0.5).whileTrue(mWrist.setVoltsCmd(1.5));
 
-    operatorButtonboard.axisLessThan(0, -0.50).whileTrue(mWrist.setVoltsCmd(-2));
+    operatorButtonboard.axisLessThan(0, -0.50).whileTrue(mWrist.setVoltsCmd(-1.5));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kEjectAlgaeToBarge)
@@ -438,6 +439,10 @@ public class ControlsSubsystem extends SubsystemBase {
 
     driverController.rightBumper().whileTrue(mIntake.setRollerCmd(6.0));
     driverController.leftBumper().whileTrue(mIntake.setRollerCmd(-6.0));
+  }
+
+  public void initWristTuning() {
+    driverController.povUp().whileTrue(mWrist.setTunablePIDCmd());
   }
 
   public void initElevatorTuning() {

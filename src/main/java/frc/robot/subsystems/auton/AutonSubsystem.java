@@ -6,6 +6,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -13,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.RollerSpeed;
@@ -28,8 +32,10 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import frc.robot.util.AllianceFlipUtil;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutonSubsystem {
   private final DriveSubsystem mDrive;
@@ -38,6 +44,7 @@ public class AutonSubsystem {
   private final ElevatorSubsystem mElevator;
   private final IntakeSubsystem mIntake;
   private final WristSubsystem mWrist;
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   public AutonSubsystem(
       DriveSubsystem pDrive,
@@ -52,6 +59,34 @@ public class AutonSubsystem {
     this.mClaw = pClaw;
     this.mElevator = pElevator;
     this.mIntake = pIntake;
+    configureNamedCommands();
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    SmartDashboard.putData(autoChooser.getSendableChooser());
+
+    configureAutoChooser();
+  }
+
+  public Command getChosenAuton() {
+    return autoChooser.get();
+  }
+
+  private void configureAutoChooser() {
+    // addSysIDRoutines();
+    addChoreoPaths();
+  }
+
+  private void addChoreoPaths() {
+    autoChooser.addOption("Choreo Test", choreoAuton());
+  }
+
+  // private Command goToBranch() {
+  //   return GoToPose(0, 0)
+  // }
+
+  public Command choreoAuton() {
+    return new SequentialCommandGroup(
+        followFirstChoreoPath("SSC-C3", false, true), followChoreoPath("C3-LS", true, true));
   }
 
   public void configureNamedCommands() {
@@ -59,18 +94,13 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ReadyScoreSubsystemsL2", readyScoreSubsystems(2));
     NamedCommands.registerCommand("ReadyScoreSubsystemsL3", readyScoreSubsystems(3));
     NamedCommands.registerCommand("ReadyScoreSubsystemsL4", readyScoreSubsystems(4));
-    NamedCommands.registerCommand("", null);
+
     NamedCommands.registerCommand("ReverseL4", reverseL4());
     NamedCommands.registerCommand("ReverseScore", reverseScoreL4());
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
 
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
     NamedCommands.registerCommand("ReadyHP", readyFunnelSubsystem());
-
-    NamedCommands.registerCommand("ScoreToPoseC10L2", GoToPose(10, 2));
-    NamedCommands.registerCommand("ScoreToPoseC3L2", GoToPose(3, 2));
-    NamedCommands.registerCommand("ScoreToPoseC10L4", GoToPose(10, 4));
-    NamedCommands.registerCommand("ScoreToPoseC3L4", GoToPose(3, 4));
 
     NamedCommands.registerCommand("ReadyAlgaeL3", readyAlgaeL3());
     NamedCommands.registerCommand("ReadyAlgaeL2", readyAlgaeL2());
@@ -172,19 +202,19 @@ public class AutonSubsystem {
         new InstantCommand(() -> mClaw.setClaw(RollerSpeed.INTAKE_ALGAE)));
   }
 
-  private SequentialCommandGroup GoToPose(int branch, int level) {
+  private GoToPose goToPose(Pose2d targetPose) {
+    return new GoToPose(() -> targetPose, () -> mDrive.getPose(), mDrive);
+  }
+
+  private GoToPose goToClosestBranchPose(int branch, int level) {
     Supplier<linearPoseOffsets> horizontalOffset = () -> intToOffsets(level);
     Supplier<PoseOffsets> awayOffset =
-        () -> ((branch % 2 == 0) ? PoseOffsets.RIGHT : PoseOffsets.LEFT);
+        () -> (branch % 2 == 0 ? PoseOffsets.RIGHT : PoseOffsets.LEFT);
 
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> mDrive.stop()),
-        new GoToPose(
-            () -> mVision.getClosestReefScoringPose(horizontalOffset, awayOffset),
-            () -> mDrive.getPose(),
-            mDrive),
-        new WaitCommand(0.5),
-        scoreCoral());
+    return new GoToPose(
+        () -> mVision.getClosestReefScoringPose(horizontalOffset, awayOffset),
+        () -> mDrive.getPose(),
+        mDrive);
   }
 
   // private SequentialCommandGroup GoToPose(String pathToFollowAfter, int tagID,
@@ -297,40 +327,75 @@ public class AutonSubsystem {
     }
   }
 
-  ///////////////// PATH CREATION LOGIC \\\\\\\\\\\\\\\\\\\\\\
-  public Command followFirstChoreoPath(String pathName, Rotation2d startingRotation) {
-    PathPlannerPath path = getTraj(pathName).get();
+  public Command followFirstChoreoPath(String pathName, boolean correctStart, boolean correctEnd) {
+    return followChoreoPath(pathName, correctStart, correctEnd, true);
+  }
+
+  public Command followChoreoPath(String pathName, boolean correctStart, boolean correctEnd) {
+    return followChoreoPath(pathName, correctStart, correctEnd, false);
+  }
+
+  public Command followChoreoPath(
+      String pathName, boolean correctStart, boolean correctEnd, boolean setPoseAtStart) {
+    PathPlannerPath path = getChoreoTrajectory(pathName).get();
     double totalTimeSeconds =
         path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
+    List<Pose2d> pathPoses = path.getPathPoses();
+    Pose2d firstPose = pathPoses.get(0);
+    Pose2d lastPose = pathPoses.get(pathPoses.size() - 1);
+    Rotation2d startingRot = mDrive.getRotation();
+
+    if (pathPoses.isEmpty()) {
+      DriverStation.reportError(
+          "CHOREO PATH ERROR: PATH " + pathName + " DOESN'T HAVE ANY POSES", true);
+      return AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5);
+    }
 
     return new SequentialCommandGroup(
-        new InstantCommand(
-            () -> {
-              mDrive.setPose(
-                  AllianceFlipUtil.apply(
-                      new Pose2d(path.getPathPoses().get(0).getTranslation(), startingRotation)));
-            }),
-        AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5));
+        (setPoseAtStart)
+            ? new InstantCommand(
+                () -> {
+                  mDrive.setPose(
+                      AllianceFlipUtil.apply(new Pose2d(firstPose.getTranslation(), startingRot)));
+                })
+            : new InstantCommand(),
+        (correctStart)
+            ? goToPose(
+                AllianceFlipUtil.apply(
+                    new Pose2d(firstPose.getTranslation(), firstPose.getRotation())))
+            : new InstantCommand(),
+        AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5),
+        (correctEnd)
+            ? goToPose(
+                AllianceFlipUtil.apply(
+                    new Pose2d(lastPose.getTranslation(), lastPose.getRotation())))
+            : new InstantCommand());
   }
 
-  public Command choreoAuton() {
-    return new SequentialCommandGroup(followChoreoPath("SSC-C3"), followChoreoPath("C3-LS"));
-  }
-
-  public Command followChoreoPath(String pathName) {
-    PathPlannerPath path = getTraj(pathName).get();
-    path.getIdealTrajectory(DriveSubsystem.robotConfig);
-    double totalTimeSeconds =
-        path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
-    return AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5);
-  }
-
-  public Optional<PathPlannerPath> getTraj(String pathName) {
+  public Optional<PathPlannerPath> getChoreoTrajectory(String pathName) {
     try {
       return Optional.of(PathPlannerPath.fromChoreoTrajectory(pathName));
     } catch (Exception e) {
       e.printStackTrace();
       return Optional.empty();
     }
+  }
+
+  private void addSysIDRoutines() {
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(mDrive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(mDrive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }

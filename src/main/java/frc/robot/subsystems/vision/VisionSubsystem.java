@@ -125,6 +125,14 @@ public class VisionSubsystem extends SubsystemBase {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }
 
+  public Pose2d getBranchScoringPose(int branchNum) {
+    return getBranchScoringPose(branchNum, 0.0);
+  }
+
+  public Pose2d getBranchScoringPose(int branchNum, double pDistanceInches) {
+    return null;
+  }
+
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pXOffsetM, double pYOffsetM) {
     Pose2d tagPose =
         VisionConstants.kAprilTagFieldLayout.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
