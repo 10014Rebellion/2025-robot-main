@@ -39,11 +39,7 @@ public class ClawSubsystem extends SubsystemBase {
 
   public FunctionalCommand setClawCmd(double pVoltage) {
     return new FunctionalCommand(
-        () -> setClaw(pVoltage),
-        () -> setClaw(pVoltage),
-        (interrupted) -> setClaw(0.0),
-        () -> false,
-        this);
+        () -> setClaw(pVoltage), () -> setClaw(pVoltage), (interrupted) -> {}, () -> false, this);
   }
 
   public FunctionalCommand holdCoralCmd() {

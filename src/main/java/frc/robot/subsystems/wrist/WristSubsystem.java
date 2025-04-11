@@ -69,6 +69,7 @@ public class WristSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.Feedforward;
+          System.out.println("Wrist FF Running");
         },
         () -> {
           double calculatedOutput = mWristFF.calculate(Units.degreesToRadians(getEncReading()), 0);

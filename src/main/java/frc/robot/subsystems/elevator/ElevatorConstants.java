@@ -18,7 +18,7 @@ public class ElevatorConstants {
   public static double kMaxVelocity = 2400; // 500;
   public static double kTolerance = 1;
 
-  public static double kForwardSoftLimit = 60;
+  public static double kForwardSoftLimit = 55;
   public static double kReverseSoftLimit = 0;
   public static double kReverseNoDieLimit = 21;
 
@@ -38,22 +38,18 @@ public class ElevatorConstants {
     HPINTAKE(2),
     PREINTAKE(23.0),
     POSTINTAKE(18.0),
-    GROUNDINTAKE(0.5),
     GROUNDALGAE(15),
-    NORM_LOLI_L4(80),
-    L1(45),
-    L2(10),
-    L3(37.5),
-    L4(80),
-    ReverseL4(85),
+    L1(27),
+    L2(8),
+    L3(22),
+    L4(52),
     SCORE(20),
-    REVERSESCORE(60),
     BARGE(85),
-    L2ALGAE(60),
-    L3ALGAE(83),
+    L2ALGAE(41),
+    L3ALGAE(50),
     HOLD_ALGAE(3),
     PreClimb(40),
-    Climb(5);
+    Climb(0.0);
 
     public final double setpoint;
 

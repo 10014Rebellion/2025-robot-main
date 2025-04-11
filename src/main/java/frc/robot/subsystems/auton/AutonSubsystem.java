@@ -95,8 +95,6 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ReadyScoreSubsystemsL3", readyScoreSubsystems(3));
     NamedCommands.registerCommand("ReadyScoreSubsystemsL4", readyScoreSubsystems(4));
 
-    NamedCommands.registerCommand("ReverseL4", reverseL4());
-    NamedCommands.registerCommand("ReverseScore", reverseScoreL4());
     NamedCommands.registerCommand("ScoreCoral", scoreCoral());
 
     NamedCommands.registerCommand("IntakeCoral", intakeCoral());
@@ -112,15 +110,7 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ActivateIntake", activateIntake());
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
-    NamedCommands.registerCommand("LolipopReady", lolipopReady());
-    NamedCommands.registerCommand("LolipopScoreReady", lolipopScoreReady());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
-  }
-
-  private SequentialCommandGroup lolipopScoreReady() {
-    return new SequentialCommandGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.NORM_LOLI_L4),
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.NORM_LOLI_L4));
   }
 
   private InstantCommand holdCoral() {
@@ -151,34 +141,11 @@ public class AutonSubsystem {
         .andThen(new InstantCommand(() -> mIntake.setVoltsIntakeRoller(0)));
   }
 
-  private SequentialCommandGroup lolipopReady() {
-    return new SequentialCommandGroup(
-        new WaitCommand(0.25),
-        new ParallelCommandGroup(
-            mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
-            mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE),
-            new SequentialCommandGroup(new WaitCommand(0.1), mClaw.intakeCoralCmd())));
-  }
-
   private SequentialCommandGroup scoreProcessor() {
     return new SequentialCommandGroup(
         new InstantCommand(() -> mClaw.setClaw(RollerSpeed.OUTTAKE_PROCESSOR)),
         new WaitCommand(3),
         new InstantCommand(() -> mClaw.setClaw(0)));
-  }
-
-  private ParallelCommandGroup reverseL4() {
-    return new ParallelCommandGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.ReverseL4));
-  }
-
-  private ParallelCommandGroup reverseScoreL4() {
-    return new ParallelCommandGroup(
-        mWrist.setPIDCmd(WristConstants.Setpoints.REVERSEL4),
-        mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF),
-        new WaitCommand(0.1)
-            .andThen(mElevator.setPIDCmd(ElevatorConstants.Setpoints.REVERSESCORE)));
   }
 
   private ParallelCommandGroup holdAlgae() {

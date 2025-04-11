@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -34,7 +35,6 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,9 +44,8 @@ public class ControlsSubsystem extends SubsystemBase {
   // CommandXboxController(1);
   private final CommandGenericHID operatorButtonboard = new CommandGenericHID(1);
 
-  private IntSupplier levelSetpointInt;
+  private int currentCoralScore;
   private Supplier<VisionConstants.PoseOffsets> sideScoring;
-  private Supplier<VisionConstants.linearPoseOffsets> distanceScoring;
   private boolean mSwerveFieldOriented = true;
 
   // private final double kDriveSwerveMultipler = 0.5;
@@ -76,19 +75,17 @@ public class ControlsSubsystem extends SubsystemBase {
     this.mClaw = pClaw;
     this.mClimb = pClimb;
 
-    levelSetpointInt = () -> 2;
+    currentCoralScore = 4;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
-    distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
     SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
     SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Levels/Chosen Level", levelSetpointInt.getAsInt());
     SmartDashboard.putBoolean(
         "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
-    SmartDashboard.putNumber("Levels/Distance Offset", distanceScoring.get().getOffsetM());
+    SmartDashboard.putNumber("Levels/Current Coral Level", currentCoralScore);
   }
 
   public void initDriverController() {
@@ -138,10 +135,10 @@ public class ControlsSubsystem extends SubsystemBase {
         .y()
         .whileTrue(
             new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDINTAKE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE),
                 new ParallelCommandGroup(
                     mClaw.intakeCoralCmd(),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDINTAKE))));
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDALGAE))));
     driverController.a().whileTrue(mClaw.intakeCoralCmd());
   }
 
@@ -167,21 +164,18 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController
         .rightTrigger()
         .whileTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> levelToDrivebase(levelSetpointInt)),
-                new GoToPose(
-                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.RIGHT),
-                    () -> mDrive.getPose(),
-                    mDrive)));
+            new GoToPose(
+                () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.RIGHT),
+                () -> mDrive.getPose(),
+                mDrive));
 
     driverController
         .leftTrigger()
         .whileTrue(
-            new SequentialCommandGroup(
-                new GoToPose(
-                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
-                    () -> mDrive.getPose(),
-                    mDrive)));
+            new GoToPose(
+                () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
+                () -> mDrive.getPose(),
+                mDrive));
 
     driverController
         .x()
@@ -305,9 +299,7 @@ public class ControlsSubsystem extends SubsystemBase {
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kScoreCoral)
-        .whileTrue(
-            new SequentialCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.setClawCmd(-0.5)));
+        .whileTrue(getCoralScoreCmd(currentCoralScore));
 
     // operatorButtonboard
     //     .button(ControlsConstants.Buttonboard.kClimbAscend)
@@ -326,7 +318,7 @@ public class ControlsSubsystem extends SubsystemBase {
             //         .andThen(mClaw.scoreCoralCmd(ClawConstants.RollerSpeed.REVERSE_REEF))));
             // mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
             new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB),
+                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
                 mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
@@ -340,6 +332,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kSetScoreL4)
         .whileTrue(
             new ParallelCommandGroup(
+                new InstantCommand(() -> currentCoralScore = 4),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L4),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L4)));
 
@@ -347,6 +340,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kSetScoreL3)
         .whileTrue(
             new ParallelCommandGroup(
+                new InstantCommand(() -> currentCoralScore = 3),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L3)));
 
@@ -354,6 +348,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kSetScoreL2)
         .whileTrue(
             new SequentialCommandGroup(
+                new InstantCommand(() -> currentCoralScore = 2),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2)));
 
@@ -361,6 +356,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .button(ControlsConstants.Buttonboard.kSetScoreL1)
         .whileTrue(
             new ParallelCommandGroup(
+                new InstantCommand(() -> currentCoralScore = 1),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L1),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L1)));
 
@@ -369,13 +365,13 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         // .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()))
         .onFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
 
     operatorButtonboard
@@ -383,12 +379,12 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         .onFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
     // .onFalse(
     //     new ParallelCommandGroup(
@@ -457,39 +453,20 @@ public class ControlsSubsystem extends SubsystemBase {
     driverController.b().whileTrue(mWrist.setVoltsCmd(2));
   }
 
-  private void levelToElevator(IntSupplier level) {
-    int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
-    // this is atrocious please redo this to work with suppliers ;-;
-    // That's week 4 tho not just yet (3/4/2025)
-    if (curLevel == 4) {
-      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L4.getPos());
-    } else if (curLevel == 3) {
-      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L3.getPos());
-    } else if (curLevel == 2) {
-      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
-    } else
-      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L1.getPos());
-  }
+  private Command getCoralScoreCmd(int level) {
+    int curLevel = MathUtil.clamp(level, 1, 4);
 
-  private void levelToWrist(IntSupplier level) {
-    int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
-    if (curLevel == 4) {
-      SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L4.getPos());
-    } else if (curLevel == 3) {
-      SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L3.getPos());
-    } else if (curLevel == 2) {
-      SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
-    } else SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L1.getPos());
-  }
+    if (curLevel == 2) {
+      return new ParallelCommandGroup(
+          mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE).andThen(mWrist.enableFFCmd()),
+          new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
+    } else if (curLevel == 1) {
+      return mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_L1.get());
+    } else {
 
-  private void levelToDrivebase(IntSupplier level) {
-    int curLevel = MathUtil.clamp(level.getAsInt(), 0, 4);
-    if (curLevel == 4) {
-      distanceScoring = () -> VisionConstants.linearPoseOffsets.L4;
-    } else if (curLevel == 3) {
-      distanceScoring = () -> VisionConstants.linearPoseOffsets.L3;
-    } else if (curLevel == 2) {
-      distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
-    } else distanceScoring = () -> VisionConstants.linearPoseOffsets.L2;
+      return new ParallelCommandGroup(
+          mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()),
+          new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
+    }
   }
 }

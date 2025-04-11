@@ -82,7 +82,8 @@ public class VisionConstants {
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-red-reef.json";
 
   public static AprilTagFieldLayout kAprilTagFieldLayout =
       AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
@@ -123,9 +124,9 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(12.908), // X: inches forward
-                      Units.inchesToMeters(13.409), // Y: inches left
-                      Units.inchesToMeters(12.77) // Z: inches above ground
+                      Units.inchesToMeters(10), // X: inches forward
+                      Units.inchesToMeters(12 + 7.0 / 8.0), // Y: inches left
+                      Units.inchesToMeters(12 + 5.0 / 8.0) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
@@ -138,9 +139,9 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(12.908), // X: inches forward
-                      Units.inchesToMeters(-13.409), // Y: inches right
-                      Units.inchesToMeters(12.77) // Z: inches above ground
+                      Units.inchesToMeters(10), // X: inches forward
+                      Units.inchesToMeters(-10.25), // Y: inches right
+                      Units.inchesToMeters(12 + 5.0 / 8.0) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
