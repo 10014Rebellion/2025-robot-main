@@ -114,7 +114,7 @@ public class WristSubsystem extends SubsystemBase {
               mWristFF.calculate(
                   Units.degreesToRadians(mWristProfiledPID.getSetpoint().position),
                   Units.degreesToRadians(mWristProfiledPID.getSetpoint().velocity));
-          
+
           setVolts(calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Wrist/Full Output", calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Wrist/PID Output", calculatedPID);

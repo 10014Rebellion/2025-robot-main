@@ -94,14 +94,14 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    // mControls.initDriverController();
-    // mControls.initOperatorButtonboard();
-    // mControls.initDrivebase();
-    // mControls.initTriggers();
+    mControls.initDriverController();
+    mControls.initOperatorButtonboard();
+    mControls.initDrivebase();
+    mControls.initTriggers();
     // mControls.initTuningDrive();
     // mControls.initIntakeTuning();
     // mControls.initElevatorTuning();
-    mControls.initWristTuning();
+    // mControls.initWristTuning();
   }
 
   public Command getAutonomousCommand() {
