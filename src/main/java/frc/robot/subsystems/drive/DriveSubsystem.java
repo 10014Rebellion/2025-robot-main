@@ -8,7 +8,11 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -66,9 +70,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Pathplanner and Choreo
   public static RobotConfig robotConfig;
-  // private SwerveSetpoint lastSetpoint =
-  // new SwerveSetpoint(new ChassisSpeeds(), zeroStates(),
-  // DriveFeedforwards.zeros(4));
+  private static SwerveSetpointGenerator mSwerveSPGen;
+  private SwerveSetpoint prevSetpoint =
+  new SwerveSetpoint(new ChassisSpeeds(), zeroStates(),
+  DriveFeedforwards.zeros(4));
 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -105,6 +110,18 @@ public class DriveSubsystem extends SubsystemBase {
     SparkOdometryThread.getInstance().start();
 
     robotConfig = DriveConstants.ppConfig;
+    try{
+      robotConfig = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+
+    mSwerveSPGen = new SwerveSetpointGenerator(
+            robotConfig, // The robot configuration. This is the same config used for generating trajectories and running path following commands.
+            kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per second. This should probably be stored in your Constants file
+        );
+
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
@@ -236,6 +253,18 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public void runSwerveSPGen(ChassisSpeeds speeds) {
+    prevSetpoint = mSwerveSPGen.generateSetpoint(prevSetpoint, speeds, 0.02);
+    
+    setModuleStates(prevSetpoint.moduleStates());
+  }
+
+  private void setModuleStates(SwerveModuleState[] states) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSetpoint(states[i]);
+    }
+  }
+
   /**
    * Runs the drive at the desired velocity.
    *
@@ -252,9 +281,7 @@ public class DriveSubsystem extends SubsystemBase {
     Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
     // Send setpoints to modules
-    for (int i = 0; i < 4; i++) {
-      modules[i].runSetpoint(setpointStates[i]);
-    }
+    setModuleStates(setpointStates);
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
