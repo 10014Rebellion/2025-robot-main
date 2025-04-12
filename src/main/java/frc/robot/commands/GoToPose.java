@@ -263,7 +263,7 @@ public class GoToPose extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    mDriveSubsystem.isAtPose = true;
+    mDriveSubsystem.isAtPose = false;
     mDriveSubsystem.stop();
     // StateDaddy.currentDrive = StateEnums.Drive.Current.MANUAL;
     running = false;

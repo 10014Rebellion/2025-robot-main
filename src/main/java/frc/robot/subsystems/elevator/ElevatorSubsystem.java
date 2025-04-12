@@ -188,5 +188,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator/Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator/Voltage", mElevatorSparkMax.getBusVoltage());
+    SmartDashboard.putBoolean("Elevator/At Setpoint", isPIDAtGoal());
   }
 }

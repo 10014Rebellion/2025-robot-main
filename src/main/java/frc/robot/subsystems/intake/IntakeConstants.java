@@ -70,14 +70,14 @@ public class IntakeConstants {
     public static double kReverseSoftLimit = 2.0; // TO DO: CONFIGURE ME!
 
     public static double kS = 0.0; // 0.34
-    public static double kG = 1.1;
-    public static double kV = 0.0; // 0.43
-    public static double kA = 0.0; // 0.06
+    public static double kG = 0.19; // 0.3
+    public static double kV = 2.4; // 0.43
+    public static double kA = 0.08; // 0.06
 
     public enum Setpoints {
       STOWED(90.0),
       ALGAEINTAKE(70),
-      INTAKING(2.0);
+      INTAKING(3.0);
       public final double position;
 
       private Setpoints(double position) {

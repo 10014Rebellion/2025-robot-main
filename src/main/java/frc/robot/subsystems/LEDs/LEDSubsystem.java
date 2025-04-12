@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
@@ -67,7 +68,10 @@ public class LEDSubsystem extends SubsystemBase {
         // && elevatorSubsystem.isPIDAtGoal()
         // // && clawSubsystem.getBeamBreak()
         // && wristSubsystem.isPIDAtGoal())
-        .whileTrue(new InstantCommand(() -> setSolid(ledColor.GREEN)))
+        .whileTrue(
+            new ParallelCommandGroup(
+                // new DynamicCommand(() -> getCoralScoreCmd(currentCoralScore)),
+                new InstantCommand(() -> setSolid(ledColor.GREEN))))
         .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
   }
 

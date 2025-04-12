@@ -97,10 +97,11 @@ public class RobotContainer {
     mControls.initDriverController();
     mControls.initOperatorButtonboard();
     mControls.initDrivebase();
-    // // mControls.initTuningDrive();
+    mControls.initTriggers();
+    // mControls.initTuningDrive();
     // mControls.initIntakeTuning();
     // mControls.initElevatorTuning();
-    // mControls.initWristTuning();
+    //mControls.initWristTuning();
   }
 
   public Command getAutonomousCommand() {

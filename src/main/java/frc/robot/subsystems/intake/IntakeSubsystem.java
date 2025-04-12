@@ -76,9 +76,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     SmartDashboard.putNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
     SmartDashboard.putNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
+    SmartDashboard.putNumber("Intake/PivotKa", IntakeConstants.IntakePivot.kA);
+    SmartDashboard.putNumber("Intake/PivotKv", IntakeConstants.IntakePivot.kV);
+    SmartDashboard.putNumber("Intake/PivotKs", IntakeConstants.IntakePivot.kS);
 
     SmartDashboard.putNumber("Intake/Tunable Setpoint", 0.0);
     SmartDashboard.putNumber("Intake/Tunable Pivot Voltage", 0.0);
+
+    SmartDashboard.putNumber("Intake/Max Velocity", IntakeConstants.IntakePivot.kMaxVelocity);
+    SmartDashboard.putNumber(
+        "Intake/Max Acceleration", IntakeConstants.IntakePivot.kMaxAcceleration);
 
     mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
     // mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
@@ -181,19 +188,27 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public FunctionalCommand setTunablePIDIntakeCommand() {
+    return setTunablePIDIntakeCommand(SmartDashboard.getNumber("Intake/Tunable Setpoint", 0.0));
+  }
+
+  public FunctionalCommand setTunablePIDIntakeCommand(double pSetpoint) {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
           double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
           double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
           double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
-          double pSetpoint = SmartDashboard.getNumber("Intake/Tunable Setpoint", 0.0);
-          mIntakePivotFF =
-              new ArmFeedforward(
-                  IntakeConstants.IntakePivot.kS,
-                  newKg,
-                  IntakeConstants.IntakePivot.kV,
-                  IntakeConstants.IntakePivot.kA);
+          double newKa = SmartDashboard.getNumber("Intake/PivotKa", IntakeConstants.IntakePivot.kA);
+          double newKv = SmartDashboard.getNumber("Intake/PivotKv", IntakeConstants.IntakePivot.kV);
+          double newKs = SmartDashboard.getNumber("Intake/PivotKs", IntakeConstants.IntakePivot.kS);
+          double newMaxVel =
+              SmartDashboard.getNumber(
+                  "Intake/Max Velocity", IntakeConstants.IntakePivot.kMaxVelocity);
+          double newMaxAccel =
+              SmartDashboard.getNumber(
+                  "Intake/Max Acceleration", IntakeConstants.IntakePivot.kMaxAcceleration);
+          mIntakePivotFF = new ArmFeedforward(newKs, newKg, newKv, newKa);
+          mIntakePivotProfiledPID.setConstraints(new Constraints(newMaxVel, newMaxAccel));
           mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
           mIntakePivotProfiledPID.reset(getEncoderReading());
           mIntakePivotProfiledPID.setGoal(pSetpoint);

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
@@ -35,6 +36,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.util.DynamicCommand;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -75,7 +77,7 @@ public class ControlsSubsystem extends SubsystemBase {
     this.mClaw = pClaw;
     this.mClimb = pClimb;
 
-    currentCoralScore = 4;
+    currentCoralScore = 1;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
     SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
     SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
@@ -86,6 +88,16 @@ public class ControlsSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean(
         "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
     SmartDashboard.putNumber("Levels/Current Coral Level", currentCoralScore);
+  }
+
+  public void initTriggers() {
+    new Trigger(
+            () ->
+                (mDrive.isAtPose
+                    && mElevator.isPIDAtGoal()
+                    && mWrist.isPIDAtGoal()))
+        .whileTrue(new DynamicCommand(() -> getCoralScoreCmd(currentCoralScore)));
+    // .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
   }
 
   public void initDriverController() {
@@ -299,7 +311,7 @@ public class ControlsSubsystem extends SubsystemBase {
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kScoreCoral)
-        .whileTrue(getCoralScoreCmd(currentCoralScore));
+        .whileTrue(new DynamicCommand(() -> getCoralScoreCmd(currentCoralScore)));
 
     // operatorButtonboard
     //     .button(ControlsConstants.Buttonboard.kClimbAscend)
@@ -424,31 +436,37 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initIntakeTuning() {
-    driverController.povRight().whileTrue(mIntake.setTunablePIDIntakeCommand());
     driverController
         .povLeft()
-        .whileTrue(mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING));
+        .whileTrue(
+            mIntake.setTunablePIDIntakeCommand(
+                IntakeConstants.IntakePivot.Setpoints.STOWED.getPos()));
+    driverController
+        .povRight()
+        .whileTrue(
+            mIntake.setTunablePIDIntakeCommand(
+                IntakeConstants.IntakePivot.Setpoints.INTAKING.getPos()));
     // driverController.povLeft().whileTrue(mIntake.setTunablePivotCmd());
 
     driverController.povUp().whileTrue(mIntake.setPivotCmd(3.0));
-    driverController.povDown().whileTrue(mIntake.setPivotCmd(-1));
+    driverController.povDown().whileTrue(mIntake.setPivotCmd(-3));
 
     driverController.rightBumper().whileTrue(mIntake.setRollerCmd(6.0));
     driverController.leftBumper().whileTrue(mIntake.setRollerCmd(-6.0));
   }
 
   public void initWristTuning() {
-    driverController.povUp().whileTrue(mWrist.setTunablePIDCmd());
+    driverController.povUp().whileTrue(mWrist.setTunablePIDCmd(90.0));
+    driverController.povRight().whileTrue(mWrist.setTunablePIDCmd(45.0));
+    driverController.povDown().whileTrue(mWrist.setTunablePIDCmd(0.0));
+    driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd(-30.0));
   }
 
   public void initElevatorTuning() {
-    driverController
-        .axisMagnitudeGreaterThan(1, 0.2)
-        .whileTrue(mElevator.setVoltsCmd(driverController.getLeftY() * 8));
     driverController.povUp().whileTrue(mElevator.setTunablePIDCommand());
     // driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
-    driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd());
-    driverController.povRight().whileTrue(mWrist.setTunablePIDCmd());
+    // driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd());
+    // driverController.povRight().whileTrue(mWrist.setTunablePIDCmd());
     driverController.x().whileTrue(mWrist.setVoltsCmd(-2));
     driverController.b().whileTrue(mWrist.setVoltsCmd(2));
   }
