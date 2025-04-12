@@ -91,11 +91,7 @@ public class ControlsSubsystem extends SubsystemBase {
   }
 
   public void initTriggers() {
-    new Trigger(
-            () ->
-                (mDrive.isAtPose
-                    && mElevator.isPIDAtGoal()
-                    && mWrist.isPIDAtGoal()))
+    new Trigger(() -> (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new DynamicCommand(() -> getCoralScoreCmd(currentCoralScore)));
     // .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
   }

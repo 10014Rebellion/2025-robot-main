@@ -155,8 +155,8 @@ public class Robot extends LoggedRobot {
                       .map(
                           point ->
                               new Pose2d(
-                                  PoseConstants.AndyMarkField.kFieldLengthM - point.position.getX(),
-                                  PoseConstants.AndyMarkField.kFieldWidthM - point.position.getY(),
+                                  PoseConstants.WeldedField.kFieldLengthM - point.position.getX(),
+                                  PoseConstants.WeldedField.kFieldWidthM - point.position.getY(),
                                   new Rotation2d()))
                       .collect(Collectors.toList()));
             }
