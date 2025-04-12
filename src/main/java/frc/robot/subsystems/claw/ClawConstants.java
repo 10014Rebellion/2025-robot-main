@@ -29,7 +29,8 @@ public class ClawConstants {
     OUTTAKE_BARGE(-8),
     OUTTAKE_PROCESSOR(-6),
     OUTTAKE_L1(-3),
-    EJECT_CORAL(-3);
+    EJECT_CORAL(-3),
+    EJECT_ALGAE(-12);
 
     public final double setVolts;
 

@@ -83,7 +83,7 @@ public class WristSubsystem extends SubsystemBase {
   }
 
   public boolean isPIDAtGoal() {
-    return mCurrentController.equals(Controllers.ProfiledPID) && mWristProfiledPID.atGoal();
+    return mWristProfiledPID.atGoal();
   }
 
   public FunctionalCommand setTunablePIDCmd(double pSetpoint) {
@@ -109,19 +109,19 @@ public class WristSubsystem extends SubsystemBase {
         },
         () -> {
           double encoderReading = getEncReading();
+          double calculatedPID = mWristProfiledPID.calculate(encoderReading);
           double calculatedFF =
               mWristFF.calculate(
                   Units.degreesToRadians(mWristProfiledPID.getSetpoint().position),
                   Units.degreesToRadians(mWristProfiledPID.getSetpoint().velocity));
-          double calculatedPID = mWristProfiledPID.calculate(encoderReading);
-
+          
           setVolts(calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Wrist/Full Output", calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Wrist/PID Output", calculatedPID);
           SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
         },
         (interrupted) -> setVolts(0),
-        () -> false,
+        () -> isPIDAtGoal(),
         this);
   }
 
