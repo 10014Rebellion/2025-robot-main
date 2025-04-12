@@ -206,6 +206,9 @@ public class WristSubsystem extends SubsystemBase {
   public void periodic() {
     stopIfLimit();
     SmartDashboard.putNumber("Wrist/Encoder", getEncReading());
+    SmartDashboard.putNumber("Wrist/Position Setpoint", mWristProfiledPID.getSetpoint().position);
+    SmartDashboard.putNumber("Wrist/Velocity Setpoint", mWristProfiledPID.getSetpoint().velocity);
+
     SmartDashboard.putBoolean("Wrist/At Setpoint", isPIDAtGoal());
   }
 }

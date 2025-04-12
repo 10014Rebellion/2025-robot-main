@@ -22,7 +22,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private final int kLEDLength = 30; // TUNE ME
 
-  private final ledColor defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
+  private ledColor defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
 
   public LEDSubsystem(
       ClawSubsystem clawSubsystem,
@@ -76,5 +76,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
+  }
 }

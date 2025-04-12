@@ -23,7 +23,7 @@ import java.util.*;
  * have a blue alliance origin.
  */
 public class FieldConstants {
-  public static final FieldType fieldType = FieldType.ANDYMARK;
+  public static final FieldType fieldType = FieldType.WELDED;
 
   private static double fieldLength = -1;
   private static double fieldWidth = -1;
