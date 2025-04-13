@@ -46,7 +46,8 @@ public class VisionConstants {
     L4(Units.inchesToMeters(0.0)),
     L3(Units.inchesToMeters(0.0)),
     L2(Units.inchesToMeters(0.0)),
-    L1(Units.inchesToMeters(0.0));
+    L1(Units.inchesToMeters(0.0)),
+    ALGAE(Units.inchesToMeters(3.0));
 
     public final double offset;
 

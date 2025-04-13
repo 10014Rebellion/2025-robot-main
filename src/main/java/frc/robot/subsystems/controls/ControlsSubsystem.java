@@ -189,6 +189,9 @@ public class ControlsSubsystem extends SubsystemBase {
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
     driverController.a().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
+
+    driverController.povUp().whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
+    driverController.povDown().whileTrue(mClimb.retractClimb());
   }
 
   public void initDrivebase() {
@@ -347,12 +350,12 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
+                mClimb.climbUntilRetracted(),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(mClimb.setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints.DESCEND));
+        .whileTrue(mClimb.climbUntilRetracted());
     // .whileFalse();
 
     operatorButtonboard
@@ -452,9 +455,7 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> currentScoreLevel = 5),
-                new InstantCommand(() -> goingToBarge = true),
-                new DynamicCommand(
-                    () ->
+                new DynamicCommand(() ->
                         getScoreCmd(
                             5)))) // mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
         .whileFalse(new InstantCommand(() -> goingToBarge = false));
@@ -510,18 +511,21 @@ public class ControlsSubsystem extends SubsystemBase {
       return new ParallelCommandGroup(
           mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE).andThen(mWrist.enableFFCmd()),
           new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
-    } else if (curLevel == 0) {
+    } 
+    else if (curLevel == 0) {
       return new ParallelCommandGroup(
           mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
           mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
           mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
-    } else if (curLevel == 5) {
+    } 
+    else if (curLevel == 5) {
       return new SequentialCommandGroup(
           mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
           new ParallelCommandGroup(
               // new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
               mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
-              mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)));
+              mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
+              mClaw.throwAlgae(mWrist, mElevator)));
     } else {
 
       return new ParallelCommandGroup(

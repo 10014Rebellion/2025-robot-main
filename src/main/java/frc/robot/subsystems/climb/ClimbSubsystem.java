@@ -2,14 +2,20 @@ package frc.robot.subsystems.climb;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.claw.ClawConstants;
+import frc.robot.subsystems.climb.ClimbConstants.Grabber.VoltageSetpoints;
+import frc.robot.subsystems.wrist.WristConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax mClimbMotor;
-  // private final SparkMax mGrabberMotor;
+  private final SparkMax mGrabberMotor;
+  private final AbsoluteEncoder mClimbEncoder;
   // private boolean mHasExtended;
 
   // private double kExtendTime;
@@ -21,33 +27,35 @@ public class ClimbSubsystem extends SubsystemBase {
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    // mGrabberMotor =
-    //     new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
-    // mGrabberMotor.configure(
-    //     ClimbConstants.Grabber.kClimbConfig,
-    //     ResetMode.kResetSafeParameters,
-    //     PersistMode.kPersistParameters);
+    mClimbEncoder = mClimbMotor.getAbsoluteEncoder();
+    //mClimbEncoder.
+    mGrabberMotor =
+        new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
+    mGrabberMotor.configure(
+        ClimbConstants.Grabber.kClimbConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
-    // mHasExtended = false;
+    //mHasExtended = false;
   }
 
-  // public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
-  //   return setGrabberVoltsCmd(pVolts.getVolts());
-  // }
+  public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
+    return setGrabberVoltsCmd(pVolts.getVolts());
+  }
 
-  // public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
-  //   return new FunctionalCommand(
-  //       () -> {},
-  //       () -> {
-  //         setGrabberVolts(pVolts);
-  //       },
-  //       (interrupted) -> setGrabberVolts(0),
-  //       () -> false);
-  // }
+  public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
+    return new FunctionalCommand(
+        () -> {},
+        () -> {
+          setGrabberVolts(pVolts);
+        },
+        (interrupted) -> setGrabberVolts(0),
+        () -> false);
+  }
 
-  // public void setGrabberVolts(double pVolts) {
-  //   mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
-  // }
+  public void setGrabberVolts(double pVolts) {
+    mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
+  }
 
   public FunctionalCommand setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints pVolts) {
     return setPulleyVoltsCmd(pVolts.getVolts());
@@ -65,5 +73,49 @@ public class ClimbSubsystem extends SubsystemBase {
 
   private void setPulleyVolts(double pVolts) {
     mClimbMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
+  }
+
+  private void setPulleyVolts(frc.robot.subsystems.climb.ClimbConstants.Pulley.VoltageSetpoints pVoltSetpoint) {
+    setPulleyVolts(pVoltSetpoint);
+  }
+
+  private double getEncReading() {
+    double encoderMeasurement = mClimbEncoder.getPosition();
+    if (encoderMeasurement > 180.0)
+      encoderMeasurement -= 360.0;
+    return encoderMeasurement;
+  }
+
+  public FunctionalCommand releasePulley() {
+    return new FunctionalCommand(
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND), // Start the command by setting the claw to coral speed
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND),
+        (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
+        () -> getEncReading() < ClimbConstants.Pulley.Setpoints.EXTENDED.getPos(),
+        this);
+  }
+
+  public FunctionalCommand climbUntilRetracted() {
+    return new FunctionalCommand(
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND), // Start the command by setting the claw to coral speed
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
+        (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
+        () -> getEncReading() > ClimbConstants.Pulley.Setpoints.CLIMBED.getPos(),
+        this);
+  }
+
+  public FunctionalCommand retractClimb() {
+    return new FunctionalCommand(
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND), // Start the command by setting the claw to coral speed
+        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
+        (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
+        () -> getEncReading() > ClimbConstants.Pulley.Setpoints.STOWED.getPos(),
+        this);
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Climb/Position", getEncReading());
+    SmartDashboard.putBoolean("Climb/Fully Extended", getEncReading() < ClimbConstants.Pulley.Setpoints.EXTENDED.getPos());
   }
 }

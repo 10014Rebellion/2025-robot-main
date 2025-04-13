@@ -95,6 +95,7 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ReadyAlgaeL3", readyAlgaeL3());
     NamedCommands.registerCommand("ReadyAlgaeL2", readyAlgaeL2());
+    NamedCommands.registerCommand("ScoreBarge", scoreBarge());
 
     NamedCommands.registerCommand("HoldAlgae", holdAlgae());
     NamedCommands.registerCommand("HoldCoral", holdCoral());
@@ -107,6 +108,7 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("GoToLeftPose", goToClosestBranchPose(false, 4));
     NamedCommands.registerCommand("GoToRightPose", goToClosestBranchPose(true, 4));
+    NamedCommands.registerCommand("GoToCenterPose", goToClosestCenterPose());
   }
 
   private InstantCommand holdCoral() {
@@ -147,23 +149,33 @@ public class AutonSubsystem {
 
   private ParallelCommandGroup holdAlgae() {
     return new ParallelCommandGroup(
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-        mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.HOLD_ALGAE)));
+      mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+      mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
+      mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()));
   }
 
   private ParallelCommandGroup readyAlgaeL3() {
     return new ParallelCommandGroup(
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
-        mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.INTAKE_ALGAE)));
+      mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
+      mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE).andThen(mWrist.enableFFCmd()),
+      mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
   }
 
   private ParallelCommandGroup readyAlgaeL2() {
     return new ParallelCommandGroup(
-        mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
-        mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE),
-        new InstantCommand(() -> mClaw.setClaw(RollerSpeed.INTAKE_ALGAE)));
+      mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
+      mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
+      mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
+  }
+
+  private SequentialCommandGroup scoreBarge() {
+    return new SequentialCommandGroup(
+          mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+          new ParallelCommandGroup(
+              // new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+              mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+              mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
+              mClaw.throwAlgae(mWrist, mElevator)));
   }
 
   private GoToPose goToPose(Pose2d targetPose) {
@@ -180,6 +192,16 @@ public class AutonSubsystem {
 
     return new AutonGoToPose(
         () -> mVision.getClosestReefScoringPose(horizontalOffset, () -> awayOffset),
+        () -> mDrive.getPose(),
+        mDrive);
+  }
+
+  private AutonGoToPose goToClosestCenterPose() {
+    linearPoseOffsets awayOffset = intToOffsets(5);
+    PoseOffsets sideOffset = PoseOffsets.CENTER;
+
+    return new AutonGoToPose(
+        () -> mVision.getClosestReefScoringPose(() -> awayOffset, () -> sideOffset),
         () -> mDrive.getPose(),
         mDrive);
   }
@@ -286,7 +308,7 @@ public class AutonSubsystem {
   }
 
   private linearPoseOffsets intToOffsets(int level) {
-    int curLevel = MathUtil.clamp(level, 1, 4);
+    int curLevel = MathUtil.clamp(level, 1, 5);
     switch (curLevel) {
       case 1:
         return linearPoseOffsets.L1;
@@ -294,6 +316,8 @@ public class AutonSubsystem {
         return linearPoseOffsets.L2;
       case 3:
         return linearPoseOffsets.L3;
+      case 5:
+        return linearPoseOffsets.ALGAE;
       default:
         return linearPoseOffsets.L4;
     }

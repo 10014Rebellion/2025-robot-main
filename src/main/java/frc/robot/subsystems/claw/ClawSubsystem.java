@@ -11,6 +11,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.wrist.WristConstants;
+import frc.robot.subsystems.wrist.WristSubsystem;
 
 public class ClawSubsystem extends SubsystemBase {
   private final SparkFlex mClawSparkMax;
@@ -95,6 +99,21 @@ public class ClawSubsystem extends SubsystemBase {
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.EJECT_CORAL),
         () -> !getBeamBreak(),
+        this);
+  }
+
+  public FunctionalCommand throwAlgae(WristSubsystem mWrist, ElevatorSubsystem mElevator) {
+    return new FunctionalCommand(
+        () -> setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE),
+        () -> {},
+        (interrupted) -> {
+          if (mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
+              && mWrist.getEncReading() > WristConstants.throwAlgaePos)
+              setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
+          else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
+        },
+        () -> (mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
+        && mWrist.getEncReading() > WristConstants.throwAlgaePos),
         this);
   }
 
