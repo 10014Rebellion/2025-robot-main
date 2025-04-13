@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.AutonGoToPose;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
@@ -35,6 +37,7 @@ import frc.robot.util.AllianceFlipUtil;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutonSubsystem {
@@ -64,30 +67,20 @@ public class AutonSubsystem {
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     SmartDashboard.putData(autoChooser.getSendableChooser());
 
-    configureAutoChooser();
+    // configureAutoChooser();
   }
 
   public Command getChosenAuton() {
     return autoChooser.get();
   }
 
-  private void configureAutoChooser() {
-    // addSysIDRoutines();
-    addChoreoPaths();
-  }
-
-  private void addChoreoPaths() {
-    autoChooser.addOption("Choreo Test", choreoAuton());
-  }
+  // private void configureAutoChooser() {
+  // addSysIDRoutines();
+  // }
 
   // private Command goToBranch() {
   //   return GoToPose(0, 0)
   // }
-
-  public Command choreoAuton() {
-    return new SequentialCommandGroup(
-        followFirstChoreoPath("SSC-C3", false, true), followChoreoPath("C3-LS", true, true));
-  }
 
   public void configureNamedCommands() {
     NamedCommands.registerCommand("ReadyScoreSubsystemsL1", readyScoreSubsystems(1));
@@ -111,6 +104,9 @@ public class AutonSubsystem {
 
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
+
+    NamedCommands.registerCommand("GoToLeftPose", goToClosestBranchPose(false, 4));
+    NamedCommands.registerCommand("GoToRightPose", goToClosestBranchPose(true, 4));
   }
 
   private InstantCommand holdCoral() {
@@ -121,8 +117,9 @@ public class AutonSubsystem {
     return new ParallelRaceGroup(
         new SequentialCommandGroup(
             new WaitCommand(0.3),
-            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-            mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)),
+            new ParallelCommandGroup(
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
         mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING));
   }
 
@@ -132,7 +129,7 @@ public class AutonSubsystem {
             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
             new SequentialCommandGroup(
                 mIntake.setIndexCoralCmd(),
-                new WaitCommand(0.1),
+                // new WaitCommand(0.1),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
@@ -173,13 +170,16 @@ public class AutonSubsystem {
     return new GoToPose(() -> targetPose, () -> mDrive.getPose(), mDrive);
   }
 
-  private GoToPose goToClosestBranchPose(int branch, int level) {
-    Supplier<linearPoseOffsets> horizontalOffset = () -> intToOffsets(level);
-    Supplier<PoseOffsets> awayOffset =
-        () -> (branch % 2 == 0 ? PoseOffsets.RIGHT : PoseOffsets.LEFT);
+  private GoToPose goToBranch(Pose2d targetPose) {
+    return new GoToPose(() -> targetPose, () -> mDrive.getPose(), mDrive);
+  }
 
-    return new GoToPose(
-        () -> mVision.getClosestReefScoringPose(horizontalOffset, awayOffset),
+  private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
+    Supplier<linearPoseOffsets> horizontalOffset = () -> intToOffsets(level);
+    PoseOffsets awayOffset = isLeft ? PoseOffsets.RIGHT : PoseOffsets.LEFT;
+
+    return new AutonGoToPose(
+        () -> mVision.getClosestReefScoringPose(horizontalOffset, () -> awayOffset),
         () -> mDrive.getPose(),
         mDrive);
   }
@@ -216,16 +216,21 @@ public class AutonSubsystem {
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
   }
 
-  private SequentialCommandGroup readyScoreSubsystems(int level) {
-    return new SequentialCommandGroup(
+  private ParallelCommandGroup readyScoreSubsystems(int level) {
+    if (level == 4) {
+      return new ParallelCommandGroup(
+          mElevator.setPIDCmd(ElevatorConstants.Setpoints.L4),
+          mWrist.setPIDCmd(WristConstants.Setpoints.L4));
+    }
+    return new ParallelCommandGroup(
         mWrist.setPIDCmd(intToWristPos(level)), mElevator.setPIDCmd(intToElevatorPos(level)));
   }
 
-  private SequentialCommandGroup scoreCoral() {
-    return new SequentialCommandGroup(
-        new WaitCommand(0.25),
-        new ParallelCommandGroup(
-            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE), mClaw.scoreCoralCmd()));
+  private ParallelDeadlineGroup scoreCoral() {
+    return new ParallelDeadlineGroup(
+        new WaitCommand(0.5),
+        mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()),
+        new WaitCommand(0.1).andThen(mClaw.setClawCmd(0.0)));
   }
 
   private SequentialCommandGroup intakeCoral() {
@@ -304,12 +309,19 @@ public class AutonSubsystem {
 
   public Command followChoreoPath(
       String pathName, boolean correctStart, boolean correctEnd, boolean setPoseAtStart) {
-    PathPlannerPath path = getChoreoTrajectory(pathName).get();
+    PathPlannerPath path =
+        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? getChoreoTrajectory(pathName).get().flipPath()
+            : getChoreoTrajectory(pathName).get();
+
     double totalTimeSeconds =
         path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
     List<Pose2d> pathPoses = path.getPathPoses();
     Pose2d firstPose = pathPoses.get(0);
+    Logger.recordOutput("Auton/Starting", firstPose);
     Pose2d lastPose = pathPoses.get(pathPoses.size() - 1);
+    Logger.recordOutput("Auton/Ending", lastPose);
+
     Rotation2d startingRot = mDrive.getRotation();
 
     if (pathPoses.isEmpty()) {

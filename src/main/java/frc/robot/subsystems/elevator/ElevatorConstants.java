@@ -21,7 +21,7 @@ public class ElevatorConstants {
   public static double kForwardSoftLimit = 55;
   public static double kReverseSoftLimit = 0;
   public static double kReverseNoDieLimit = 21;
-  public static double throwAlgaePos = 50;
+  public static double throwAlgaePos = 40;
 
   public static double kS = 0.0;
   public static double kG = 1.1;
@@ -39,14 +39,14 @@ public class ElevatorConstants {
     HPINTAKE(2),
     PREINTAKE(23.0),
     POSTINTAKE(18.0),
-    GROUNDALGAE(15),
+    GROUNDALGAE(10),
     L1(27),
     L2(8),
     L3(22),
-    L4(52),
+    L4(54),
     SCORE(20),
     BARGE(55),
-    L2ALGAE(41),
+    L2ALGAE(38),
     L3ALGAE(50),
     HOLD_ALGAE(3),
     PreClimb(40),

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.96,
-        "y": 2.8
+        "x": 7.12,
+        "y": 0.775
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.003228476821192,
-        "y": 1.479387417218544
+        "x": 5.9813493426333135,
+        "y": 0.7645600591045775
       },
       "isLocked": false,
-      "linkedName": "C3"
+      "linkedName": "FarSouthStart"
     },
     {
       "anchor": {
-        "x": 1.906045081967213,
-        "y": 1.153944672131147
+        "x": 5.154713114754099,
+        "y": 2.5325307377049184
       },
       "prevControl": {
-        "x": 2.7212090163934426,
-        "y": 2.0650102459016386
+        "x": 5.849291545689714,
+        "y": 1.4338646986208292
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SGPickup"
+      "linkedName": "F2"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "South Side Ground",
+  "folder": "South Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

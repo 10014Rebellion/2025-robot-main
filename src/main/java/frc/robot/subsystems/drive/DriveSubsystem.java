@@ -12,7 +12,6 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
-
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -72,8 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   public static RobotConfig robotConfig;
   private static SwerveSetpointGenerator mSwerveSPGen;
   private SwerveSetpoint prevSetpoint =
-  new SwerveSetpoint(new ChassisSpeeds(), zeroStates(),
-  DriveFeedforwards.zeros(4));
+      new SwerveSetpoint(new ChassisSpeeds(), zeroStates(), DriveFeedforwards.zeros(4));
 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -110,18 +108,20 @@ public class DriveSubsystem extends SubsystemBase {
     SparkOdometryThread.getInstance().start();
 
     robotConfig = DriveConstants.ppConfig;
-    try{
+    try {
       robotConfig = RobotConfig.fromGUISettings();
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
     }
 
-    mSwerveSPGen = new SwerveSetpointGenerator(
-            robotConfig, // The robot configuration. This is the same config used for generating trajectories and running path following commands.
-            kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per second. This should probably be stored in your Constants file
-        );
-
+    mSwerveSPGen =
+        new SwerveSetpointGenerator(
+            robotConfig, // The robot configuration. This is the same config used for generating
+            // trajectories and running path following commands.
+            kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per
+            // second. This should probably be stored in your Constants file
+            );
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
@@ -134,7 +134,10 @@ public class DriveSubsystem extends SubsystemBase {
             new PIDConstants(
                 DriveConstants.drivebaseThetaKp, 0.0, DriveConstants.drivebaseThetaKd)),
         ppConfig,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        () -> {
+          // return false;
+          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+        },
         this);
 
     Pathfinding.setPathfinder(new LocalADStarAK());
@@ -255,7 +258,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void runSwerveSPGen(ChassisSpeeds speeds) {
     prevSetpoint = mSwerveSPGen.generateSetpoint(prevSetpoint, speeds, 0.02);
-    
+
     setModuleStates(prevSetpoint.moduleStates());
   }
 

@@ -23,7 +23,7 @@ public class ClawConstants {
     INTAKE_CORAL(6.0),
     HOLD_CORAL(0.5),
     INTAKE_ALGAE(6.0),
-    HOLD_ALGAE(5),
+    HOLD_ALGAE(7),
     OUTTAKE_REEF(-0.6),
     REVERSE_REEF(-2.0),
     OUTTAKE_BARGE(-8),

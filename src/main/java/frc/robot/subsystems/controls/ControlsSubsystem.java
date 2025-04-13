@@ -49,7 +49,7 @@ public class ControlsSubsystem extends SubsystemBase {
   private int currentScoreLevel;
   private Supplier<VisionConstants.PoseOffsets> sideScoring;
   private boolean mSwerveFieldOriented = true;
-  private boolean hasAlgae = false;
+  private boolean goingToBarge = false;
 
   // private final double kDriveSwerveMultipler = 0.5;
   // private final double kRotationSwerveMultipler = 0.6;
@@ -78,7 +78,7 @@ public class ControlsSubsystem extends SubsystemBase {
     this.mClaw = pClaw;
     this.mClimb = pClimb;
 
-    currentScoreLevel = 1;
+    currentScoreLevel = 4;
     sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
     SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
     SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
@@ -89,24 +89,38 @@ public class ControlsSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean(
         "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
     SmartDashboard.putNumber("Levels/Current Coral Level", currentScoreLevel);
+    SmartDashboard.putBoolean("Levels/GOTOBARGE", goingToBarge);
   }
 
   public void initTriggers() {
     new Trigger(() -> (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new DynamicCommand(() -> getScoreCmd(currentScoreLevel)));
 
-    new Trigger(
-            () ->
-                ((currentScoreLevel == 5) // Check we're scoring barge
-                    && (hasAlgae) // ALso check that we should actually have an algae
-                    && (mElevator.getEncReading()
-                        > ElevatorConstants
-                            .throwAlgaePos) // Now, check if we're high enough on the elevator
-                    && (mWrist.getEncReading()
-                        > WristConstants
-                            .throwAlgaePos) // Also check if the arm is high enough to throw
-                ))
-        .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
+    // new Trigger(
+    //         () ->
+    //             (goingToBarge
+    //                 && mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
+    //                 && (mWrist.getEncReading() > WristConstants.throwAlgaePos)))
+    //     .whileTrue(
+    //         new InstantCommand(() ->
+    // mClaw.setClaw(ClawConstants.RollerSpeed.EJECT_ALGAE.get())));
+
+    // new Trigger(
+    //         () ->
+    //             ( // (currentScoreLevel == 5) // Check we're scoring barge
+    //             (goingToBarge)
+    //                 && // ALso check that we should actually have an algae
+    //                 (mElevator.getEncReading()
+    //                     > ElevatorConstants
+    //                         .throwAlgaePos) // Now, check if we're high enough on the elevator
+    //                 && (mWrist.getEncReading()
+    //                     > WristConstants
+    //                         .throwAlgaePos) // Also check if the arm is high enough to throw
+    //             ))
+    //     .whileTrue(
+    //         (new InstantCommand(() -> goingToBarge = false))
+    //             .andThen(mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get())))
+    //     .whileFalse(mClaw.setClawCmd(0.0));
     // .alongWith(new InstantCommand(() -> hasAlgae = mClaw.getBeamBreak())));
     // .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
   }
@@ -158,10 +172,18 @@ public class ControlsSubsystem extends SubsystemBase {
         .y()
         .whileTrue(
             new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE),
+                mWrist
+                    .setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
+                    .andThen(mWrist.enableFFCmd()),
                 new ParallelCommandGroup(
                     mClaw.intakeCoralCmd(),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDALGAE))));
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDALGAE))))
+        .whileFalse(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> currentScoreLevel = 0),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
     driverController.a().whileTrue(mClaw.intakeCoralCmd());
   }
 
@@ -367,12 +389,11 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
+                mClaw.setClawCmd(-ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         // .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()))
         .onFalse(
             new ParallelCommandGroup(
                 new InstantCommand(() -> currentScoreLevel = 0),
-                new InstantCommand(() -> hasAlgae = mClaw.getBeamBreak()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
@@ -387,7 +408,6 @@ public class ControlsSubsystem extends SubsystemBase {
         .onFalse(
             new ParallelCommandGroup(
                 new InstantCommand(() -> currentScoreLevel = 0),
-                new InstantCommand(() -> hasAlgae = mClaw.getBeamBreak()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
@@ -428,10 +448,12 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> currentScoreLevel = 5),
+                new InstantCommand(() -> goingToBarge = true),
                 new DynamicCommand(
                     () ->
                         getScoreCmd(
-                            currentScoreLevel)))); // mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
+                            5)))) // mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
+        .whileFalse(new InstantCommand(() -> goingToBarge = false));
   }
 
   public void initIntakeTuning() {
@@ -490,9 +512,12 @@ public class ControlsSubsystem extends SubsystemBase {
           mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
           mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
     } else if (curLevel == 5) {
-      return new ParallelCommandGroup(
-          mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
-          mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE));
+      return new SequentialCommandGroup(
+          mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+          new ParallelCommandGroup(
+              // new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+              mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+              mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)));
     } else {
 
       return new ParallelCommandGroup(

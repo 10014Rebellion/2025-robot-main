@@ -43,10 +43,10 @@ public class VisionConstants {
   public static double kScoringDistance = Units.inchesToMeters(0.0);
 
   public enum linearPoseOffsets {
-    L4(Units.inchesToMeters(10)),
-    L3(Units.inchesToMeters(4.5)),
-    L2(Units.inchesToMeters(0.5)),
-    L1(Units.inchesToMeters(0.25));
+    L4(Units.inchesToMeters(0.0)),
+    L3(Units.inchesToMeters(0.0)),
+    L2(Units.inchesToMeters(0.0)),
+    L1(Units.inchesToMeters(0.0));
 
     public final double offset;
 

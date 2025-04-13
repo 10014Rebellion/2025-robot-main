@@ -13,17 +13,17 @@ public class WristConstants {
   public static boolean kMotorInverted = true;
 
   public static int kCurrentLimit = 60; // CHANGED: 80
-  public static double kP = 0.0015; // 0.0015 without coral
-  public static double kD = 0.0;
+  public static double kP = 0.2; // 0.0015 without coral
+  public static double kD = 0.005;
 
-  public static double kMaxAcceleration = 1400; // 1000 too fast
+  public static double kMaxAcceleration = 1000;
   public static double kMaxVelocity = 800;
   public static double kTolerance = 3.0;
 
   public static double kForwardSoftLimit = 90;
   public static double kReverseSoftLimit = -89;
   public static double kElevatorDownLimit = -30;
-  public static double throwAlgaePos = 80;
+  public static double throwAlgaePos = 60;
 
   public static double kEncoderOffsetDeg = -152.0; // 81.9;
   public static boolean kEncoderInverted = true;
@@ -33,7 +33,7 @@ public class WristConstants {
 
   public static double kS = 0.0;
   public static double kG = 0.31; // 0.29 without coral
-  public static double kV = 0.78; // 0.78 without coral
+  public static double kV = 0.0; // 0.78 without coral
   public static double kA = 0.0;
 
   public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();

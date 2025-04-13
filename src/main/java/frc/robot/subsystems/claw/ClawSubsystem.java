@@ -7,7 +7,6 @@ package frc.robot.subsystems.claw;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -34,7 +33,7 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public void setClaw(double pVoltage) {
-    mClawSparkMax.setVoltage(MathUtil.clamp(pVoltage, -12, 12));
+    mClawSparkMax.setVoltage(pVoltage); // MathUtil.clamp(pVoltage, -12, 12));
   }
 
   public FunctionalCommand setClawCmd(double pVoltage) {
@@ -108,5 +107,6 @@ public class ClawSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Claw/Beam Break", getBeamBreak());
+    SmartDashboard.putNumber("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * 12.0);
   }
 }
