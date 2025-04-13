@@ -124,7 +124,7 @@ public class WristSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
         },
         (interrupted) -> setVolts(0),
-        () -> false, // isPIDAtGoal(),
+        () -> isPIDAtGoal(),
         this);
   }
 

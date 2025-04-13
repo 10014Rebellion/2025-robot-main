@@ -49,6 +49,7 @@ public class ControlsSubsystem extends SubsystemBase {
   private int currentScoreLevel;
   private Supplier<VisionConstants.PoseOffsets> sideScoring;
   private boolean mSwerveFieldOriented = true;
+  private boolean doAutoScore = true;
   private boolean goingToBarge = false;
 
   // private final double kDriveSwerveMultipler = 0.5;
@@ -90,10 +91,13 @@ public class ControlsSubsystem extends SubsystemBase {
         "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
     SmartDashboard.putNumber("Levels/Current Coral Level", currentScoreLevel);
     SmartDashboard.putBoolean("Levels/GOTOBARGE", goingToBarge);
+    SmartDashboard.putBoolean("Levels/Auto Score", doAutoScore);
   }
 
   public void initTriggers() {
-    new Trigger(() -> (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
+    new Trigger(
+            () ->
+                (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal() && doAutoScore))
         .whileTrue(new DynamicCommand(() -> getScoreCmd(currentScoreLevel)));
 
     // new Trigger(
@@ -184,7 +188,7 @@ public class ControlsSubsystem extends SubsystemBase {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
-    driverController.a().whileTrue(mClaw.intakeCoralCmd());
+    driverController.a().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
   }
 
   public void initDrivebase() {
