@@ -1,5 +1,5 @@
 {
- "name":"C5-LC",
+ "name":"FAST SM-F2",
  "version":1,
  "snapshot":{
   "waypoints":[],
@@ -8,8 +8,8 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"C5.x", "val":3.678854637951001}, "y":{"exp":"C5.y", "val":3.0284689693318483}, "heading":{"exp":"C5.heading", "val":1.0471975511965976}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"LM.x", "val":1.2192}, "y":{"exp":"LM.y", "val":4.021}, "heading":{"exp":"LM.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"7.207053184509277 m", "val":7.207053184509277}, "y":{"exp":"1.9306814670562744 m", "val":1.9306814670562744}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"4.644773006439209 m", "val":4.644773006439209}, "y":{"exp":"1.734660029411316 m", "val":1.734660029411316}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

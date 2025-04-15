@@ -2,12 +2,7 @@ package frc.robot.subsystems.auton;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -19,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.AutonGoToPose;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawConstants.RollerSpeed;
 import frc.robot.subsystems.claw.ClawSubsystem;
@@ -33,11 +27,7 @@ import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.util.AllianceFlipUtil;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutonSubsystem {
@@ -65,6 +55,7 @@ public class AutonSubsystem {
     configureNamedCommands();
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser.addDefaultOption("Taxi", mDrive.driveForwardDefaultAuton(2.0));
     SmartDashboard.putData(autoChooser.getSendableChooser());
 
     // configureAutoChooser();
@@ -180,14 +171,6 @@ public class AutonSubsystem {
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
             mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
             mClaw.throwAlgae(mWrist, mElevator)));
-  }
-
-  private GoToPose goToPose(Pose2d targetPose) {
-    return new GoToPose(() -> targetPose, () -> mDrive.getPose(), mDrive);
-  }
-
-  private GoToPose goToBranch(Pose2d targetPose) {
-    return new GoToPose(() -> targetPose, () -> mDrive.getPose(), mDrive);
   }
 
   private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
@@ -324,67 +307,6 @@ public class AutonSubsystem {
         return linearPoseOffsets.ALGAE;
       default:
         return linearPoseOffsets.L4;
-    }
-  }
-
-  public Command followFirstChoreoPath(String pathName, boolean correctStart, boolean correctEnd) {
-    return followChoreoPath(pathName, correctStart, correctEnd, true);
-  }
-
-  public Command followChoreoPath(String pathName, boolean correctStart, boolean correctEnd) {
-    return followChoreoPath(pathName, correctStart, correctEnd, false);
-  }
-
-  public Command followChoreoPath(
-      String pathName, boolean correctStart, boolean correctEnd, boolean setPoseAtStart) {
-    PathPlannerPath path =
-        DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-            ? getChoreoTrajectory(pathName).get().flipPath()
-            : getChoreoTrajectory(pathName).get();
-
-    double totalTimeSeconds =
-        path.getIdealTrajectory(DriveSubsystem.robotConfig).get().getTotalTimeSeconds();
-    List<Pose2d> pathPoses = path.getPathPoses();
-    Pose2d firstPose = pathPoses.get(0);
-    Logger.recordOutput("Auton/Starting", firstPose);
-    Pose2d lastPose = pathPoses.get(pathPoses.size() - 1);
-    Logger.recordOutput("Auton/Ending", lastPose);
-
-    Rotation2d startingRot = mDrive.getRotation();
-
-    if (pathPoses.isEmpty()) {
-      DriverStation.reportError(
-          "CHOREO PATH ERROR: PATH " + pathName + " DOESN'T HAVE ANY POSES", true);
-      return AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5);
-    }
-
-    return new SequentialCommandGroup(
-        (setPoseAtStart)
-            ? new InstantCommand(
-                () -> {
-                  mDrive.setPose(
-                      AllianceFlipUtil.apply(new Pose2d(firstPose.getTranslation(), startingRot)));
-                })
-            : new InstantCommand(),
-        (correctStart)
-            ? goToPose(
-                AllianceFlipUtil.apply(
-                    new Pose2d(firstPose.getTranslation(), firstPose.getRotation())))
-            : new InstantCommand(),
-        AutoBuilder.followPath(path).withTimeout(totalTimeSeconds + 0.5),
-        (correctEnd)
-            ? goToPose(
-                AllianceFlipUtil.apply(
-                    new Pose2d(lastPose.getTranslation(), lastPose.getRotation())))
-            : new InstantCommand());
-  }
-
-  public Optional<PathPlannerPath> getChoreoTrajectory(String pathName) {
-    try {
-      return Optional.of(PathPlannerPath.fromChoreoTrajectory(pathName));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return Optional.empty();
     }
   }
 

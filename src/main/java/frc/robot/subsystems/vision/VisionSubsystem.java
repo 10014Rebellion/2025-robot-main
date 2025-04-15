@@ -64,6 +64,15 @@ public class VisionSubsystem extends SubsystemBase {
     this.mDriveSubsystem = pDriveSubsystem;
   }
 
+  // Returns true as long as it can see at least one tag
+  public boolean canSeeTag() {
+    for (PoseCamera camera : mCameraList) 
+      if (camera.getCameraResults().size() > 0)
+        return true;
+  
+    return false;
+  }
+
   public int getClosestReefTag(boolean isBlueAlliance) { // , double pDistanceMeters) {
     // Determine valid tag IDs based on alliance
     int[] validTags =

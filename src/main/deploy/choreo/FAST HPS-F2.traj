@@ -1,5 +1,5 @@
 {
- "name":"LC-C6",
+ "name":"FAST HPS-F2",
  "version":1,
  "snapshot":{
   "waypoints":[],
@@ -8,8 +8,8 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"LM.x", "val":1.2192}, "y":{"exp":"LM.y", "val":4.021}, "heading":{"exp":"LM.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"C6.x", "val":3.21945}, "y":{"exp":"C6.y", "val":3.8989}, "heading":{"exp":"C6.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"5.834903240203857 m", "val":5.834903240203857}, "y":{"exp":"1.6366493701934814 m", "val":1.6366493701934814}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"3.538651704788208 m", "val":3.538651704788208}, "y":{"exp":"1.230604887008667 m", "val":1.230604887008667}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

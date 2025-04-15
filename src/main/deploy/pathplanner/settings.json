@@ -1,5 +1,5 @@
 {
-  "robotWidth": 0.9398,
+  "robotWidth": 0.94,
   "robotLength": 0.889,
   "holonomicMode": true,
   "pathFolders": [
@@ -13,9 +13,7 @@
     "South Side Lolipop",
     "South Start"
   ],
-  "autoFolders": [
-    "Lolipop Autons"
-  ],
+  "autoFolders": [],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,
   "defaultMaxAngVel": 540.0,
@@ -30,7 +28,7 @@
   "driveMotorType": "vortex",
   "driveCurrentLimit": 60.0,
   "wheelCOF": 1.6,
-  "flModuleX": 0.3175,
+  "flModuleX": 0.318,
   "flModuleY": 0.343,
   "frModuleX": 0.318,
   "frModuleY": -0.343,
