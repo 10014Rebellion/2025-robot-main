@@ -47,7 +47,7 @@ public class VisionConstants {
     L3(Units.inchesToMeters(0.0)),
     L2(Units.inchesToMeters(0.0)),
     L1(Units.inchesToMeters(0.0)),
-    ALGAE(Units.inchesToMeters(3.0));
+    ALGAE(Units.inchesToMeters(2.0));
 
     public final double offset;
 
@@ -83,7 +83,8 @@ public class VisionConstants {
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-processor.json";
   // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-red-reef.json";
 
   public static AprilTagFieldLayout kAprilTagFieldLayout =

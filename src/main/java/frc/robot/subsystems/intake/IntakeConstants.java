@@ -34,7 +34,7 @@ public class IntakeConstants {
     public static boolean kInverted = false;
     public static double kIntakeSpeed = 12;
 
-    public static int kRollerCurrentLimit = 60;
+    public static int kRollerCurrentLimit = 80;
 
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 
@@ -91,7 +91,6 @@ public class IntakeConstants {
 
     static {
       kPivotConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kInverted);
-      kPivotConfig.absoluteEncoder.inverted(kEncoderInverted);
       kPivotConfig
           .absoluteEncoder
           .positionConversionFactor(kPositionConversionFactor)

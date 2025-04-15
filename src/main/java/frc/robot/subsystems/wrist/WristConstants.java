@@ -32,7 +32,7 @@ public class WristConstants {
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
   public static double kS = 0.02;
-  public static double kG = 0.3; // 0.29 without coral
+  public static double kG = 0.4; // 0.29 without coral
   public static double kV = 0.003; // 0.78 without coral
   public static double kA = 0.0;
 
@@ -47,15 +47,15 @@ public class WristConstants {
     L3(46),
     L4(65),
 
-    SCORE(13),
-    L2SCORE(11),
+    SCORE(11),
+    L2SCORE(9),
     BARGE(71),
     L2ALGAE(-28),
     L3ALGAE(-13),
-    HOLD_ALGAE(0),
+    HOLD_ALGAE(5),
     THROW_ALGAE(90),
     CLIMB(-15),
-    GROUNDALGAE(-35);
+    GROUNDALGAE(-31);
 
     public final double setpoint;
 

@@ -10,14 +10,14 @@ public class ClimbConstants {
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kBrake;
-    public static boolean kMotorInverted = false;
+    public static boolean kMotorInverted = true;
 
     public static int kCurrentLimit = 60;
 
     public static final SparkMaxConfig kClimbConfig = new SparkMaxConfig();
 
     public enum VoltageSetpoints {
-      PULL_IN(8),
+      PULL_IN(4.0),
       SPIN_FREE(2);
 
       public final double setpoint;
@@ -47,6 +47,7 @@ public class ClimbConstants {
     public static double encoderZeroOffset = 0.3297160;
     public static double encoderPositionFactor = 360.0;
     public static double encoderVelocityFactor = 360.0;
+    public static double kTolerance = 3.0;
 
     public static int kCurrentLimit = 60;
 
@@ -72,27 +73,26 @@ public class ClimbConstants {
       EXTENDED(0.0),
       CLIMBED(95.0),
       STOWED(150.0);
-  
+
       public final double setpoint;
-  
+
       private Setpoints(double setpoint) {
         this.setpoint = setpoint;
       }
-  
+
       public double getPos() {
         return this.setpoint;
       }
     };
+
     static {
+      kClimbConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kMotorInverted);
       kClimbConfig
-        .idleMode(kIdleMode)
-        .smartCurrentLimit(kCurrentLimit)
-        .inverted(kMotorInverted);
-      kClimbConfig.absoluteEncoder
-        .inverted(encoderInverted)
-        .zeroOffset(encoderZeroOffset)
-        .positionConversionFactor(encoderPositionFactor)
-        .velocityConversionFactor(encoderVelocityFactor);
+          .absoluteEncoder
+          .inverted(encoderInverted)
+          .zeroOffset(encoderZeroOffset)
+          .positionConversionFactor(encoderPositionFactor)
+          .velocityConversionFactor(encoderVelocityFactor);
     }
   }
 }

@@ -14,9 +14,7 @@
     "South Start"
   ],
   "autoFolders": [
-    "HP Autons",
-    "Lolipop Autons",
-    "Push Autons"
+    "Lolipop Autons"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 2.0,

@@ -20,7 +20,7 @@ public class ClawConstants {
   public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
   public enum RollerSpeed {
-    //Coral Values
+    // Coral Values
     INTAKE_CORAL(6.0),
     HOLD_CORAL(0.35),
     OUTTAKE_REEF(-0.6),
@@ -28,13 +28,11 @@ public class ClawConstants {
     EJECT_CORAL(-3),
 
     // Algae Values
-    INTAKE_ALGAE(6.0),
+    INTAKE_ALGAE(12.0),
     HOLD_ALGAE(7),
     EJECT_ALGAE(-12),
     OUTTAKE_PROCESSOR(-6),
-    SCORE_BARGE(0.0);
-    
-    
+    SCORE_BARGE(-12.0);
 
     public final double setVolts;
 

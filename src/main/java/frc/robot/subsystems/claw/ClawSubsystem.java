@@ -27,9 +27,7 @@ public class ClawSubsystem extends SubsystemBase {
     // this.setDefaultCommand(holdCoralCmd());
 
     mClawSparkMax.configure(
-        ClawConstants.kClawConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+        ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void setClaw(ClawConstants.RollerSpeed pVoltage) {
@@ -109,11 +107,12 @@ public class ClawSubsystem extends SubsystemBase {
         (interrupted) -> {
           if (mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
               && mWrist.getEncReading() > WristConstants.throwAlgaePos)
-              setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
+            setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
           else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
         },
-        () -> (mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
-        && mWrist.getEncReading() > WristConstants.throwAlgaePos),
+        () ->
+            (mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
+                && mWrist.getEncReading() > WristConstants.throwAlgaePos),
         this);
   }
 

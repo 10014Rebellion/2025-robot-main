@@ -188,9 +188,12 @@ public class ControlsSubsystem extends SubsystemBase {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
-    driverController.a().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
 
-    driverController.povUp().whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
+    driverController.povRight().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
+
+    driverController
+        .povUp()
+        .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
     driverController.povDown().whileTrue(mClimb.retractClimb());
   }
 
@@ -228,6 +231,17 @@ public class ControlsSubsystem extends SubsystemBase {
                 () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
                 () -> mDrive.getPose(),
                 mDrive));
+
+    driverController
+        .a()
+        .whileTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> doAutoScore = false),
+                new GoToPose(
+                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.CENTER),
+                    () -> mDrive.getPose(),
+                    mDrive)))
+        .whileFalse(new InstantCommand(() -> doAutoScore = true));
 
     driverController
         .x()
@@ -350,12 +364,13 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.climbUntilRetracted(),
+                mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.CLIMBED),
+                mClimb.setGrabberVoltsCmd(0.0),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     operatorButtonboard
         .button(ControlsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(mClimb.climbUntilRetracted());
+        .whileTrue(mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.EXTENDED));
     // .whileFalse();
 
     operatorButtonboard
@@ -396,7 +411,7 @@ public class ControlsSubsystem extends SubsystemBase {
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
-                mClaw.setClawCmd(-ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         // .onFalse(mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get()))
         .onFalse(
             new ParallelCommandGroup(
@@ -455,7 +470,8 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileTrue(
             new ParallelCommandGroup(
                 new InstantCommand(() -> currentScoreLevel = 5),
-                new DynamicCommand(() ->
+                new DynamicCommand(
+                    () ->
                         getScoreCmd(
                             5)))) // mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
         .whileFalse(new InstantCommand(() -> goingToBarge = false));
@@ -511,14 +527,12 @@ public class ControlsSubsystem extends SubsystemBase {
       return new ParallelCommandGroup(
           mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE).andThen(mWrist.enableFFCmd()),
           new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
-    } 
-    else if (curLevel == 0) {
+    } else if (curLevel == 0) {
       return new ParallelCommandGroup(
           mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
           mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
           mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
-    } 
-    else if (curLevel == 5) {
+    } else if (curLevel == 5) {
       return new SequentialCommandGroup(
           mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
           new ParallelCommandGroup(

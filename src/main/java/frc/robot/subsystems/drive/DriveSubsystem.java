@@ -256,7 +256,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
-  public void runSwerveSPGen(ChassisSpeeds speeds) {
+  public void runVelocity(ChassisSpeeds speeds) {
     prevSetpoint = mSwerveSPGen.generateSetpoint(prevSetpoint, speeds, 0.02);
 
     setModuleStates(prevSetpoint.moduleStates());
@@ -273,22 +273,22 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @param speeds Speeds in meters/sec
    */
-  public void runVelocity(ChassisSpeeds speeds) {
-    // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+  // public void runVelocity(ChassisSpeeds speeds) {
+  //   // Calculate module setpoints
+  //   ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+  //   SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+  //   SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
-    // Log unoptimized setpoints
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+  //   // Log unoptimized setpoints
+  //   Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+  //   Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
-    // Send setpoints to modules
-    setModuleStates(setpointStates);
+  //   // Send setpoints to modules
+  //   setModuleStates(setpointStates);
 
-    // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
-  }
+  //   // Log optimized setpoints (runSetpoint mutates each state)
+  //   Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  // }
 
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
