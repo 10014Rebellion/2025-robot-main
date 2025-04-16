@@ -66,10 +66,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   // Returns true as long as it can see at least one tag
   public boolean canSeeTag() {
-    for (PoseCamera camera : mCameraList) 
-      if (camera.getCameraResults().size() > 0)
-        return true;
-  
+    for (PoseCamera camera : mCameraList) if (camera.getCameraResults().size() > 0) return true;
+
     return false;
   }
 

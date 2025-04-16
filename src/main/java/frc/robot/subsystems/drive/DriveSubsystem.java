@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
@@ -388,15 +387,15 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   // public void rotateInPlace(double pDegPerSec) {
-  //   runVelocity(new ChassisSpeeds(0.0, 0.0, edu.wpi.first.math.util.Units.degreesToRadians(pDegPerSec)));
+  //   runVelocity(new ChassisSpeeds(0.0, 0.0,
+  // edu.wpi.first.math.util.Units.degreesToRadians(pDegPerSec)));
   // }
 
-  public Command driveForwardDefaultAuton(double pDistanceForward) {  
+  public Command driveForwardDefaultAuton(double pDistanceForward) {
     return run(() -> runVelocity(new ChassisSpeeds(kMaxLinearSpeedMPS, 0.0, 0.0)))
         .withTimeout(pDistanceForward / kMaxLinearSpeedMPS)
         .finallyDo(interrupted -> stop());
   }
-  
 
   /** Adds a new timestamped vision measurement. */
   public void addVisionMeasurement(

@@ -55,7 +55,7 @@ public class IntakeConstants {
     public static double kPositionConversionFactor = 360.0;
     public static double kVelocityConversionFactor = kPositionConversionFactor / 60;
 
-    public static double kEncoderOffsetRev = 0.175553;
+    public static double kEncoderOffsetRev = 0.3345553;
 
     public static final SparkMaxConfig kPivotConfig = new SparkMaxConfig();
 

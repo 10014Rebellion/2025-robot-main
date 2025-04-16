@@ -72,7 +72,7 @@ public class ClimbConstants {
     public enum Setpoints {
       EXTENDED(0.0),
       CLIMBED(95.0),
-      STOWED(150.0);
+      STOWED(149.0);
 
       public final double setpoint;
 
