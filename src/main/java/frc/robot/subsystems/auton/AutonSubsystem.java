@@ -121,7 +121,7 @@ public class AutonSubsystem {
             mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
             new SequentialCommandGroup(
-                mIntake.setIndexCoralCmd(),
+                mIntake.autonSetIndexCoralCmd(),
                 // new WaitCommand(0.1),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
@@ -214,7 +214,7 @@ public class AutonSubsystem {
   private SequentialCommandGroup HPCoralIntake() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(
-            mIntake.setIndexCoralCmd(),
+            mIntake.autonSetIndexCoralCmd(),
             new SequentialCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
@@ -246,7 +246,7 @@ public class AutonSubsystem {
     return new SequentialCommandGroup(
         new ParallelDeadlineGroup(
             new ParallelCommandGroup(
-                mIntake.setIndexCoralCmd(),
+                mIntake.autonSetIndexCoralCmd(),
                 new SequentialCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
@@ -261,7 +261,7 @@ public class AutonSubsystem {
 
   private ParallelCommandGroup readyFunnelSubsystem() {
     return new ParallelCommandGroup(
-        mIntake.setIndexCoralCmd(),
+        mIntake.autonSetIndexCoralCmd(),
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.HPINTAKE),
         mWrist.setPIDCmd(WristConstants.Setpoints.HPINTAKE));
   }

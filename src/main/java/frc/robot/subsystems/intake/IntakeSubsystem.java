@@ -259,19 +259,19 @@ public class IntakeSubsystem extends SubsystemBase {
     mIndexerMotor.setVoltage(pVoltage);
   }
 
-  // public FunctionalCommand setIndexCoralCmd() {
-  //   return new FunctionalCommand(
-  //       () -> {},
-  //       () -> {
-  //         setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
-  //       },
-  //       (interrupted) -> {
-  //         setVoltsIndexer(1.0);
-  //       },
-  //       () -> {
-  //         return getCoralDetected();
-  //       });
-  // }
+  public FunctionalCommand autonSetIndexCoralCmd() {
+    return new FunctionalCommand(
+        () -> {},
+        () -> {
+          setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+        },
+        (interrupted) -> {
+          setVoltsIndexer(1.0);
+        },
+        () -> {
+          return getCoralDetected();
+        });
+  }
 
   // public Command setIndexCoralCmd() {
   //   return new AutoFunnelCoralCommand(this);

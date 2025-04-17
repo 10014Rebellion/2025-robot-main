@@ -86,7 +86,8 @@ public class VisionConstants {
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-hp.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
   // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-processor.json";
   // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-red-reef.json";
 

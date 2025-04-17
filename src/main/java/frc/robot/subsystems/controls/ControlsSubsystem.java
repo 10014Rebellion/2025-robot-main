@@ -291,6 +291,9 @@ public class ControlsSubsystem extends SubsystemBase {
 
     // Menu button, the one with 3 lines like a hamburger menu icon
     driverController.button(8).onTrue(new InstantCommand(() -> mIntake.toggleIRSensor()));
+
+    // Weird button with the two rectangles inside each other, idk what its called ngl
+    // driverController.button(7).onTrue(new InstantCommand(() -> mIntake.toggleIRSensor()));
   }
 
   public void initTuningDrive() {

@@ -260,6 +260,8 @@ public class DriveSubsystem extends SubsystemBase {
     prevSetpoint = mSwerveSPGen.generateSetpoint(prevSetpoint, speeds, 0.02);
 
     setModuleStates(prevSetpoint.moduleStates());
+
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", prevSetpoint.moduleStates());
   }
 
   private void setModuleStates(SwerveModuleState[] states) {

@@ -28,6 +28,7 @@ public class VisionSubsystem extends SubsystemBase {
   private List<PoseCamera> mCameraList;
   private List<PhotonPipelineResult> results;
   private final DriveSubsystem mDriveSubsystem;
+  private boolean mKillVision;
 
   private void initCameraList() {
     List<PoseCamera> poseCameras = new ArrayList<>();
@@ -62,6 +63,7 @@ public class VisionSubsystem extends SubsystemBase {
       Supplier<SwerveModulePosition[]> swerveModulePositions) {
     initCameraList();
     this.mDriveSubsystem = pDriveSubsystem;
+    this.mKillVision = false;
   }
 
   // Returns true as long as it can see at least one tag
