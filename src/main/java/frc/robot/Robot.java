@@ -216,7 +216,7 @@ public class Robot extends LoggedRobot {
     }
     robotContainer.initTriggers();
 
-    // Elastic.selectTab("Teleoperated");
+    Elastic.selectTab("Teleoperated");
   }
 
   /** This function is called periodically during operator control. */

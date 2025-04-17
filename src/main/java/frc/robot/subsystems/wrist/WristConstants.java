@@ -23,7 +23,7 @@ public class WristConstants {
   public static double kForwardSoftLimit = 90;
   public static double kReverseSoftLimit = -89;
   public static double kElevatorDownLimit = -30;
-  public static double throwAlgaePos = 60;
+  public static double throwAlgaePos = 50;
 
   public static double kEncoderOffsetDeg = -152.0; // 81.9;
   public static boolean kEncoderInverted = true;
@@ -52,7 +52,7 @@ public class WristConstants {
     BARGE(71),
     L2ALGAE(-28),
     L3ALGAE(-13),
-    HOLD_ALGAE(5),
+    HOLD_ALGAE(-10),
     THROW_ALGAE(90),
     CLIMB(-15),
     GROUNDALGAE(-31);

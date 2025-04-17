@@ -26,14 +26,17 @@ public class IntakeSubsystem extends SubsystemBase {
   private final AbsoluteEncoder mEncoder;
   private final SparkFlex mIntakeRollerMotor;
   private final SparkFlex mIndexerMotor;
+  private boolean mDisableIR;
 
   // private final DigitalInput mCoralSensor1;
   private final DigitalInput mCoralSensorFront;
-  // private final DigitalInput mCoralSensorBack;
+  private final DigitalInput mCoralSensorBack;
 
   private Controllers mCurrentController;
   private final ProfiledPIDController mIntakePivotProfiledPID;
   private ArmFeedforward mIntakePivotFF;
+
+  private boolean mBackTriggered;
 
   private enum Controllers {
     ProfiledPID,
@@ -42,6 +45,8 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public IntakeSubsystem() {
+    mBackTriggered = false;
+    this.mDisableIR = false;
     this.mIntakePivotMotor = new SparkMax(IntakePivot.kPivotID, IntakePivot.kMotorType);
     this.mEncoder = mIntakePivotMotor.getAbsoluteEncoder();
     // this.mEncoder.
@@ -88,7 +93,7 @@ public class IntakeSubsystem extends SubsystemBase {
         "Intake/Max Acceleration", IntakeConstants.IntakePivot.kMaxAcceleration);
 
     mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
-    // mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
+    mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -111,6 +116,10 @@ public class IntakeSubsystem extends SubsystemBase {
         (interrupted) -> setVoltsIntakePivot(0),
         () -> false,
         this);
+  }
+
+  public void toggleIRSensor() {
+    mDisableIR = !mDisableIR;
   }
 
   public boolean isPIDAtGoalIntakePivot() {
@@ -250,14 +259,43 @@ public class IntakeSubsystem extends SubsystemBase {
     mIndexerMotor.setVoltage(pVoltage);
   }
 
+  // public FunctionalCommand setIndexCoralCmd() {
+  //   return new FunctionalCommand(
+  //       () -> {},
+  //       () -> {
+  //         setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+  //       },
+  //       (interrupted) -> {
+  //         setVoltsIndexer(1.0);
+  //       },
+  //       () -> {
+  //         return getCoralDetected();
+  //       });
+  // }
+
+  // public Command setIndexCoralCmd() {
+  //   return new AutoFunnelCoralCommand(this);
+  // }
+
   public FunctionalCommand setIndexCoralCmd() {
     return new FunctionalCommand(
-        () -> {},
         () -> {
-          setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          mBackTriggered = false;
+        },
+        () -> {
+          if (getCoralDetectedBack()) {
+            mBackTriggered = true;
+          }
+
+          if (mBackTriggered) {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow);
+          } else {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          }
         },
         (interrupted) -> {
           setVoltsIndexer(1.0);
+          mBackTriggered = false;
         },
         () -> {
           return getCoralDetected();
@@ -296,15 +334,15 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public boolean getCoralDetectedFront() {
-    return !mCoralSensorFront.get();
+    return mDisableIR ? false : !mCoralSensorFront.get();
   }
 
-  // public boolean getCoralDetectedBack() {
-  //   return !mCoralSensorBack.get();
-  // }
+  public boolean getCoralDetectedBack() {
+    return mDisableIR ? true : !mCoralSensorBack.get();
+  }
 
   public boolean getCoralDetected() {
-    return getCoralDetectedFront(); // && getCoralDetectedBack();
+    return getCoralDetectedFront();
   }
 
   public FunctionalCommand setPivotCmd(double pVoltage) {
@@ -342,11 +380,15 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     stopIfLimitIntakePivot();
+    SmartDashboard.putBoolean("Intake/Coral Detected Back", getCoralDetectedBack());
+    SmartDashboard.putBoolean("Intake/Run Slower", mBackTriggered);
+
     SmartDashboard.putNumber("Intake/Pivot Position", getEncoderReading());
     SmartDashboard.putNumber("Intake/Pivot Current", mIntakePivotMotor.getOutputCurrent());
-    SmartDashboard.putNumber("Intake/Pivot Voltage", mIntakePivotMotor.getAppliedOutput() * 12.0);
+    SmartDashboard.putNumber("Intake/Pivot Voltage", mIntakePivotMotor.getBusVoltage());
     SmartDashboard.putNumber("Intake/Roller Current", mIntakeRollerMotor.getOutputCurrent());
     SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetected());
     SmartDashboard.putNumber("Intake/Pivot Setpoint", mIntakePivotProfiledPID.getGoal().position);
+    SmartDashboard.putBoolean("Intake/IR Disabled", mDisableIR);
   }
 }

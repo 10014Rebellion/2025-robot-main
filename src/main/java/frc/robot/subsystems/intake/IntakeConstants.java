@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 public class IntakeConstants {
   public static class Beambreak {
     public static int kFrontSensorDIOPort = 3;
+    public static int kBackSensorDIOPort = 4;
   }
 
   public static class Indexer {
@@ -16,6 +17,7 @@ public class IntakeConstants {
     public static int kCurrentLimit = 60;
 
     public static int kIntakeVolts = 4;
+    public static int kIntakeVoltsSlow = 3;
     public static int kOuttakeVolts = -3;
 
     public static final SparkMaxConfig kIndexerConfig = new SparkMaxConfig();

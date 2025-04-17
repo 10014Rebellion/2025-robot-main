@@ -2,10 +2,9 @@ package frc.robot.util;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import java.util.function.Supplier;
 
-public class DynamicCommand extends InstantCommand {
+public class DynamicCommand extends Command {
   private final Supplier<Command> mCommandSupplier;
 
   public DynamicCommand(Supplier<Command> pCommandSupplier) {
@@ -14,7 +13,11 @@ public class DynamicCommand extends InstantCommand {
 
   @Override
   public void initialize() {
-    Command dynamicCommand = mCommandSupplier.get();
-    CommandScheduler.getInstance().schedule(dynamicCommand);
+    CommandScheduler.getInstance().schedule(mCommandSupplier.get());
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    CommandScheduler.getInstance().cancel(mCommandSupplier.get());
   }
 }
