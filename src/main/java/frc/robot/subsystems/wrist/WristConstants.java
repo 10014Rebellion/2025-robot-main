@@ -40,11 +40,11 @@ public class WristConstants {
 
   public enum Setpoints {
     BOTTOM(0),
-    INTAKE(-87),
+    INTAKE(-88),
     HPINTAKE(0),
     L1(-30),
-    L2(46),
-    L3(46),
+    L2(46 + 6),
+    L3(46 + 6),
     L4(65),
 
     SCORE(11),

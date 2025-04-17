@@ -97,8 +97,8 @@ public class AutonSubsystem {
     NamedCommands.registerCommand("ScoreProcessor", scoreProcessor());
     NamedCommands.registerCommand("IntakeHP", HPCoralIntake());
 
-    NamedCommands.registerCommand("GoToLeftPose", goToClosestBranchPose(false, 4));
-    NamedCommands.registerCommand("GoToRightPose", goToClosestBranchPose(true, 4));
+    NamedCommands.registerCommand("GoToLeftPose", goToClosestBranchPose(true, 4));
+    NamedCommands.registerCommand("GoToRightPose", goToClosestBranchPose(false, 4));
     NamedCommands.registerCommand("GoToCenterPose", goToClosestCenterPose());
   }
 
@@ -174,11 +174,11 @@ public class AutonSubsystem {
   }
 
   private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
-    Supplier<linearPoseOffsets> horizontalOffset = () -> intToOffsets(level);
-    PoseOffsets awayOffset = isLeft ? PoseOffsets.RIGHT : PoseOffsets.LEFT;
+    Supplier<linearPoseOffsets> awayOffset = () -> intToOffsets(level);
+    PoseOffsets branchOffset = isLeft ? PoseOffsets.AUTONLEFT : PoseOffsets.AUTONRIGHT;
 
     return new AutonGoToPose(
-        () -> mVision.getClosestReefScoringPose(horizontalOffset, () -> awayOffset),
+        () -> mVision.getClosestReefScoringPose(awayOffset, () -> branchOffset),
         () -> mDrive.getPose(),
         mDrive);
   }

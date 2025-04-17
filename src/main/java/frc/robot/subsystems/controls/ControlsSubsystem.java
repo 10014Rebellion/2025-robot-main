@@ -62,196 +62,212 @@ public class ControlsSubsystem extends SubsystemBase {
   private final IntakeSubsystem mIntake;
   private final ClawSubsystem mClaw;
   private final ClimbSubsystem mClimb;
-
-  public ControlsSubsystem(
-      DriveSubsystem pDrive,
-      VisionSubsystem pVision,
-      WristSubsystem pWrist,
-      ElevatorSubsystem pElevator,
-      IntakeSubsystem pIntake,
-      ClawSubsystem pClaw,
-      ClimbSubsystem pClimb) {
-    this.mDrive = pDrive;
-    this.mVision = pVision;
-    this.mWrist = pWrist;
-    this.mElevator = pElevator;
-    this.mIntake = pIntake;
-    this.mClaw = pClaw;
-    this.mClimb = pClimb;
-
-    currentScoreLevel = 4;
-    sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
-    SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
-    SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
-  }
-
-  @Override
-  public void periodic() {
-    SmartDashboard.putBoolean(
-        "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
-    SmartDashboard.putNumber("Levels/Current Coral Level", currentScoreLevel);
-    SmartDashboard.putBoolean("Levels/GOTOBARGE", goingToBarge);
-    SmartDashboard.putBoolean("Levels/Auto Score", doAutoScore);
-  }
-
-  public void initTriggers() {
-    new Trigger(
-            () ->
-                (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal() && doAutoScore))
-        .whileTrue(new DynamicCommand(() -> getScoreCmd(currentScoreLevel)));
-
-    // new Trigger(
-    //         () ->
-    //             (goingToBarge
-    //                 && mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
-    //                 && (mWrist.getEncReading() > WristConstants.throwAlgaePos)))
-    //     .whileTrue(
-    //         new InstantCommand(() ->
-    // mClaw.setClaw(ClawConstants.RollerSpeed.EJECT_ALGAE.get())));
-
-    // new Trigger(
-    //         () ->
-    //             ( // (currentScoreLevel == 5) // Check we're scoring barge
-    //             (goingToBarge)
-    //                 && // ALso check that we should actually have an algae
-    //                 (mElevator.getEncReading()
-    //                     > ElevatorConstants
-    //                         .throwAlgaePos) // Now, check if we're high enough on the elevator
-    //                 && (mWrist.getEncReading()
-    //                     > WristConstants
-    //                         .throwAlgaePos) // Also check if the arm is high enough to throw
-    //             ))
-    //     .whileTrue(
-    //         (new InstantCommand(() -> goingToBarge = false))
-    //             .andThen(mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get())))
-    //     .whileFalse(mClaw.setClawCmd(0.0));
-    // .alongWith(new InstantCommand(() -> hasAlgae = mClaw.getBeamBreak())));
-    // .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
-  }
-
-  public void initDriverController() {
-    // driverController
-    //     .povUp()
-    //     .whileTrue(
-    //         new InstantCommand(
-    //             () ->
-    //                 mClimb.setGrabberVolts(
-    //                     ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
-    driverController
-        .rightBumper()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new ParallelDeadlineGroup(
-                    new ParallelCommandGroup(
-                        mIntake.setIndexCoralCmd(),
-                        new SequentialCommandGroup(
-                            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                            mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
-                    mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-                    mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed)),
-                new WaitCommand(0.1),
-                new ParallelCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
-                    mClaw.intakeCoralCmd()),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
-        .whileFalse(
-            new ParallelCommandGroup(
-                mIntake
-                    .setEndablePIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
-                    .andThen(mIntake.enableFFCmd()),
-                mIntake.setIndexerCmd(0),
-                mIntake.setRollerCmd(0)));
-    // mElevator.enableFFCmd(),
-    // mWrist.enableFFCmd()));
-    driverController
-        .leftBumper()
-        .whileTrue(
-            new ParallelCommandGroup(
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.ALGAEINTAKE),
-                mIntake.setIndexerCmd(-2),
-                mIntake.setRollerCmd(-8)))
-        .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
-    driverController
-        .y()
-        .whileTrue(
-            new ParallelCommandGroup(
-                mWrist
-                    .setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
-                    .andThen(mWrist.enableFFCmd()),
-                new ParallelCommandGroup(
-                    mClaw.intakeCoralCmd(),
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDALGAE))))
-        .whileFalse(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> currentScoreLevel = 0),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
-
-    driverController.povRight().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
-
-    driverController
-        .povUp()
-        .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
-    driverController.povDown().whileTrue(mClimb.retractClimb());
-  }
-
-  public void initDrivebase() {
-    mDrive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            mDrive,
-            () ->
-                -Math.pow(driverController.getLeftY(), 2)
-                    * Math.signum(driverController.getLeftY()),
-            () ->
-                -Math.pow(driverController.getLeftX(), 2)
-                    * Math.signum(driverController.getLeftX()),
-            () ->
-                -Math.pow(driverController.getRightX(), 2)
-                    * Math.signum(driverController.getRightX()),
-            () -> mSwerveFieldOriented));
-
-    driverController
-        .b()
-        .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
-
-    driverController
-        .rightTrigger()
-        .whileTrue(
-            new GoToPose(
-                () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.RIGHT),
-                () -> mDrive.getPose(),
-                mDrive));
-
-    driverController
-        .leftTrigger()
-        .whileTrue(
-            new GoToPose(
-                () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
-                () -> mDrive.getPose(),
-                mDrive));
-
-    driverController
-        .a()
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> doAutoScore = false),
-                new GoToPose(
-                    () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.CENTER),
-                    () -> mDrive.getPose(),
-                    mDrive)))
-        .whileFalse(new InstantCommand(() -> doAutoScore = true));
-
-    driverController
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        mDrive.setPose(
-                            new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
-                    mDrive)
-                .ignoringDisable(true));
+  private boolean isAligningToBarge;
+  
+    public ControlsSubsystem(
+        DriveSubsystem pDrive,
+        VisionSubsystem pVision,
+        WristSubsystem pWrist,
+        ElevatorSubsystem pElevator,
+        IntakeSubsystem pIntake,
+        ClawSubsystem pClaw,
+        ClimbSubsystem pClimb) {
+      this.mDrive = pDrive;
+      this.mVision = pVision;
+      this.mWrist = pWrist;
+      this.mElevator = pElevator;
+      this.mIntake = pIntake;
+      this.mClaw = pClaw;
+      this.mClimb = pClimb;
+  
+      isAligningToBarge = false;
+      currentScoreLevel = 4;
+      sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
+      SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
+      SmartDashboard.putNumber("Levels/Wrist Setpoint", WristConstants.Setpoints.L2.getPos());
+    }
+  
+    @Override
+    public void periodic() {
+      SmartDashboard.putBoolean(
+          "Levels/Left Side Chosen", sideScoring.get().equals(VisionConstants.PoseOffsets.LEFT));
+      SmartDashboard.putNumber("Levels/Current Coral Level", currentScoreLevel);
+      SmartDashboard.putBoolean("Levels/GOTOBARGE", goingToBarge);
+      SmartDashboard.putBoolean("Levels/Auto Score", doAutoScore);
+    }
+  
+    public void initTriggers() {
+      new Trigger(
+              () ->
+                  (mDrive.isAtPose && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal() && doAutoScore))
+          .whileTrue(new DynamicCommand(() -> getScoreCmd(currentScoreLevel)));
+  
+      // new Trigger(
+      //         () ->
+      //             (goingToBarge
+      //                 && mElevator.getEncReading() > ElevatorConstants.throwAlgaePos
+      //                 && (mWrist.getEncReading() > WristConstants.throwAlgaePos)))
+      //     .whileTrue(
+      //         new InstantCommand(() ->
+      // mClaw.setClaw(ClawConstants.RollerSpeed.EJECT_ALGAE.get())));
+  
+      // new Trigger(
+      //         () ->
+      //             ( // (currentScoreLevel == 5) // Check we're scoring barge
+      //             (goingToBarge)
+      //                 && // ALso check that we should actually have an algae
+      //                 (mElevator.getEncReading()
+      //                     > ElevatorConstants
+      //                         .throwAlgaePos) // Now, check if we're high enough on the elevator
+      //                 && (mWrist.getEncReading()
+      //                     > WristConstants
+      //                         .throwAlgaePos) // Also check if the arm is high enough to throw
+      //             ))
+      //     .whileTrue(
+      //         (new InstantCommand(() -> goingToBarge = false))
+      //             .andThen(mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get())))
+      //     .whileFalse(mClaw.setClawCmd(0.0));
+      // .alongWith(new InstantCommand(() -> hasAlgae = mClaw.getBeamBreak())));
+      // .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
+    }
+  
+    public void initDriverController() {
+      // driverController
+      //     .povUp()
+      //     .whileTrue(
+      //         new InstantCommand(
+      //             () ->
+      //                 mClimb.setGrabberVolts(
+      //                     ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts())));
+      driverController
+          .rightBumper()
+          .whileTrue(
+              new SequentialCommandGroup(
+                  new ParallelDeadlineGroup(
+                      new ParallelCommandGroup(
+                          mIntake.setIndexCoralCmd(),
+                          new SequentialCommandGroup(
+                              mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                              mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
+                      mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                      mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed)),
+                  new WaitCommand(0.1),
+                  new ParallelCommandGroup(
+                      mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
+                      mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                      mClaw.intakeCoralCmd()),
+                  mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
+          .whileFalse(
+              new ParallelCommandGroup(
+                  mIntake
+                      .setEndablePIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)
+                      .andThen(mIntake.enableFFCmd()),
+                  mIntake.setIndexerCmd(0),
+                  mIntake.setRollerCmd(0)));
+      // mElevator.enableFFCmd(),
+      // mWrist.enableFFCmd()));
+      driverController
+          .leftBumper()
+          .whileTrue(
+              new ParallelCommandGroup(
+                  mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.ALGAEINTAKE),
+                  mIntake.setIndexerCmd(-2),
+                  mIntake.setRollerCmd(-8)))
+          .whileFalse(new ParallelCommandGroup(mIntake.setIndexerCmd(0), mIntake.setRollerCmd(0)));
+      driverController
+          .y()
+          .whileTrue(
+              new ParallelCommandGroup(
+                  mWrist
+                      .setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
+                      .andThen(mWrist.enableFFCmd()),
+                  new ParallelCommandGroup(
+                      mClaw.intakeCoralCmd(),
+                      mElevator.setPIDCmd(ElevatorConstants.Setpoints.GROUNDALGAE))))
+          .whileFalse(
+              new ParallelCommandGroup(
+                  new InstantCommand(() -> currentScoreLevel = 0),
+                  mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+                  mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
+                  mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
+  
+      driverController.povRight().onTrue(new InstantCommand(() -> doAutoScore = !doAutoScore));
+  
+      driverController
+          .povUp()
+          .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
+      driverController.povDown().whileTrue(mClimb.retractClimb());
+    }
+  
+    public void initDrivebase() {
+      mDrive.setDefaultCommand(
+          DriveCommands.joystickDrive(
+              mDrive,
+              () ->
+              isAligningToBarge ? 0.0 : 
+                  (-Math.pow(driverController.getLeftY(), 2) * Math.signum(driverController.getLeftY())),
+              () ->
+                  -Math.pow(driverController.getLeftX(), 2)
+                      * Math.signum(driverController.getLeftX()),
+              () ->
+                  -Math.pow(driverController.getRightX(), 2)
+                      * Math.signum(driverController.getRightX()),
+              () -> mSwerveFieldOriented));
+  
+      driverController
+          .b()
+          .onTrue(new InstantCommand(() -> mSwerveFieldOriented = !mSwerveFieldOriented));
+  
+      driverController
+          .rightTrigger()
+          .whileTrue(
+              new GoToPose(
+                  () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.RIGHT),
+                  () -> mDrive.getPose(),
+                  mDrive));
+  
+      driverController
+          .leftTrigger()
+          .whileTrue(
+              new GoToPose(
+                  () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.LEFT),
+                  () -> mDrive.getPose(),
+                  mDrive));
+  
+      driverController
+          .a()
+          .whileTrue(
+              new ParallelCommandGroup(
+                  new InstantCommand(() -> doAutoScore = false),
+                  new GoToPose(
+                      () -> mVision.getClosestReefScoringPose(VisionConstants.PoseOffsets.CENTER),
+                      () -> mDrive.getPose(),
+                      mDrive)))
+          .whileFalse(new InstantCommand(() -> doAutoScore = true));
+  
+      driverController
+          .x()
+          .onTrue(
+              Commands.runOnce(
+                      () ->
+                          mDrive.setPose(
+                              new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+                      mDrive)
+                  .ignoringDisable(true));
+  
+    //   driverController.x().whileTrue(
+    //       new SequentialCommandGroup(
+    //           new InstantCommand(() -> isAligningToBarge = true),
+    //           new GoToBarge(
+    //             () -> {
+    //                 double currentY = mDrive.getPose().getY();
+                    
+    //                 return mDrive.getPose();
+    //             }, () -> mDrive.getPose(), mDrive)
+    //       )
+    // ).onFalse(
+    //     new InstantCommand(() -> isAligningToBarge = false)
+    // );
   }
 
   public void initTuningDrive() {

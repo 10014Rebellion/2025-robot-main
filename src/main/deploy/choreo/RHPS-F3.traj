@@ -1,5 +1,5 @@
 {
- "name":"HPS-F3",
+ "name":"RHPS-F3",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -15,7 +15,7 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"HPS.x", "val":1.85}, "y":{"exp":"HPS.y", "val":1.0}, "heading":{"exp":"HPS.heading", "val":0.9599310885968813}, "intervals":33, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"RHPS.x", "val":1.85}, "y":{"exp":"RHPS.y", "val":1.0}, "heading":{"exp":"RHPS.heading", "val":0.9599310885968813}, "intervals":33, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"F3.x", "val":3.67}, "y":{"exp":"F3.y", "val":2.57}, "heading":{"exp":"F3.heading", "val":1.0471975511965976}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

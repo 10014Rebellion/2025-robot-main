@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SS-F2"
+                  "pathName": "FAST SSC-C3"
                 }
               },
               {
@@ -21,12 +21,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "GoToLeftPose"
           }
         },
         {
@@ -42,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C3-RHPS"
+                  "pathName": "FAST C3-RHPS"
                 }
               },
               {
@@ -74,7 +68,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RHPS-F3"
+                  "pathName": "FAST RHPS-F3"
                 }
               },
               {
@@ -118,7 +112,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C4-CHPS"
+                  "pathName": "FAST C4-CHPS"
                 }
               },
               {
@@ -150,7 +144,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CHPS-F3"
+                  "pathName": "FAST CHPS-F3"
                 }
               },
               {
@@ -188,9 +182,79 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "C5-RHPS"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FAST C5-RHPS"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DeployIntake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ActivateIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FAST RHPS-F2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ActivateIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReadyScoreSubsystemsL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "GoToRightPose"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ScoreCoral"
+                }
+              }
+            ]
           }
         }
       ]

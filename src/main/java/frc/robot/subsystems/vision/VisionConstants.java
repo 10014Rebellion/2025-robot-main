@@ -21,13 +21,16 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
 
-  public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13);
-  public static final double kDistOffset = Units.inchesToMeters(0.0);
+  public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13.25);
+  public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
+  // public static final double kDistOffset = Units.inchesToMeters(0.0);
 
   public enum PoseOffsets {
-    LEFT(kDistBetweenBranchesCenter / 2.0 + kDistOffset),
+    AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0),
+    AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0),
+    LEFT(kDistBetweenBranchesCenter / 2.0),
     CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 + kDistOffset);
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0);
 
     public final double offset;
 
@@ -83,8 +86,8 @@ public class VisionConstants {
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
-  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-processor.json";
+  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-processor.json";
   // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-red-reef.json";
 
   public static AprilTagFieldLayout kAprilTagFieldLayout =

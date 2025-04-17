@@ -1,5 +1,5 @@
 {
- "name":"C4-HPS",
+ "name":"C4-RHPS",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -17,8 +17,8 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"C4.x", "val":3.9648162262806226}, "y":{"exp":"C4.y", "val":2.863368969331848}, "heading":{"exp":"C4.heading", "val":1.0471975511965976}, "intervals":28, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"2.520167589187622 m", "val":2.520167589187622}, "y":{"exp":"1.9717081785202026 m", "val":1.9717081785202024}, "heading":{"exp":"HPS.heading", "val":0.9599310885968813}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"HPS.x", "val":1.85}, "y":{"exp":"HPS.y", "val":1.0}, "heading":{"exp":"HPS.heading", "val":0.9599310885968813}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"2.520167589187622 m", "val":2.520167589187622}, "y":{"exp":"1.9717081785202026 m", "val":1.9717081785202024}, "heading":{"exp":"RHPS.heading", "val":0.9599310885968813}, "intervals":22, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"RHPS.x", "val":1.85}, "y":{"exp":"RHPS.y", "val":1.0}, "heading":{"exp":"RHPS.heading", "val":0.9599310885968813}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
