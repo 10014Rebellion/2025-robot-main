@@ -62,7 +62,6 @@ public class ControlsSubsystem extends SubsystemBase {
   private final IntakeSubsystem mIntake;
   private final ClawSubsystem mClaw;
   private final ClimbSubsystem mClimb;
-  private boolean isAligningToBarge;
   
     public ControlsSubsystem(
         DriveSubsystem pDrive,
@@ -80,7 +79,6 @@ public class ControlsSubsystem extends SubsystemBase {
       this.mClaw = pClaw;
       this.mClimb = pClimb;
   
-      isAligningToBarge = false;
       currentScoreLevel = 4;
       sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
       SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
@@ -204,8 +202,7 @@ public class ControlsSubsystem extends SubsystemBase {
           DriveCommands.joystickDrive(
               mDrive,
               () ->
-              isAligningToBarge ? 0.0 : 
-                  (-Math.pow(driverController.getLeftY(), 2) * Math.signum(driverController.getLeftY())),
+                  -Math.pow(driverController.getLeftY(), 2) * Math.signum(driverController.getLeftY()),
               () ->
                   -Math.pow(driverController.getLeftX(), 2)
                       * Math.signum(driverController.getLeftX()),
