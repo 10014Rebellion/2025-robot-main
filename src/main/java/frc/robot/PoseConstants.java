@@ -13,6 +13,17 @@ public class PoseConstants {
     public static final double kPipeDistanceM = 0.3302;
     public static final double kStartingLineX = 7.6057252;
     public static final double kBargeCenterX = 8.774;
+    public static final double kDistAwayFromBargeX = Units.inchesToMeters(65);
+    public static final Rotation2d kHeadingForBarge = new Rotation2d(Units.degreesToRadians(45));
+
+    public static final double kBargeAlignBlueX = kBargeCenterX - kDistAwayFromBargeX; // Blue inner
+    public static final double kBargeAlignRedX = kBargeCenterX + kDistAwayFromBargeX; // Red Inner
+    
+    public static final double kBargeAlignEastDeg = 135;
+    public static final double kBargeAlignWestDeg = 45;
+
+
+
 
     public static final Pose2d kBargeScorePoseBlue =
         new Pose2d(7.31, 0.0, new Rotation2d(Units.degreesToRadians(2.7)));

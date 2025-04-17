@@ -21,7 +21,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.PoseConstants;
+import frc.robot.Robot;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.GoToBarge;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
@@ -36,6 +39,7 @@ import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.DynamicCommand;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -62,6 +66,7 @@ public class ControlsSubsystem extends SubsystemBase {
   private final IntakeSubsystem mIntake;
   private final ClawSubsystem mClaw;
   private final ClimbSubsystem mClimb;
+  private boolean isAligningToBarge;
   
     public ControlsSubsystem(
         DriveSubsystem pDrive,
@@ -79,6 +84,7 @@ public class ControlsSubsystem extends SubsystemBase {
       this.mClaw = pClaw;
       this.mClimb = pClimb;
   
+      isAligningToBarge = false;
       currentScoreLevel = 4;
       sideScoring = () -> VisionConstants.PoseOffsets.LEFT;
       SmartDashboard.putNumber("Levels/Elevator Setpoint", ElevatorConstants.Setpoints.L2.getPos());
@@ -202,7 +208,8 @@ public class ControlsSubsystem extends SubsystemBase {
           DriveCommands.joystickDrive(
               mDrive,
               () ->
-                  -Math.pow(driverController.getLeftY(), 2) * Math.signum(driverController.getLeftY()),
+              isAligningToBarge ? 0.0 : 
+                  (-Math.pow(driverController.getLeftY(), 2) * Math.signum(driverController.getLeftY())),
               () ->
                   -Math.pow(driverController.getLeftX(), 2)
                       * Math.signum(driverController.getLeftX()),
@@ -242,29 +249,46 @@ public class ControlsSubsystem extends SubsystemBase {
                       mDrive)))
           .whileFalse(new InstantCommand(() -> doAutoScore = true));
   
-      driverController
-          .x()
-          .onTrue(
-              Commands.runOnce(
-                      () ->
-                          mDrive.setPose(
-                              new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
-                      mDrive)
-                  .ignoringDisable(true));
+    //   driverController
+    //       .x()
+    //       .onTrue(
+    //           Commands.runOnce(
+    //                   () ->
+    //                       mDrive.setPose(
+    //                           new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+    //                   mDrive)
+    //               .ignoringDisable(true));
   
-    //   driverController.x().whileTrue(
-    //       new SequentialCommandGroup(
-    //           new InstantCommand(() -> isAligningToBarge = true),
-    //           new GoToBarge(
-    //             () -> {
-    //                 double currentY = mDrive.getPose().getY();
+      driverController.x().whileTrue(
+          new SequentialCommandGroup(
+              new InstantCommand(() -> isAligningToBarge = true),
+              new GoToBarge(
+                () -> {
+                    double currentY = mDrive.getPose().getY();
+                    double currentX = mDrive.getPose().getX();
+   
+                    double blueDiff = Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignBlueX);
+                    double redDiff = Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignRedX);
+
+                    double targetX;
+                    double targetThetaDeg;
+
+                    if(redDiff < blueDiff) {
+                        targetX = PoseConstants.WeldedField.kBargeAlignRedX;
+                        targetThetaDeg = PoseConstants.WeldedField.kBargeAlignEastDeg;
+                    } else {
+                        targetX = PoseConstants.WeldedField.kBargeAlignBlueX;
+                        targetThetaDeg = PoseConstants.WeldedField.kBargeAlignWestDeg;
+                    }
+
+                    targetThetaDeg *= (Robot.gIsBlueAlliance) ? -1 : 1; 
                     
-    //                 return mDrive.getPose();
-    //             }, () -> mDrive.getPose(), mDrive)
-    //       )
-    // ).onFalse(
-    //     new InstantCommand(() -> isAligningToBarge = false)
-    // );
+                    return new Pose2d(targetX, currentY, new Rotation2d(Units.degreesToRadians(targetThetaDeg)));
+                }, () -> mDrive.getPose(), mDrive)
+          )
+    ).onFalse(
+        new InstantCommand(() -> isAligningToBarge = false)
+    );
   }
 
   public void initTuningDrive() {
