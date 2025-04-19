@@ -116,6 +116,23 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
+  public FunctionalCommand autonThrowAlgae(WristSubsystem mWrist, ElevatorSubsystem mElevator) {
+    return new FunctionalCommand(
+        () -> setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE),
+        () -> {
+          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+            setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
+          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
+        },
+        (interrupted) -> {
+          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+            setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
+          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
+        },
+        () -> (mWrist.getEncReading() > WristConstants.throwAlgaePos + 6),
+        this);
+  }
+
   // returns true when beambreak is broken (Coral is in the claw)
   // returns false when beambreak is intact (Coral is not in the claw)
   public boolean getBeamBreak() {

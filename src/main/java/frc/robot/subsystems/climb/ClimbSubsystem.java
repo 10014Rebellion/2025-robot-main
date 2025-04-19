@@ -87,14 +87,20 @@ public class ClimbSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> {}, // Start the command by setting the claw to coral speed
         () -> {
+          double encReading = getEncReading();
           // This is a bang bang controller, TAHA had no part in this, he advised against it but
           // they didnt do PID, I'm sorry );
-          if (getEncReading() > pSetpoint.getPos()) {
+          if (encReading > pSetpoint.getPos()) {
             setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND.getVolts());
           }
-          if (getEncReading() < pSetpoint.getPos()) {
+          if (encReading < pSetpoint.getPos()) {
             setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND.getVolts());
           }
+          // if (encReading <= ClimbConstants.Pulley.Setpoints.STARTROLLING.getPos()) {
+          //   setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
+          // } else {
+          //   setGrabberVolts(0.0);
+          // }
         },
         (interrupted) -> {
           setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);

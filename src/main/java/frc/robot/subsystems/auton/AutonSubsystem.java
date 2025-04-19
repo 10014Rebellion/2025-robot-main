@@ -27,7 +27,7 @@ import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class AutonSubsystem {
@@ -170,15 +170,16 @@ public class AutonSubsystem {
             // new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
             mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
-            mClaw.throwAlgae(mWrist, mElevator)));
+            mClaw.autonThrowAlgae(mWrist, mElevator)));
   }
 
   private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
-    Supplier<linearPoseOffsets> awayOffset = () -> intToOffsets(level);
+    // Supplier<linearPoseOffsets> awayOffset = () -> intToOffsets(level);
+    DoubleSupplier distAwayMeters = () -> 0.02;
     PoseOffsets branchOffset = isLeft ? PoseOffsets.AUTONLEFT : PoseOffsets.AUTONRIGHT;
 
     return new AutonGoToPose(
-        () -> mVision.getClosestReefScoringPose(awayOffset, () -> branchOffset),
+        () -> mVision.getClosestReefScoringPose(distAwayMeters, () -> branchOffset),
         () -> mDrive.getPose(),
         mDrive);
   }

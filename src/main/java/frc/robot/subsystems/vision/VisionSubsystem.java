@@ -18,6 +18,7 @@ import frc.robot.util.MiscUtils;
 import frc.robot.util.PoseCamera;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -123,6 +124,14 @@ public class VisionSubsystem extends SubsystemBase {
         pOffset.get().getOffsetM());
   }
 
+  public Pose2d getClosestReefScoringPose(
+      DoubleSupplier pDistanceOffsetM, Supplier<PoseOffsets> pOffset) {
+    return getPoseInFrontOfAprilTag(
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
+        pDistanceOffsetM.getAsDouble(),
+        pOffset.get().getOffsetM());
+  }
+
   public Pose2d getClosestReefScoringPose(PoseOffsets pOffset) {
     return getPoseInFrontOfAprilTag(
         getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
@@ -134,13 +143,13 @@ public class VisionSubsystem extends SubsystemBase {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }
 
-  public Pose2d getBranchScoringPose(int branchNum) {
-    return getBranchScoringPose(branchNum, 0.0);
-  }
+  // public Pose2d getBranchScoringPose(int branchNum) {
+  //   return getBranchScoringPose(branchNum, 0.0);
+  // }
 
-  public Pose2d getBranchScoringPose(int branchNum, double pDistanceInches) {
-    return null;
-  }
+  // public Pose2d getBranchScoringPose(int branchNum, double pDistanceInches) {
+  //   return null;
+  // }
 
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pXOffsetM, double pYOffsetM) {
     Pose2d tagPose =

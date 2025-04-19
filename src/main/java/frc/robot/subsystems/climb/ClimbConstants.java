@@ -71,6 +71,7 @@ public class ClimbConstants {
 
     public enum Setpoints {
       EXTENDED(0.0),
+      STARTROLLING(28.0), // angle of the climb where it start intaking the cage
       CLIMBED(95.0),
       STOWED(149.0);
 
