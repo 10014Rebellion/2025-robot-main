@@ -68,5 +68,25 @@
   },
   "[java]": {
     "editor.defaultFormatter": "redhat.java"
-  }
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#aba4cf",
+    "activityBar.background": "#aba4cf",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#f4ecea",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#aba4cf",
+    "statusBar.background": "#8c83bd",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#6d62ab",
+    "statusBarItem.remoteBackground": "#8c83bd",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#8c83bd",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#8c83bd99",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#8c83bd"
 }
