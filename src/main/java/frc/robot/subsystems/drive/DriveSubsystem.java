@@ -3,6 +3,7 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -39,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.util.LocalADStarAK;
@@ -64,6 +66,8 @@ public class DriveSubsystem extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
 
+  static final double ODOMETRY_FREQUENCY =
+      new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
   // @AutoLogOutput(key = "RobotState/RobotVelocity")
   // private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
@@ -92,10 +96,10 @@ public class DriveSubsystem extends SubsystemBase {
       TelemetrySubsystem telemetry) {
     this.mTelemetry = telemetry;
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0);
-    modules[1] = new Module(frModuleIO, 1);
-    modules[2] = new Module(blModuleIO, 2);
-    modules[3] = new Module(brModuleIO, 3);
+    modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
+    modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
+    modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
     // modules[0] = new Module(flModuleIO, 1);
     // modules[1] = new Module(frModuleIO, 3);
     // modules[2] = new Module(blModuleIO, 0);
@@ -105,7 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
     // Start odometry thread
-    SparkOdometryThread.getInstance().start();
+    PhoenixOdometryThread.getInstance().start();
 
     robotConfig = DriveConstants.ppConfig;
     try {

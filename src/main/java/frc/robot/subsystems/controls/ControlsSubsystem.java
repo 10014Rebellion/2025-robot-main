@@ -208,7 +208,7 @@ public class ControlsSubsystem extends SubsystemBase {
             mDrive,
             () -> isAligningToBarge ? 0.0 : -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX(),
+            () -> driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
     driverController
@@ -302,7 +302,7 @@ public class ControlsSubsystem extends SubsystemBase {
             mDrive,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> -driverController.getRightX(),
+            () -> driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
     driverController

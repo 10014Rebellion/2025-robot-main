@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
@@ -11,7 +12,7 @@ import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.drive.ModuleIOTalonFXandFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
@@ -53,10 +54,10 @@ public class RobotContainer {
         mDrive =
             new DriveSubsystem(
                 new GyroIOPigeon2(),
-                new ModuleIOSpark(0),
-                new ModuleIOSpark(1),
-                new ModuleIOSpark(2),
-                new ModuleIOSpark(3),
+                new ModuleIOTalonFXandFXS(TunerConstants.FrontLeft),
+                new ModuleIOTalonFXandFXS(TunerConstants.FrontRight),
+                new ModuleIOTalonFXandFXS(TunerConstants.BackLeft),
+                new ModuleIOTalonFXandFXS(TunerConstants.BackRight),
                 mTelemetry);
         break;
 
@@ -64,10 +65,10 @@ public class RobotContainer {
         mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight),
                 mTelemetry);
         break;
 
