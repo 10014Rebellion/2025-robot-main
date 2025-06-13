@@ -25,7 +25,7 @@ public class WristConstants {
   public static double kElevatorDownLimit = -30;
   public static double throwAlgaePos = 50;
 
-  public static double kEncoderOffsetDeg = -152.0; // 81.9;
+  public static double kEncoderOffsetDeg = -162.0; // 81.9;
   public static boolean kEncoderInverted = true;
 
   public static double kPositionConversionFactor = 360.0;

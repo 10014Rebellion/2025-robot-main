@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,12 +15,15 @@ public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax mClimbMotor;
   private final SparkMax mGrabberMotor;
   private final AbsoluteEncoder mClimbEncoder;
+  private final DigitalInput mBeamBreak;
+
   // private boolean mHasExtended;
 
   // private double kExtendTime;
 
   public ClimbSubsystem() {
     mClimbMotor = new SparkMax(ClimbConstants.Pulley.kMotorID, ClimbConstants.Pulley.kMotorType);
+    mBeamBreak = new DigitalInput(ClimbConstants.Grabber.kClimbBeamBreakID);
     mClimbMotor.configure(
         ClimbConstants.Pulley.kClimbConfig,
         ResetMode.kResetSafeParameters,
@@ -35,6 +39,12 @@ public class ClimbSubsystem extends SubsystemBase {
         PersistMode.kPersistParameters);
 
     // mHasExtended = false;
+  }
+
+    // returns true when beambreak is broken (Coral is in the claw)
+  // returns false when beambreak is intact (Coral is not in the claw)
+  public boolean getBeamBroken() {
+    return !mBeamBreak.get();
   }
 
   public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
@@ -137,6 +147,7 @@ public class ClimbSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Climb/Position", getEncReading());
+    SmartDashboard.putBoolean("Climb/BeamBroken", getBeamBroken());
     SmartDashboard.putBoolean(
         "Climb/Fully Extended",
         getEncReading() < ClimbConstants.Pulley.Setpoints.EXTENDED.getPos());
