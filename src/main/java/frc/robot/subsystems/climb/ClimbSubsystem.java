@@ -41,7 +41,7 @@ public class ClimbSubsystem extends SubsystemBase {
     // mHasExtended = false;
   }
 
-    // returns true when beambreak is broken (Coral is in the claw)
+  // returns true when beambreak is broken (Coral is in the claw)
   // returns false when beambreak is intact (Coral is not in the claw)
   public boolean getBeamBroken() {
     return !mBeamBreak.get();
