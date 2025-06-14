@@ -3,12 +3,16 @@ package frc.robot.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -23,6 +27,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,6 +40,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,6 +50,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveSubsystem extends SubsystemBase {
+  public boolean isAtPose = false;
+
   public double mDriveSpeedMultiplier = kHighSpeedTrans;
   public double mRotationSpeedMultiplier = kHighSpeedRot;
   static final Lock odometryLock = new ReentrantLock();
@@ -48,20 +59,23 @@ public class DriveSubsystem extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final SysIdRoutine sysId;
+  private final TelemetrySubsystem mTelemetry;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
 
+  static final double ODOMETRY_FREQUENCY =
+      new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
   // @AutoLogOutput(key = "RobotState/RobotVelocity")
   // private ChassisSpeeds robotVelocity = new ChassisSpeeds();
 
   // Pathplanner and Choreo
   public static RobotConfig robotConfig;
-  // private SwerveSetpoint lastSetpoint =
-  // new SwerveSetpoint(new ChassisSpeeds(), zeroStates(),
-  // DriveFeedforwards.zeros(4));
+  private static SwerveSetpointGenerator mSwerveSPGen;
+  private SwerveSetpoint prevSetpoint =
+      new SwerveSetpoint(new ChassisSpeeds(), zeroStates(), DriveFeedforwards.zeros(4));
 
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
@@ -78,20 +92,40 @@ public class DriveSubsystem extends SubsystemBase {
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO,
+      TelemetrySubsystem telemetry) {
+    this.mTelemetry = telemetry;
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0);
-    modules[1] = new Module(frModuleIO, 1);
-    modules[2] = new Module(blModuleIO, 2);
-    modules[3] = new Module(brModuleIO, 3);
+    modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
+    modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
+    modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
+    // modules[0] = new Module(flModuleIO, 1);
+    // modules[1] = new Module(frModuleIO, 3);
+    // modules[2] = new Module(blModuleIO, 0);
+    // modules[3] = new Module(brModuleIO, 2);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
     // Start odometry thread
-    SparkOdometryThread.getInstance().start();
+    PhoenixOdometryThread.getInstance().start();
 
     robotConfig = DriveConstants.ppConfig;
+    try {
+      robotConfig = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+
+    mSwerveSPGen =
+        new SwerveSetpointGenerator(
+            robotConfig, // The robot configuration. This is the same config used for generating
+            // trajectories and running path following commands.
+            kMaxTurnAngularRadPS // The max rotation velocity of a swerve module in radians per
+            // second. This should probably be stored in your Constants file
+            );
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
@@ -104,7 +138,10 @@ public class DriveSubsystem extends SubsystemBase {
             new PIDConstants(
                 DriveConstants.drivebaseThetaKp, 0.0, DriveConstants.drivebaseThetaKd)),
         ppConfig,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+        () -> {
+          // return false;
+          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+        },
         this);
 
     Pathfinding.setPathfinder(new LocalADStarAK());
@@ -124,10 +161,12 @@ public class DriveSubsystem extends SubsystemBase {
             new SysIdRoutine.Config(
                 null,
                 null,
-                null,
+                Time.ofBaseUnits(7.0, Units.Second),
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    updateTelem();
   }
 
   @Override
@@ -189,6 +228,15 @@ public class DriveSubsystem extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
     // If our elevator is too high, we slow the bot down.
     updateSpeedMultipliers();
+    updateTelem();
+  }
+
+  public ChassisSpeeds getCurrentRobotChassisSpeeds() {
+    return getChassisSpeeds();
+  }
+
+  private void updateTelem() {
+    mTelemetry.updateFieldPose(getPose());
   }
 
   public static SwerveModuleState[] zeroStates() {
@@ -203,7 +251,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void updateSpeedMultipliers() {
-    if (SmartDashboard.getNumber("Elevator/Position", 0) >= 40) {
+    if (SmartDashboard.getNumber("Elevator/Position", 0) >= ElevatorConstants.kHighCutoff) {
       this.mDriveSpeedMultiplier = DriveConstants.kLowSpeedTrans;
       this.mRotationSpeedMultiplier = DriveConstants.kLowSPeedRot;
     } else {
@@ -212,29 +260,41 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public void runVelocity(ChassisSpeeds speeds) {
+    prevSetpoint = mSwerveSPGen.generateSetpoint(prevSetpoint, speeds, 0.02);
+
+    setModuleStates(prevSetpoint.moduleStates());
+
+    Logger.recordOutput("SwerveStates/SetpointsOptimized", prevSetpoint.moduleStates());
+  }
+
+  private void setModuleStates(SwerveModuleState[] states) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSetpoint(states[i]);
+    }
+  }
+
   /**
    * Runs the drive at the desired velocity.
    *
    * @param speeds Speeds in meters/sec
    */
-  public void runVelocity(ChassisSpeeds speeds) {
-    // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+  // public void runVelocity(ChassisSpeeds speeds) {
+  //   // Calculate module setpoints
+  //   ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+  //   SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+  //   SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
 
-    // Log unoptimized setpoints
-    Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+  //   // Log unoptimized setpoints
+  //   Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+  //   Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
-    // Send setpoints to modules
-    for (int i = 0; i < 4; i++) {
-      modules[i].runSetpoint(setpointStates[i]);
-    }
+  //   // Send setpoints to modules
+  //   setModuleStates(setpointStates);
 
-    // Log optimized setpoints (runSetpoint mutates each state)
-    Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
-  }
+  //   // Log optimized setpoints (runSetpoint mutates each state)
+  //   Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+  // }
 
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
@@ -330,6 +390,17 @@ public class DriveSubsystem extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  // public void rotateInPlace(double pDegPerSec) {
+  //   runVelocity(new ChassisSpeeds(0.0, 0.0,
+  // edu.wpi.first.math.util.Units.degreesToRadians(pDegPerSec)));
+  // }
+
+  public Command driveForwardDefaultAuton(double pDistanceForward) {
+    return run(() -> runVelocity(new ChassisSpeeds(kMaxLinearSpeedMPS, 0.0, 0.0)))
+        .withTimeout(pDistanceForward / kMaxLinearSpeedMPS)
+        .finallyDo(interrupted -> stop());
   }
 
   /** Adds a new timestamped vision measurement. */

@@ -12,17 +12,26 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class VisionConstants {
 
-  public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(15);
+  public static final double kDistBetweenBranchesCenter =
+      Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
+  public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
+  // public static final double kDistOffset = Units.inchesToMeters(0.0);
 
   public enum PoseOffsets {
+    AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0),
+    AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0),
     LEFT(kDistBetweenBranchesCenter / 2.0),
     CENTER(0),
-    RIGHT(-kDistBetweenBranchesCenter / 2.0);
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0);
 
     public final double offset;
 
@@ -35,11 +44,14 @@ public class VisionConstants {
     }
   };
 
+  public static double kScoringDistance = Units.inchesToMeters(0.0);
+
   public enum linearPoseOffsets {
-    L4(Units.inchesToMeters(10)),
-    L3(Units.inchesToMeters(4.5)),
-    L2(Units.inchesToMeters(0.5)),
-    L1(Units.inchesToMeters(0.25));
+    L4(Units.inchesToMeters(0.0)),
+    L3(Units.inchesToMeters(0.0)),
+    L2(Units.inchesToMeters(0.0)),
+    L1(Units.inchesToMeters(0.0)),
+    ALGAE(Units.inchesToMeters(2.0));
 
     public final double offset;
 
@@ -58,7 +70,10 @@ public class VisionConstants {
   public static final String BACK_LEFT_CAM = "BackLeft-OV9281";
   public static final String BACK_RIGHT_CAM = "BackRight-OV9281";
 
-  public static final double kRobotYLength = Units.inchesToMeters(37.0);
+  public static final double kRobotYLength =
+      Units.inchesToMeters(35.0); // Climb Side / Elevator Side 0.889m
+  public static final double kRobotXLength =
+      Units.inchesToMeters(37.0); // Scoring Side / Intake Side 0.9398m
 
   // Pose estimation strategies
   public static final PoseStrategy kPoseStrategy = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
@@ -72,12 +87,32 @@ public class VisionConstants {
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;
 
-  // Load the official 2025 AprilTag field layout
-  public static final AprilTagFieldLayout kAprilTagFieldLayout =
-      AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+  private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-hp.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-no-barge.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-reef-processor.json";
+  // private static final String CUSTOM_JSON_PATH = "apriltags/welded/2025-red-reef.json";
+
+  public static AprilTagFieldLayout kAprilTagFieldLayout =
+      AprilTagFields.k2025ReefscapeAndyMark.loadAprilTagLayoutField();
+
+  static {
+    try {
+      Path customPath = Path.of("/home/lvuser/deploy", CUSTOM_JSON_PATH);
+      if (Files.exists(customPath)) {
+        kAprilTagFieldLayout = new AprilTagFieldLayout(customPath);
+      }
+    } catch (IOException e) {
+      DriverStation.reportError("Unable to load custom AprilTag JSON: " + e.getMessage(), true);
+    }
+  }
 
   /**
-   * Map of camera positions relative to the robot's center.
+   * EXTREMELY IMPORTANT NOTE: The FrontLeft FrontRight, BackLeft, BackRight naming scheme is all
+   * relative to the scoring side being the front of the bot (the side where the coral is scored on
+   * the reef), BUT the values put into the Transform 3d is assuming the side perpendicular to the
+   * elevator (battery side) is the front
+   *
+   * <p>Map of camera positions relative to the robot's center.
    *
    * <p>- **Translation3d (X, Y, Z)**: - X: Forward (+) / Backward (-) relative to the center of the
    * bot - Y: Left (+) / Right (-) relative to the center of the bot - Z: Up (+) / Down (-) relative
@@ -96,9 +131,9 @@ public class VisionConstants {
               FRONT_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.55), // X: inches forward
-                      Units.inchesToMeters(11.75), // Y: inches left
-                      Units.inchesToMeters(9.675) // Z: inches above ground
+                      Units.inchesToMeters(10.284), // X: inches forward
+                      Units.inchesToMeters(12.7829), // Y: inches left
+                      Units.inchesToMeters(12.769) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
@@ -111,9 +146,9 @@ public class VisionConstants {
               FRONT_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(14.55), // X: inches forward
-                      Units.inchesToMeters(-11.75), // Y: inches right (negative)
-                      Units.inchesToMeters(9.675) // Z: inches above ground
+                      Units.inchesToMeters(9.7965), // X: inches forward
+                      Units.inchesToMeters(-9.8046), // Y: inches right
+                      Units.inchesToMeters(12.769) // Z: inches above ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
@@ -121,33 +156,33 @@ public class VisionConstants {
                       Units.degreesToRadians(30) // Yaw: (angled inward)
                       ))),
 
-          // Rear Left Camera (Mounted near BL swerve module, positions TBD)
+          // Rear Left Camera (Mounted near BL swerve module)
           entry(
               BACK_LEFT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(0), // X: TBD
-                      Units.inchesToMeters(0), // Y: TBD
-                      Units.inchesToMeters(0) // Z: TBD
+                      Units.inchesToMeters(-13.51), // X: inches back
+                      Units.inchesToMeters(13.599), // Y: inches left
+                      Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(0) // Yaw: TBD
+                      Units.degreesToRadians(165) // Yaw: 15 degrees angled inwards
                       ))),
 
-          // Rear Right Camera (Mounted near BR swerve module, positions TBD)
+          // Rear Right Camera (Mounted near BR swerve module)
           entry(
               BACK_RIGHT_CAM,
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(0), // X: TBD
-                      Units.inchesToMeters(0), // Y: TBD
-                      Units.inchesToMeters(0) // Z: TBD
+                      Units.inchesToMeters(-13.51), // X: inches forward
+                      Units.inchesToMeters(-13.599), // Y: inches right
+                      Units.inchesToMeters(12.6) // Z: inches off the ground
                       ),
                   new Rotation3d(
                       Units.degreesToRadians(0), // Roll: No side tilt
                       Units.degreesToRadians(0), // Pitch: No upwards tilt
-                      Units.degreesToRadians(0) // Yaw: TBD
+                      Units.degreesToRadians(-165) // Yaw: 15 degrees angled inwards
                       ))));
 }

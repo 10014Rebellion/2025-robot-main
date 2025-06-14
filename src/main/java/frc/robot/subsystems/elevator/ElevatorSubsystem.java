@@ -41,6 +41,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             0,
             ElevatorConstants.kD,
             new Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
+    this.mElevatorProfiledPID.setTolerance(ElevatorConstants.kTolerance);
     this.mElevatorFF =
         new ElevatorFeedforward(
             ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
@@ -52,6 +53,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         ElevatorConstants.kElevatorConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kNoPersistParameters);
+
+    SmartDashboard.putNumber("Elevator/Kp", ElevatorConstants.kP);
+    SmartDashboard.putNumber("Elevator/Kd", ElevatorConstants.kD);
+
+    SmartDashboard.putNumber("Elevator/Tunable Setpoint", 0.0);
+
+    SmartDashboard.putNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
+    SmartDashboard.putNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -69,22 +78,25 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public boolean isPIDAtGoal() {
-    return mCurrentController.equals(Controllers.ProfiledPID) && mElevatorProfiledPID.atGoal();
+    return mElevatorProfiledPID.atGoal();
   }
 
   public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
+          mElevatorProfiledPID.reset(getEncReading());
           mElevatorProfiledPID.setGoal(pSetpoint.getPos());
+          SmartDashboard.putNumber("Elevator/Setpoint", pSetpoint.getPos());
         },
         () -> {
           double encoderReading = getEncReading();
-          double calculatedPID = mElevatorFF.calculate(encoderReading, 0.0);
+          double calculatedPID =
+              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
           double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
           setVolts(calculatedPID + calculatedFF);
         },
-        (interrupted) -> setVolts(0),
+        (interrupted) -> setVolts(mElevatorFF.calculate(0.0, 0)),
         () -> isPIDAtGoal(),
         this);
   }
@@ -100,12 +112,45 @@ public class ElevatorSubsystem extends SubsystemBase {
         this);
   }
 
+  public FunctionalCommand setTunablePIDCommand() {
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          double newKp = SmartDashboard.getNumber("Elevator/Kp", ElevatorConstants.kP);
+          double newKd = SmartDashboard.getNumber("Elevator/Kd", ElevatorConstants.kD);
+          double pSetpoint = SmartDashboard.getNumber("Elevator/Tunable Setpoint", 0.0);
+
+          double newVel =
+              SmartDashboard.getNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
+          double newAccel =
+              SmartDashboard.getNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
+          mElevatorProfiledPID.setConstraints(new Constraints(newVel, newAccel));
+          mElevatorProfiledPID.setPID(newKp, 0.0, newKd);
+          mElevatorProfiledPID.reset(getEncReading());
+          mElevatorProfiledPID.setGoal(pSetpoint);
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID =
+              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
+
+          setVolts(calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Elevator/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Elevator/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Elevator/FF Output", calculatedFF);
+        },
+        (interrupted) -> setVolts(0),
+        () -> false,
+        this);
+  }
+
   public void setVolts(double pVoltage) {
     mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
   }
 
   private double filterVoltage(double pVoltage) {
-    return filterToLimits(MathUtil.clamp(pVoltage, -12.0, 12.0));
+    return filterToLimits(MathUtil.clamp(pVoltage, -12, 12.0));
   }
 
   public double getRawEncReading() {
@@ -143,5 +188,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
     SmartDashboard.putNumber("Elevator/Output", getMotorOutput());
     SmartDashboard.putNumber("Elevator/Voltage", mElevatorSparkMax.getBusVoltage());
+    SmartDashboard.putBoolean("Elevator/At Setpoint", isPIDAtGoal());
   }
 }

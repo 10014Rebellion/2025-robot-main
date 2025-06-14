@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -19,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
   private final ProfiledPIDController mWristProfiledPID;
-  private final ArmFeedforward mWristFF;
+  private ArmFeedforward mWristFF;
   private final DutyCycleEncoder mWristEncoder;
   private Controllers mCurrentController;
 
@@ -38,6 +39,7 @@ public class WristSubsystem extends SubsystemBase {
             0,
             WristConstants.kD,
             new Constraints(WristConstants.kMaxVelocity, WristConstants.kMaxAcceleration));
+    this.mWristProfiledPID.setTolerance(WristConstants.kTolerance);
     this.mWristFF =
         new ArmFeedforward(
             WristConstants.kS, WristConstants.kG, WristConstants.kV, WristConstants.kA);
@@ -52,15 +54,28 @@ public class WristSubsystem extends SubsystemBase {
         PersistMode.kNoPersistParameters);
 
     this.setDefaultCommand(enableFFCmd());
+
+    SmartDashboard.putNumber("Wrist/kP", WristConstants.kP);
+    SmartDashboard.putNumber("Wrist/kD", WristConstants.kD);
+    SmartDashboard.putNumber("Wrist/kG", WristConstants.kG);
+    SmartDashboard.putNumber("Wrist/kV", WristConstants.kV);
+    SmartDashboard.putNumber("Wrist/kA", WristConstants.kA);
+    SmartDashboard.putNumber("Wrist/kS", WristConstants.kS);
+
+    SmartDashboard.putNumber("Wrist/Tunable Setpoint", 0.0);
+    SmartDashboard.putNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
+    SmartDashboard.putNumber("Wrist/Max Accel", WristConstants.kMaxAcceleration);
   }
 
   public FunctionalCommand enableFFCmd() {
+
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.Feedforward;
+          System.out.println("Wrist FF Running");
         },
         () -> {
-          double calculatedOutput = mWristFF.calculate(getEncReading(), 0);
+          double calculatedOutput = mWristFF.calculate(Units.degreesToRadians(getEncReading()), 0);
           setVolts(calculatedOutput);
         },
         (interrupted) -> setVolts(0),
@@ -69,19 +84,69 @@ public class WristSubsystem extends SubsystemBase {
   }
 
   public boolean isPIDAtGoal() {
-    return mCurrentController.equals(Controllers.ProfiledPID) && mWristProfiledPID.atGoal();
+    return mWristProfiledPID.atGoal();
   }
+
+  public FunctionalCommand setTunablePIDCmd(double pSetpoint) {
+    return new FunctionalCommand(
+        () -> {
+          mCurrentController = Controllers.ProfiledPID;
+          double newKp = SmartDashboard.getNumber("Wrist/kP", WristConstants.kP);
+          double newKd = SmartDashboard.getNumber("Wrist/kD", WristConstants.kD);
+          // double pSetpoint = SmartDashboard.getNumber("Wrist/Tunable Setpoint", 0.0);
+
+          double newVel = SmartDashboard.getNumber("Wrist/Max Vel", WristConstants.kMaxVelocity);
+          double newAccel =
+              SmartDashboard.getNumber("Wrist/Max Accel", WristConstants.kMaxAcceleration);
+          double newkG = SmartDashboard.getNumber("Wrist/kG", WristConstants.kG);
+          double newkV = SmartDashboard.getNumber("Wrist/kV", WristConstants.kV);
+          double newkA = SmartDashboard.getNumber("Wrist/kA", WristConstants.kA);
+          double newkS = SmartDashboard.getNumber("Wrist/kS", WristConstants.kS);
+
+          mWristProfiledPID.setConstraints(new Constraints(newVel, newAccel));
+          mWristProfiledPID.setPID(newKp, 0.0, newKd);
+          mWristProfiledPID.reset(getEncReading());
+          mWristProfiledPID.setGoal(pSetpoint);
+
+          mWristFF = new ArmFeedforward(newkS, newkG, newkV, newkA);
+        },
+        () -> {
+          double encoderReading = getEncReading();
+          double calculatedPID = mWristProfiledPID.calculate(encoderReading);
+          double calculatedFF =
+              mWristFF.calculate(
+                  Units.degreesToRadians(mWristProfiledPID.getSetpoint().position),
+                  Units.degreesToRadians(mWristProfiledPID.getSetpoint().velocity));
+
+          setVolts(calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Wrist/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Wrist/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
+        },
+        (interrupted) -> setVolts(0),
+        () -> isPIDAtGoal(),
+        this);
+  }
+
+  // public FunctionalCommand setTunableCommand
 
   public FunctionalCommand setPIDCmd(WristConstants.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
           mCurrentController = Controllers.ProfiledPID;
+          SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());
+          mWristProfiledPID.reset(getEncReading());
           mWristProfiledPID.setGoal(pSetpoint.getPos());
         },
         () -> {
-          double encoderReading = getEncReading();
-          double calculatedPID = mWristFF.calculate(encoderReading, 0.0);
-          double calculatedFF = mWristProfiledPID.calculate(encoderReading);
+          double calculatedFF =
+              mWristFF.calculate(
+                  Math.toRadians(mWristProfiledPID.getSetpoint().position),
+                  Math.toRadians(mWristProfiledPID.getSetpoint().velocity));
+          double calculatedPID = mWristProfiledPID.calculate(getEncReading());
+          SmartDashboard.putNumber("Wrist/Full Output", calculatedPID + calculatedFF);
+          SmartDashboard.putNumber("Wrist/PID Output", calculatedPID);
+          SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
           setVolts(calculatedPID + calculatedFF);
         },
         (interrupted) -> setVolts(0),
@@ -130,7 +195,7 @@ public class WristSubsystem extends SubsystemBase {
   public double getEncReading() {
     double encoderMeasurement =
         (getRawEncReading() * WristConstants.kPositionConversionFactor)
-            - WristConstants.kEncoderOffsetDeg;
+            + WristConstants.kEncoderOffsetDeg;
     if (encoderMeasurement > WristConstants.kPositionConversionFactor / 2.0)
       encoderMeasurement -= WristConstants.kPositionConversionFactor;
     return encoderMeasurement;
@@ -144,5 +209,9 @@ public class WristSubsystem extends SubsystemBase {
   public void periodic() {
     stopIfLimit();
     SmartDashboard.putNumber("Wrist/Encoder", getEncReading());
+    SmartDashboard.putNumber("Wrist/Position Setpoint", mWristProfiledPID.getSetpoint().position);
+    SmartDashboard.putNumber("Wrist/Velocity Setpoint", mWristProfiledPID.getSetpoint().velocity);
+
+    SmartDashboard.putBoolean("Wrist/At Setpoint", isPIDAtGoal());
   }
 }

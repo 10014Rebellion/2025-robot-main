@@ -9,41 +9,48 @@ public class ElevatorConstants {
   public static MotorType kMotorType = MotorType.kBrushless;
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kInverted = true;
-  public static int kCurrentLimit = 80;
-  public static double kP = 1.5;
+  public static int kCurrentLimit = 60; // CHANGED: 80
+  public static double kP = 1.7;
   public static double kI = 0.0;
-  public static double kD = 0.08;
+  public static double kD = 0.0;
 
-  public static double kMaxAcceleration = 250;
-  public static double kMaxVelocity = 500;
-  public static double kTolerance = 5;
+  public static double kMaxAcceleration = 950; // 250;
+  public static double kMaxVelocity = 2400; // 500;
+  public static double kTolerance = 1;
 
-  public static double kForwardSoftLimit = 80;
+  public static double kForwardSoftLimit = 55;
   public static double kReverseSoftLimit = 0;
+  public static double kReverseNoDieLimit = 21;
+  public static double throwAlgaePos = 40;
 
   public static double kS = 0.0;
-  public static double kG = 0.9;
-  public static double kV = 0.0;
-  public static double kA = 0.0;
+  public static double kG = 1.1;
+  public static double kV = 0.0; // 4.49;
+  public static double kA = 0.0; // 0.2;
 
   public static double kPositionConversionFactor = 1.21875; // 1.0 / kDrumCircumference
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+  public static double kHighCutoff = 45;
 
   public static final SparkMaxConfig kElevatorConfig = new SparkMaxConfig();
 
   public enum Setpoints {
     BOTTOM(0),
-    PREINTAKE(30),
-    POSTINTAKE(16),
-    L1(20),
-    L2(27.5),
-    L3(45),
-    L4(75),
+    HPINTAKE(2),
+    PREINTAKE(23.0),
+    POSTINTAKE(18.0),
+    GROUNDALGAE(8),
+    L1(27),
+    L2(7),
+    L3(24),
+    L4(51),
     SCORE(20),
-    BARGE(80),
-    L2ALGAE(44.5),
-    L3ALGAE(67.5),
-    HOLD_ALGAE(7);
+    BARGE(55),
+    L2ALGAE(38),
+    L3ALGAE(48),
+    HOLD_ALGAE(5),
+    PreClimb(40),
+    Climb(0.0);
 
     public final double setpoint;
 

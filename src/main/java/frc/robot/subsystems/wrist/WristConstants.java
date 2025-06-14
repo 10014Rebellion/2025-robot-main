@@ -12,43 +12,50 @@ public class WristConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kMotorInverted = true;
 
-  public static int kCurrentLimit = 80;
-  public static double kP = 0.12;
-  public static double kD = 0.0;
+  public static int kCurrentLimit = 60; // CHANGED: 80
+  public static double kP = 0.22; // 0.0015 without coral
+  public static double kD = 0.01;
 
-  public static double kMaxAcceleration = 100;
-  public static double kMaxVelocity = 100;
-  public static double kTolerance = 5;
+  public static double kMaxAcceleration = 1000;
+  public static double kMaxVelocity = 800;
+  public static double kTolerance = 1.5;
 
   public static double kForwardSoftLimit = 90;
-  public static double kReverseSoftLimit = -85;
+  public static double kReverseSoftLimit = -89;
+  public static double kElevatorDownLimit = -30;
+  public static double throwAlgaePos = 50;
 
-  public static double kEncoderOffsetDeg = 145;
+  public static double kEncoderOffsetDeg = -152.0; // 81.9;
   public static boolean kEncoderInverted = true;
 
   public static double kPositionConversionFactor = 360.0;
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
 
-  public static double kS = 0.0;
-  public static double kG = 0.21;
-  public static double kV = 2.15;
+  public static double kS = 0.02;
+  public static double kG = 0.4; // 0.29 without coral
+  public static double kV = 0.003; // 0.78 without coral
   public static double kA = 0.0;
 
   public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
   public enum Setpoints {
     BOTTOM(0),
-    INTAKE(-65),
-    L1(20),
-    L2(50),
-    L3(70),
-    L4(50),
-    SCORE(-50),
-    BARGE(70),
-    L2ALGAE(-12),
-    L3ALGAE(-12),
-    HOLD_ALGAE(14),
-    CLIMB(57);
+    INTAKE(-88),
+    HPINTAKE(0),
+    L1(-30),
+    L2(46 + 6),
+    L3(46 + 6),
+    L4(65),
+
+    SCORE(11),
+    L2SCORE(9),
+    BARGE(71),
+    L2ALGAE(-28),
+    L3ALGAE(-13),
+    HOLD_ALGAE(0),
+    THROW_ALGAE(90),
+    CLIMB(-15),
+    GROUNDALGAE(-31);
 
     public final double setpoint;
 

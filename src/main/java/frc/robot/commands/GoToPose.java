@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -53,13 +52,13 @@ public class GoToPose extends Command {
     drivekD.initDefault(DriveConstants.drivebaseDriveKd);
     thetakP.initDefault(DriveConstants.drivebaseThetaKp);
     thetakD.initDefault(DriveConstants.drivebaseThetaKd);
-    driveMaxVelocity.initDefault(1.25);
+    driveMaxVelocity.initDefault(1.5);
     driveMaxAcceleration.initDefault(2.0);
     thetaMaxVelocity.initDefault(Math.toRadians(360.0));
     thetaMaxAcceleration.initDefault(8.0);
-    driveTolerance.initDefault(0.005);
+    driveTolerance.initDefault(0.008);
     thetaTolerance.initDefault(Math.toRadians(0.2));
-    ffMinRadius.initDefault(0.05);
+    ffMinRadius.initDefault(0.0);
     ffMaxRadius.initDefault(0.1);
   }
 
@@ -94,7 +93,7 @@ public class GoToPose extends Command {
 
   @Override
   public void initialize() {
-
+    mDriveSubsystem.isAtPose = false;
     Pose2d currentPose = mCurrentPoseSupplier.get();
     ChassisSpeeds fieldVelocity = mDriveSubsystem.getFieldVelocity();
     Translation2d linearFieldVelocity =
@@ -124,6 +123,8 @@ public class GoToPose extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    mDriveSubsystem.isAtPose = withinTolerance(0.05, new Rotation2d(1.0));
+
     // StateDaddy.currentDrive = StateEnums.Drive.Current.MOVING_TO_SETPOINT;
 
     running = true;
@@ -213,11 +214,11 @@ public class GoToPose extends Command {
     Logger.recordOutput("DriveToPose/DistanceMeasured", currentDistance);
     Logger.recordOutput("DriveToPose/DistanceSetpoint", driveController.getSetpoint().position);
     Logger.recordOutput("DriveToPose/DistanceError", driveErrorAbs);
-    SmartDashboard.putNumber("Drive/DriveError", driveErrorAbs);
+    // SmartDashboard.putNumber("Drive/DriveError", driveErrorAbs);
     Logger.recordOutput("DriveToPose/ThetaMeasured", currentPose.getRotation().getRadians());
     Logger.recordOutput("DriveToPose/ThetaSetpoint", thetaController.getSetpoint().position);
-    Logger.recordOutput("DriveToPose/DistanceError", thetaErrorAbs);
-    SmartDashboard.putNumber("Drive/ThetaError", thetaErrorAbs);
+    Logger.recordOutput("DriveToPose/ThetaError", thetaErrorAbs);
+    // SmartDashboard.putNumber("Drive/ThetaError", thetaErrorAbs);
     Logger.recordOutput(
         "DriveToPose/Setpoint",
         new Pose2d[] {
@@ -229,18 +230,40 @@ public class GoToPose extends Command {
 
     SmartDashboard.putBoolean(
         "Drive/Within Tolerance",
-        withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(2.5))));
+        withinTolerance(driveTolerance.get(), new Rotation2d(thetaTolerance.get())));
     SmartDashboard.putBoolean(
         "Drive/Within Position Tolerance",
         running && Math.abs(driveErrorAbs) < driveTolerance.getAsDouble());
     SmartDashboard.putBoolean(
         "Drive/Within Rotation Tolerance",
         running && Math.abs(thetaErrorAbs) < thetaTolerance.getAsDouble());
+    // if (driveErrorAbs < 0.05) {
+    //   // Pose2d currentPose = mCurrentPoseSupplier.get();
+    //   ChassisSpeeds fieldVelocity = mDriveSubsystem.getFieldVelocity();
+    //   Translation2d linearFieldVelocity =
+    //       new Translation2d(fieldVelocity.vxMetersPerSecond, fieldVelocity.vyMetersPerSecond);
+    //   driveController.reset(
+    //       currentPose.getTranslation().getDistance(mTargetPose.get().getTranslation()),
+    //       Math.min(
+    //           0.0,
+    //           -linearFieldVelocity
+    //               .rotateBy(
+    //                   mTargetPose
+    //                       .get()
+    //                       .getTranslation()
+    //                       .minus(currentPose.getTranslation())
+    //                       .getAngle()
+    //                       .unaryMinus())
+    //               .getX()));
+    //   thetaController.reset(
+    //       currentPose.getRotation().getRadians(), fieldVelocity.omegaRadiansPerSecond);
+    // }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    mDriveSubsystem.isAtPose = false;
     mDriveSubsystem.stop();
     // StateDaddy.currentDrive = StateEnums.Drive.Current.MANUAL;
     running = false;
@@ -255,8 +278,7 @@ public class GoToPose extends Command {
 
   @Override
   public boolean isFinished() {
-
-    return withinTolerance(Units.inchesToMeters(1), new Rotation2d(Units.degreesToRadians(1)));
+    return withinTolerance(driveTolerance.get(), new Rotation2d(thetaTolerance.get()));
   }
 
   public boolean atGoal() {

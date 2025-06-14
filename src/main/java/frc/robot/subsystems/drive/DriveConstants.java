@@ -23,9 +23,9 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DriveConstants {
-  public static final double kHighSpeedTrans = 0.9;
-  public static final double kHighSpeedRot = 0.8;
-  public static final double kLowSpeedTrans = .25;
+  public static final double kHighSpeedTrans = 1.0;
+  public static final double kHighSpeedRot = 1.0;
+  public static final double kLowSpeedTrans = .3;
   public static final double kLowSPeedRot = .25;
 
   public static final double maxSpeedMetersPerSec = 4.8;
@@ -61,18 +61,19 @@ public class DriveConstants {
   // Device CAN IDs
   public static final int pigeonCanId = 2;
 
-  public static final int frontLeftDriveCanId = 11;
-  public static final int backLeftDriveCanId = 14;
-  public static final int frontRightDriveCanId = 12;
-  public static final int backRightDriveCanId = 13;
+  // Intake is on the right, we want to make it so the left side is the front side
+  public static final int frontRightDriveCanId = 11;
+  public static final int frontLeftDriveCanId = 15; // WAS 14
+  public static final int backRightDriveCanId = 12;
+  public static final int backLeftDriveCanId = 13;
 
-  public static final int frontLeftTurnCanId = 21;
-  public static final int backLeftTurnCanId = 24;
-  public static final int frontRightTurnCanId = 22;
-  public static final int backRightTurnCanId = 23;
+  public static final int frontRightTurnCanId = 21;
+  public static final int frontLeftTurnCanId = 24;
+  public static final int backRightTurnCanId = 22;
+  public static final int backLeftTurnCanId = 23;
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 50;
+  public static final int driveMotorCurrentLimit = 60;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
   public static final double driveMotorReduction =
       (45.0 * 22.0) / (13.0 * 15.0); // MAXSwerve with 13 pinion teeth
@@ -88,20 +89,20 @@ public class DriveConstants {
   // Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.0;
+  public static final double driveKp = 0.005;
   public static final double driveKd = 0.0;
-  public static final double driveKs = 0.0;
-  public static final double driveKv = 0.1;
+  public static final double driveKs = 0.00;
+  public static final double driveKv = 0.086; // 0.083 gave within 0.01 on most velocity
   public static final double driveSimP = 0.05;
   public static final double driveSimD = 0.0;
   public static final double driveSimKs = 0.0;
   public static final double driveSimKv = 0.0789;
 
   // Whole Bot PID
-  public static final double drivebaseDriveKp = 0.45;
-  public static final double drivebaseDriveKd = 0.01;
+  public static final double drivebaseDriveKp = 3;
+  public static final double drivebaseDriveKd = 0.001;
 
-  public static final double drivebaseThetaKp = 3.0;
+  public static final double drivebaseThetaKp = 2.0;
   public static final double drivebaseThetaKd = 0.0;
 
   // Turn motor configuration
@@ -116,7 +117,7 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 1.5;
+  public static final double turnKp = 1.49;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 0.0;
   public static final double turnSimD = 0.0;
@@ -129,7 +130,7 @@ public class DriveConstants {
 
   public static final double robotMassKg = 61.9;
   public static final double robotMOI = 6.883; // TODO: CONFIGURE ME MAY BE 5.39
-  public static final double wheelCOF = 1.2; // TODO: CONFIGURE ME
+  public static final double wheelCOF = 1.6;
 
   public static final double kVortexFreeSpeed = 5.33;
   public static final double kMaxLinearSpeedMPS = kVortexFreeSpeed;

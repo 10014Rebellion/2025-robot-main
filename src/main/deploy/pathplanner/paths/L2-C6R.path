@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.4,
+        "y": 3.55
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.6819100406468988,
+        "y": 3.681456810864436
+      },
+      "isLocked": false,
+      "linkedName": "Loli2"
+    },
+    {
+      "anchor": {
+        "x": 3.23,
+        "y": 3.77
+      },
+      "prevControl": {
+        "x": 2.099495536908083,
+        "y": 3.77
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "C6R"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "South Side Lolipop",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "useDefaultConstraints": true
+}

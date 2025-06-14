@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
@@ -12,10 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.MiscUtils;
 import frc.robot.util.PoseCamera;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -26,16 +29,21 @@ public class VisionSubsystem extends SubsystemBase {
   private List<PoseCamera> mCameraList;
   private List<PhotonPipelineResult> results;
   private final DriveSubsystem mDriveSubsystem;
+  private boolean mKillVision;
 
   private void initCameraList() {
     List<PoseCamera> poseCameras = new ArrayList<>();
-
     String[] cameraNames =
         new String[] {
-          VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM // ,
+          VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM,
           // VisionConstants.BACK_LEFT_CAM,
           // VisionConstants.BACK_RIGHT_CAM
         };
+
+    // HttpCamera frontLeftCam = new HttpCamera(getName(), "");
+    // HttpCamera frontRightCam = new HttpCamera(getName(), "");
+    // HttpCamera backLeftCam = new HttpCamera("BackLeftCam",
+    // "http://10.100.14.98:1182/stream.mjpg");
 
     for (String name : cameraNames) {
       poseCameras.add(
@@ -56,6 +64,14 @@ public class VisionSubsystem extends SubsystemBase {
       Supplier<SwerveModulePosition[]> swerveModulePositions) {
     initCameraList();
     this.mDriveSubsystem = pDriveSubsystem;
+    this.mKillVision = false;
+  }
+
+  // Returns true as long as it can see at least one tag
+  public boolean canSeeTag() {
+    for (PoseCamera camera : mCameraList) if (camera.getCameraResults().size() > 0) return true;
+
+    return false;
   }
 
   public int getClosestReefTag(boolean isBlueAlliance) { // , double pDistanceMeters) {
@@ -95,6 +111,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   public Pose2d getReefScoringPose(
       int pTagID, double pDistanceInches, Supplier<PoseOffsets> pOffset) {
+    System.out.println("Pose offset left: " + pOffset.get().getOffsetM());
     return getPoseInFrontOfAprilTag(
         pTagID, Units.inchesToMeters(pDistanceInches), pOffset.get().getOffsetM());
   }
@@ -107,9 +124,32 @@ public class VisionSubsystem extends SubsystemBase {
         pOffset.get().getOffsetM());
   }
 
+  public Pose2d getClosestReefScoringPose(
+      DoubleSupplier pDistanceOffsetM, Supplier<PoseOffsets> pOffset) {
+    return getPoseInFrontOfAprilTag(
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
+        pDistanceOffsetM.getAsDouble(),
+        pOffset.get().getOffsetM());
+  }
+
+  public Pose2d getClosestReefScoringPose(PoseOffsets pOffset) {
+    return getPoseInFrontOfAprilTag(
+        getClosestReefTag(DriverStation.getAlliance().get().equals(Alliance.Blue)),
+        VisionConstants.kScoringDistance,
+        pOffset.getOffsetM());
+  }
+
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pDistanceInches) {
     return getPoseInFrontOfAprilTag(pTagID, Units.inchesToMeters(pDistanceInches), 0);
   }
+
+  // public Pose2d getBranchScoringPose(int branchNum) {
+  //   return getBranchScoringPose(branchNum, 0.0);
+  // }
+
+  // public Pose2d getBranchScoringPose(int branchNum, double pDistanceInches) {
+  //   return null;
+  // }
 
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pXOffsetM, double pYOffsetM) {
     Pose2d tagPose =
@@ -137,8 +177,16 @@ public class VisionSubsystem extends SubsystemBase {
     Translation2d frontOfTag =
         tagTranslation.plus(new Translation2d(-pXOffsetM, pYOffsetM).rotateBy(tagRotation));
 
-    Pose2d targetPose2d = new Pose2d(frontOfTag, tagRotation);
+    Pose2d targetPose2d =
+        new Pose2d(frontOfTag, tagRotation)
+            .plus(
+                new Transform2d(
+                    0,
+                    0,
+                    new Rotation2d(
+                        Math.toRadians(0.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
     Logger.recordOutput("Robot/Vision/AprilTagSetpoint", targetPose2d);
+    Logger.recordOutput("Robot/Vision/AltAprilTagSetpoint", AllianceFlipUtil.apply(targetPose2d));
     return targetPose2d;
   }
 
@@ -195,10 +243,14 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public void updateTelemetry() {
+    Logger.recordOutput("Robot/Vision/Front Left Cam Connected", mCameraList.get(0).isConnected());
+    Logger.recordOutput("Robot/Vision/Front Right Cam Connected", mCameraList.get(1).isConnected());
     Logger.recordOutput("Robot/Vision/EstimatedPose", mDriveSubsystem.getPose());
+    Logger.recordOutput(
+        "Robot/Vision/AltEstimatedPose", AllianceFlipUtil.apply(mDriveSubsystem.getPose()));
     // for (PoseCamera camera : mCameraList) {
-    //   Logger.recordOutput("Vision/Pose/" + camera.getCameraName(),
-    // camera.getCameraPoseEstimate());
+    //   Logger.recordOutput(
+    //       "Vision/Pose/" + camera.getCameraName(), camera.getCameraPoseEstimate().toPose2d());
     // }
   }
 }

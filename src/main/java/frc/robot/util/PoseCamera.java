@@ -54,11 +54,15 @@ public class PoseCamera {
     return m_photonCamera.getLatestResult().hasTargets();
   }
 
+  public boolean isConnected() {
+    return m_photonCamera.isConnected();
+  }
+
   public void updateTelemetry() {
     SmartDashboard.putBoolean(
         "Vision/Pose/" + m_photonCamera.getName() + "/IsConnected", m_photonCamera.isConnected());
     SmartDashboard.putBoolean(
-        "Visions/Pose/" + m_photonCamera.getName() + "/HasTarget",
+        "Vision/Pose/" + m_photonCamera.getName() + "/HasTarget",
         m_photonCamera.getLatestResult().hasTargets());
   }
 }

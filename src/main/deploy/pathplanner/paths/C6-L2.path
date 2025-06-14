@@ -1,0 +1,70 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.19,
+        "y": 3.92
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.3921885556290126,
+        "y": 3.2505567112792906
+      },
+      "isLocked": false,
+      "linkedName": "C6"
+    },
+    {
+      "anchor": {
+        "x": 2.497599337748345,
+        "y": 3.92
+      },
+      "prevControl": {
+        "x": 2.865386328666546,
+        "y": 3.758166519382274
+      },
+      "nextControl": {
+        "x": 2.2687722320753134,
+        "y": 4.0206884090116795
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.23825,
+        "y": 3.4595
+      },
+      "prevControl": {
+        "x": 1.6593261589403976,
+        "y": 3.464466887417218
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "L2-Working"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.9548412538722678
+  },
+  "reversed": false,
+  "folder": "South Side Lolipop",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

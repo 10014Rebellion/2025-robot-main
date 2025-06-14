@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.51125,
+        "y": 0.8367499999999995
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.037750000000001,
+        "y": 1.0512500000000014
+      },
+      "isLocked": false,
+      "linkedName": "SouthHP"
+    },
+    {
+      "anchor": {
+        "x": 3.94875,
+        "y": 2.815999999999999
+      },
+      "prevControl": {
+        "x": 3.3930000000000007,
+        "y": 2.182249999999999
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "C4"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -30.9637565320736
+  },
+  "reversed": false,
+  "folder": "South Side HP",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -125.78897345918334
+  },
+  "useDefaultConstraints": true
+}

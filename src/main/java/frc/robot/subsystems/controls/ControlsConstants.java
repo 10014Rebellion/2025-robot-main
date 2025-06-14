@@ -10,7 +10,7 @@ public class ControlsConstants {
     public static final int kAlgaePickupL3 = 3;
 
     // Intake
-    public static final int kReadyScoring = 4;
+    public static final int kPickup = 4;
     public static final int kScoreCoral = 10;
 
     // Barge
@@ -24,7 +24,7 @@ public class ControlsConstants {
     public static final int kSetScoreL1 = 11;
 
     // Climbing
-    public static final int kClimbLetGo = 12;
-    public static final int kClimbPullUp = 8;
+    public static final int kClimbDescend = 8;
+    public static final int kClimbAscend = 12;
   }
 }

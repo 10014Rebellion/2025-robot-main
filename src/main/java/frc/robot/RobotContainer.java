@@ -1,27 +1,23 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.ControlsSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.drive.ModuleIOTalonFXandFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.pivot.PivotSubsystem;
-import frc.robot.subsystems.sensors.BeambreakSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -38,46 +34,42 @@ public class RobotContainer {
   private final WristSubsystem mWrist;
   private final VisionSubsystem mVision;
   private final ElevatorSubsystem mElevator;
-  private final PivotSubsystem mPivot;
   private final ControlsSubsystem mControls;
-  private final BeambreakSubsystem mBeambreak;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
   private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
-
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  private final ClimbSubsystem mCLimb;
 
   public RobotContainer() {
+    mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
-    mTelemetry = new TelemetrySubsystem();
     mIntake = new IntakeSubsystem();
-    mPivot = new PivotSubsystem();
-    mBeambreak = new BeambreakSubsystem();
-    mLEDs = new LEDSubsystem();
+    mCLimb = new ClimbSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
         mDrive =
             new DriveSubsystem(
                 new GyroIOPigeon2(),
-                new ModuleIOSpark(0),
-                new ModuleIOSpark(1),
-                new ModuleIOSpark(2),
-                new ModuleIOSpark(3));
+                new ModuleIOTalonFXandFXS(TunerConstants.FrontLeft),
+                new ModuleIOTalonFXandFXS(TunerConstants.FrontRight),
+                new ModuleIOTalonFXandFXS(TunerConstants.BackLeft),
+                new ModuleIOTalonFXandFXS(TunerConstants.BackRight),
+                mTelemetry);
         break;
 
       case SIM:
         mDrive =
             new DriveSubsystem(
                 new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight),
+                mTelemetry);
         break;
 
       default:
@@ -87,43 +79,52 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIO() {},
+                mTelemetry);
         break;
     }
 
+    mLEDs = new LEDSubsystem(mClaw, mIntake, mElevator, mWrist, mDrive);
+
     mVision =
         new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
-    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mPivot, mIntake, mClaw);
-    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mPivot, mIntake);
-    mAutons.configureNamedCommands();
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(mDrive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(mDrive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        mDrive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", mDrive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
+    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
+    initTeleop();
+    // mControls.initTuningDrive();
+    // mControls.initIntakeTuning();
+    // mControls.initElevatorTuning();
+    // mControls.initWristTuning();
+  }
+
+  private void initTeleop() {
     mControls.initDriverController();
     mControls.initOperatorButtonboard();
+    mControls.initDrivebase();
+  }
+
+  public void initTriggers() {
+    mControls.initTriggers();
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return mAutons.getChosenAuton();
+  }
+
+  public DriveSubsystem getDrivetrain() {
+    return mDrive;
+  }
+
+  public TelemetrySubsystem getTelemetry() {
+    return mTelemetry;
+  }
+
+  public Command getPathPlannerAuto() {
+    return mAutons.getChosenAuton();
   }
 }

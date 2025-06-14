@@ -3,38 +3,73 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.4084016393442615,
-        "y": 2.220850409836065
+        "x": 7.181,
+        "y": 2.233
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.880942622950819,
-        "y": 2.3287397540983603
+        "x": 5.9219262295081965,
+        "y": 1.705379098360655
       },
       "isLocked": false,
-      "linkedName": "SS-GLOBAL"
+      "linkedName": "SouthStart"
     },
     {
       "anchor": {
-        "x": 5.1786885245901635,
-        "y": 2.4606045081967203
+        "x": 5.2985655737704915,
+        "y": 2.233
       },
       "prevControl": {
-        "x": 5.454405737704919,
-        "y": 2.41265368852459
+        "x": 5.4235655737704915,
+        "y": 2.0164936490538903
+      },
+      "nextControl": {
+        "x": 5.1735655737704915,
+        "y": 2.44950635094611
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.96,
+        "y": 2.8
+      },
+      "prevControl": {
+        "x": 5.085,
+        "y": 2.5834936490538905
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "C3-SCORE-START"
+      "linkedName": "C3"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 2.0,
+      "constraints": {
+        "maxVelocity": 1.3,
+        "maxAcceleration": 1.4,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +77,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 121.70142966950579
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "South Start",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 144.32359177813797
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }
