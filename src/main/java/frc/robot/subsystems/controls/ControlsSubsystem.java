@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,10 +23,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.PoseConstants;
-import frc.robot.Robot;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.GoToBarge;
 import frc.robot.commands.GoToPose;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
@@ -208,7 +207,7 @@ public class ControlsSubsystem extends SubsystemBase {
             mDrive,
             () -> isAligningToBarge ? 0.0 : -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> driverController.getRightX(),
+            () -> -driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
     driverController
@@ -243,51 +242,68 @@ public class ControlsSubsystem extends SubsystemBase {
         .whileFalse(new InstantCommand(() -> doAutoScore = true));
 
     // driverController
-    // .x()
-    // .onTrue(
-    // Commands.runOnce(
-    // () ->
-    // mDrive.setPose(
-    // new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
-    // mDrive)
-    // .ignoringDisable(true));
+    //     .x()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     mDrive.setPose(
+    //                         new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+    //                 mDrive)
+    //             .ignoringDisable(true));
 
     driverController
         .x()
-        .whileTrue(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> isAligningToBarge = true),
-                new GoToBarge(
-                    () -> {
-                      double currentY = mDrive.getPose().getY();
-                      double currentX = mDrive.getPose().getX();
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        mDrive.setPose(
+                            new Pose2d(
+                                mDrive.getPose().getTranslation(),
+                                new Rotation2d()
+                                    .plus(
+                                        ((DriverStation.getAlliance().orElse(Alliance.Blue)
+                                                == Alliance.Red)
+                                            ? Rotation2d.kPi
+                                            : Rotation2d.kZero)))),
+                    mDrive)
+                .ignoringDisable(true));
 
-                      double blueDiff =
-                          Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignBlueX);
-                      double redDiff =
-                          Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignRedX);
+    // driverController
+    //     .x()
+    //     .whileTrue(
+    //         new SequentialCommandGroup(
+    //             new InstantCommand(() -> isAligningToBarge = true),
+    //             new GoToBarge(
+    //                 () -> {
+    //                   double currentY = mDrive.getPose().getY();
+    //                   double currentX = mDrive.getPose().getX();
 
-                      double targetX;
-                      double targetThetaDeg;
+    //                   double blueDiff =
+    //                       Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignBlueX);
+    //                   double redDiff =
+    //                       Math.abs(currentX - PoseConstants.WeldedField.kBargeAlignRedX);
 
-                      if (redDiff < blueDiff) {
-                        targetX = PoseConstants.WeldedField.kBargeAlignRedX;
-                        targetThetaDeg = PoseConstants.WeldedField.kBargeAlignEastDeg;
-                      } else {
-                        targetX = PoseConstants.WeldedField.kBargeAlignBlueX;
-                        targetThetaDeg = PoseConstants.WeldedField.kBargeAlignWestDeg;
-                      }
+    //                   double targetX;
+    //                   double targetThetaDeg;
 
-                      targetThetaDeg *= (Robot.gIsBlueAlliance) ? -1 : 1;
+    //                   if (redDiff < blueDiff) {
+    //                     targetX = PoseConstants.WeldedField.kBargeAlignRedX;
+    //                     targetThetaDeg = PoseConstants.WeldedField.kBargeAlignEastDeg;
+    //                   } else {
+    //                     targetX = PoseConstants.WeldedField.kBargeAlignBlueX;
+    //                     targetThetaDeg = PoseConstants.WeldedField.kBargeAlignWestDeg;
+    //                   }
 
-                      return new Pose2d(
-                          targetX,
-                          currentY,
-                          new Rotation2d(Units.degreesToRadians(targetThetaDeg)));
-                    },
-                    () -> mDrive.getPose(),
-                    mDrive)))
-        .onFalse(new InstantCommand(() -> isAligningToBarge = false));
+    //                   targetThetaDeg *= (Robot.gIsBlueAlliance) ? -1 : 1;
+
+    //                   return new Pose2d(
+    //                       targetX,
+    //                       currentY,
+    //                       new Rotation2d(Units.degreesToRadians(targetThetaDeg)));
+    //                 },
+    //                 () -> mDrive.getPose(),
+    //                 mDrive)))
+    //     .onFalse(new InstantCommand(() -> isAligningToBarge = false));
 
     // Menu button, the one with 3 lines like a hamburger menu icon
     driverController.button(8).onTrue(new InstantCommand(() -> mIntake.toggleIRSensor()));
@@ -302,7 +318,7 @@ public class ControlsSubsystem extends SubsystemBase {
             mDrive,
             () -> -driverController.getLeftY(),
             () -> -driverController.getLeftX(),
-            () -> driverController.getRightX(),
+            () -> -driverController.getRightX(),
             () -> mSwerveFieldOriented));
 
     driverController
@@ -315,7 +331,14 @@ public class ControlsSubsystem extends SubsystemBase {
             Commands.runOnce(
                     () ->
                         mDrive.setPose(
-                            new Pose2d(mDrive.getPose().getTranslation(), new Rotation2d())),
+                            new Pose2d(
+                                mDrive.getPose().getTranslation(),
+                                new Rotation2d()
+                                    .plus(
+                                        ((DriverStation.getAlliance().orElse(Alliance.Blue)
+                                                == Alliance.Red)
+                                            ? Rotation2d.kPi
+                                            : Rotation2d.kZero)))),
                     mDrive)
                 .ignoringDisable(true));
 
@@ -557,8 +580,8 @@ public class ControlsSubsystem extends SubsystemBase {
     // driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
     // driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd());
     // driverController.povRight().whileTrue(mWrist.setTunablePIDCmd());
-    driverController.x().whileTrue(mWrist.setVoltsCmd(-2));
-    driverController.b().whileTrue(mWrist.setVoltsCmd(2));
+    driverController.x().whileTrue(mElevator.setVoltsCmd(-2));
+    driverController.b().whileTrue(mElevator.setVoltsCmd(2));
   }
 
   private Command getScoreCmd(int level) {

@@ -62,15 +62,15 @@ public class DriveConstants {
   public static final int pigeonCanId = 2;
 
   // Intake is on the right, we want to make it so the left side is the front side
-  public static final int frontRightDriveCanId = 11;
-  public static final int frontLeftDriveCanId = 15; // WAS 14
-  public static final int backRightDriveCanId = 12;
-  public static final int backLeftDriveCanId = 13;
+  //   public static final int frontRightDriveCanId = 11;
+  //   public static final int frontLeftDriveCanId = 15; // WAS 14
+  //   public static final int backRightDriveCanId = 12;
+  //   public static final int backLeftDriveCanId = 13;
 
-  public static final int frontRightTurnCanId = 21;
-  public static final int frontLeftTurnCanId = 24;
-  public static final int backRightTurnCanId = 22;
-  public static final int backLeftTurnCanId = 23;
+  //   public static final int frontRightTurnCanId = 21;
+  //   public static final int frontLeftTurnCanId = 24;
+  //   public static final int backRightTurnCanId = 22;
+  //   public static final int backLeftTurnCanId = 23;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 60;
@@ -99,7 +99,7 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Whole Bot PID
-  public static final double drivebaseDriveKp = 3;
+  public static final double drivebaseDriveKp = 1;
   public static final double drivebaseDriveKd = 0.001;
 
   public static final double drivebaseThetaKp = 2.0;

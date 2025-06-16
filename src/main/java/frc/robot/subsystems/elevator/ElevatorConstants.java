@@ -10,7 +10,7 @@ public class ElevatorConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kInverted = true;
   public static int kCurrentLimit = 60; // CHANGED: 80
-  public static double kP = 1.7;
+  public static double kP = 1.0;
   public static double kI = 0.0;
   public static double kD = 0.0;
 
@@ -24,7 +24,7 @@ public class ElevatorConstants {
   public static double throwAlgaePos = 40;
 
   public static double kS = 0.0;
-  public static double kG = 1.1;
+  public static double kG = 0.6;
   public static double kV = 0.0; // 4.49;
   public static double kA = 0.0; // 0.2;
 
@@ -42,8 +42,8 @@ public class ElevatorConstants {
     GROUNDALGAE(8),
     L1(27),
     L2(7),
-    L3(24),
-    L4(51),
+    L3(22),
+    L4(48),
     SCORE(20),
     BARGE(55),
     L2ALGAE(38),
