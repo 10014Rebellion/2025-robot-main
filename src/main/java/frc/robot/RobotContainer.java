@@ -109,7 +109,7 @@ public class RobotContainer {
   }
 
   public void initTriggers() {
-    mControls.initTriggers();
+    // mControls.initTriggers();
   }
 
   public Command getAutonomousCommand() {

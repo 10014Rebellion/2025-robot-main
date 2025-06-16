@@ -44,7 +44,7 @@ public class VisionConstants {
     }
   };
 
-  public static double kScoringDistance = Units.inchesToMeters(0.0);
+  public static double kScoringDistance = Units.inchesToMeters(0.5);
 
   public enum linearPoseOffsets {
     L4(Units.inchesToMeters(0.0)),

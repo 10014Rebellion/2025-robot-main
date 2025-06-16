@@ -580,8 +580,8 @@ public class ControlsSubsystem extends SubsystemBase {
     // driverController.povDown().whileTrue(mElevator.setPIDCmd(ElevatorConstants.Setpoints.BOTTOM));
     // driverController.povLeft().whileTrue(mWrist.setTunablePIDCmd());
     // driverController.povRight().whileTrue(mWrist.setTunablePIDCmd());
-    driverController.x().whileTrue(mWrist.setVoltsCmd(-2));
-    driverController.b().whileTrue(mWrist.setVoltsCmd(2));
+    driverController.x().whileTrue(mElevator.setVoltsCmd(-2));
+    driverController.b().whileTrue(mElevator.setVoltsCmd(2));
   }
 
   private Command getScoreCmd(int level) {
