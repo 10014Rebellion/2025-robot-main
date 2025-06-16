@@ -49,11 +49,6 @@ public class LEDSubsystem extends SubsystemBase {
     mLED.setData(mLEDBuffer);
   }
 
-  // private void setPattern(ledPatterns pPattern) {
-  //   pPattern.getPattern().applyTo(mLEDBuffer);
-  //   mLED.setData(mLEDBuffer);
-  // }
-
   private void initTriggers(
       ClawSubsystem clawSubsystem,
       IntakeSubsystem intakeSubsystem,
@@ -65,12 +60,8 @@ public class LEDSubsystem extends SubsystemBase {
         .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
 
     new Trigger(() -> driveSubsystem.isAtPose)
-        // && elevatorSubsystem.isPIDAtGoal()
-        // // && clawSubsystem.getBeamBreak()
-        // && wristSubsystem.isPIDAtGoal())
         .whileTrue(
             new ParallelCommandGroup(
-                // new DynamicCommand(() -> getCoralScoreCmd(currentCoralScore)),
                 new InstantCommand(() -> setSolid(ledColor.GREEN))))
         .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
   }

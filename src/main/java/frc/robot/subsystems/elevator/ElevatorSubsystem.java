@@ -24,28 +24,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private final RelativeEncoder mEncoder;
 
-  private Controllers mCurrentController;
-
-  private enum Controllers {
-    ProfiledPID,
-    Feedforward,
-    Manual
-  }
-
   public ElevatorSubsystem() {
     this.mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
     this.mEncoder = mElevatorSparkMax.getEncoder();
-    this.mElevatorProfiledPID =
-        new ProfiledPIDController(
-            ElevatorConstants.kP,
-            0,
-            ElevatorConstants.kD,
-            new Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
+    this.mElevatorProfiledPID = new ProfiledPIDController(
+        ElevatorConstants.kP,
+        0,
+        ElevatorConstants.kD,
+        new Constraints(ElevatorConstants.kMaxVelocity, ElevatorConstants.kMaxAcceleration));
     this.mElevatorProfiledPID.setTolerance(ElevatorConstants.kTolerance);
-    this.mElevatorFF =
-        new ElevatorFeedforward(
-            ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
-    this.mCurrentController = Controllers.Manual;
+    this.mElevatorFF = new ElevatorFeedforward(
+        ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
 
     this.setDefaultCommand(enableFFCmd());
 
@@ -66,7 +55,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   public FunctionalCommand enableFFCmd() {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.Feedforward;
         },
         () -> {
           double calculatedOutput = mElevatorFF.calculate(0);
@@ -84,15 +72,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.ProfiledPID;
           mElevatorProfiledPID.reset(getEncReading());
           mElevatorProfiledPID.setGoal(pSetpoint.getPos());
           SmartDashboard.putNumber("Elevator/Setpoint", pSetpoint.getPos());
         },
         () -> {
           double encoderReading = getEncReading();
-          double calculatedPID =
-              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedPID = mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
           double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
           setVolts(calculatedPID + calculatedFF);
         },
@@ -103,7 +89,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public FunctionalCommand setVoltsCmd(double pVoltage) {
     return new FunctionalCommand(
-        () -> {},
+        () -> {
+        },
         () -> {
           setVolts(pVoltage);
         },
@@ -115,15 +102,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   public FunctionalCommand setTunablePIDCommand() {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.ProfiledPID;
           double newKp = SmartDashboard.getNumber("Elevator/Kp", ElevatorConstants.kP);
           double newKd = SmartDashboard.getNumber("Elevator/Kd", ElevatorConstants.kD);
           double pSetpoint = SmartDashboard.getNumber("Elevator/Tunable Setpoint", 0.0);
 
-          double newVel =
-              SmartDashboard.getNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
-          double newAccel =
-              SmartDashboard.getNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
+          double newVel = SmartDashboard.getNumber("Elevator/Max Vel", ElevatorConstants.kMaxVelocity);
+          double newAccel = SmartDashboard.getNumber("Elevator/Max Accel", ElevatorConstants.kMaxAcceleration);
           mElevatorProfiledPID.setConstraints(new Constraints(newVel, newAccel));
           mElevatorProfiledPID.setPID(newKp, 0.0, newKd);
           mElevatorProfiledPID.reset(getEncReading());
@@ -131,8 +115,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         },
         () -> {
           double encoderReading = getEncReading();
-          double calculatedPID =
-              mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
+          double calculatedPID = mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity, 0.0);
           double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
 
           setVolts(calculatedPID + calculatedFF);

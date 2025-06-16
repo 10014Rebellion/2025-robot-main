@@ -29,16 +29,14 @@ public class VisionSubsystem extends SubsystemBase {
   private List<PoseCamera> mCameraList;
   private List<PhotonPipelineResult> results;
   private final DriveSubsystem mDriveSubsystem;
-  private boolean mKillVision;
 
   private void initCameraList() {
     List<PoseCamera> poseCameras = new ArrayList<>();
-    String[] cameraNames =
-        new String[] {
-          VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM,
-          // VisionConstants.BACK_LEFT_CAM,
-          // VisionConstants.BACK_RIGHT_CAM
-        };
+    String[] cameraNames = new String[] {
+        VisionConstants.FRONT_LEFT_CAM, VisionConstants.FRONT_RIGHT_CAM,
+        // VisionConstants.BACK_LEFT_CAM,
+        // VisionConstants.BACK_RIGHT_CAM
+    };
 
     // HttpCamera frontLeftCam = new HttpCamera(getName(), "");
     // HttpCamera frontRightCam = new HttpCamera(getName(), "");
@@ -64,28 +62,27 @@ public class VisionSubsystem extends SubsystemBase {
       Supplier<SwerveModulePosition[]> swerveModulePositions) {
     initCameraList();
     this.mDriveSubsystem = pDriveSubsystem;
-    this.mKillVision = false;
   }
 
   // Returns true as long as it can see at least one tag
   public boolean canSeeTag() {
-    for (PoseCamera camera : mCameraList) if (camera.getCameraResults().size() > 0) return true;
+    for (PoseCamera camera : mCameraList)
+      if (camera.getCameraResults().size() > 0)
+        return true;
 
     return false;
   }
 
   public int getClosestReefTag(boolean isBlueAlliance) { // , double pDistanceMeters) {
     // Determine valid tag IDs based on alliance
-    int[] validTags =
-        isBlueAlliance ? new int[] {17, 18, 19, 20, 21, 22} : new int[] {6, 7, 8, 9, 10, 11};
+    int[] validTags = isBlueAlliance ? new int[] { 17, 18, 19, 20, 21, 22 } : new int[] { 6, 7, 8, 9, 10, 11 };
     Pose2d robotPose = mDriveSubsystem.getPose();
     Pose2d closestTagPose = null;
     double closestDistance = Double.MAX_VALUE;
     int closestTagId = -1;
     // Iterate through reef tags and find the closest one
     for (int tagId : validTags) {
-      Pose2d tagPose =
-          VisionConstants.kAprilTagFieldLayout.getTagPose(tagId).map(Pose3d::toPose2d).orElse(null);
+      Pose2d tagPose = VisionConstants.kAprilTagFieldLayout.getTagPose(tagId).map(Pose3d::toPose2d).orElse(null);
       if (tagPose != null) {
         double distance = robotPose.getTranslation().getDistance(tagPose.getTranslation());
         if (distance < closestDistance) {
@@ -144,16 +141,15 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   // public Pose2d getBranchScoringPose(int branchNum) {
-  //   return getBranchScoringPose(branchNum, 0.0);
+  // return getBranchScoringPose(branchNum, 0.0);
   // }
 
   // public Pose2d getBranchScoringPose(int branchNum, double pDistanceInches) {
-  //   return null;
+  // return null;
   // }
 
   public Pose2d getPoseInFrontOfAprilTag(int pTagID, double pXOffsetM, double pYOffsetM) {
-    Pose2d tagPose =
-        VisionConstants.kAprilTagFieldLayout.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
+    Pose2d tagPose = VisionConstants.kAprilTagFieldLayout.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
 
     if (tagPose == null) {
       updatePose();
@@ -161,30 +157,26 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     // Calculate position in front of the tag
-    Translation2d tagTranslation =
-        tagPose
-            .getTranslation()
-            .plus(
-                new Translation2d(
-                        (VisionConstants.kRobotYLength
-                            / 2.0), // Offset the robot length so the front is 0 meters away
-                        0)
-                    .rotateBy(tagPose.getRotation()));
-    Rotation2d tagRotation =
-        tagPose.getRotation().plus(new Rotation2d(Math.PI)); // Flip the robot from the tag
+    Translation2d tagTranslation = tagPose
+        .getTranslation()
+        .plus(
+            new Translation2d(
+                (VisionConstants.kRobotYLength
+                    / 2.0), // Offset the robot length so the front is 0 meters away
+                0)
+                .rotateBy(tagPose.getRotation()));
+    Rotation2d tagRotation = tagPose.getRotation().plus(new Rotation2d(Math.PI)); // Flip the robot from the tag
 
     // Move "pDistanceInches" in the direction the tag is facing
-    Translation2d frontOfTag =
-        tagTranslation.plus(new Translation2d(-pXOffsetM, pYOffsetM).rotateBy(tagRotation));
+    Translation2d frontOfTag = tagTranslation.plus(new Translation2d(-pXOffsetM, pYOffsetM).rotateBy(tagRotation));
 
-    Pose2d targetPose2d =
-        new Pose2d(frontOfTag, tagRotation)
-            .plus(
-                new Transform2d(
-                    0,
-                    0,
-                    new Rotation2d(
-                        Math.toRadians(0.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
+    Pose2d targetPose2d = new Pose2d(frontOfTag, tagRotation)
+        .plus(
+            new Transform2d(
+                0,
+                0,
+                new Rotation2d(
+                    Math.toRadians(0.0)))); // .plus(new Rotation2d(Math.toRadians(-90.0)));
     Logger.recordOutput("Robot/Vision/AprilTagSetpoint", targetPose2d);
     Logger.recordOutput("Robot/Vision/AltAprilTagSetpoint", AllianceFlipUtil.apply(targetPose2d));
     return targetPose2d;
@@ -249,8 +241,9 @@ public class VisionSubsystem extends SubsystemBase {
     Logger.recordOutput(
         "Robot/Vision/AltEstimatedPose", AllianceFlipUtil.apply(mDriveSubsystem.getPose()));
     // for (PoseCamera camera : mCameraList) {
-    //   Logger.recordOutput(
-    //       "Vision/Pose/" + camera.getCameraName(), camera.getCameraPoseEstimate().toPose2d());
+    // Logger.recordOutput(
+    // "Vision/Pose/" + camera.getCameraName(),
+    // camera.getCameraPoseEstimate().toPose2d());
     // }
   }
 }

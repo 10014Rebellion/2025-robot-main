@@ -56,22 +56,14 @@ public class AutonSubsystem {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
     autoChooser.addDefaultOption("Taxi", mDrive.driveForwardDefaultAuton(2.0));
+    addSysIDRoutines();
     SmartDashboard.putData(autoChooser.getSendableChooser());
 
-    // configureAutoChooser();
   }
 
   public Command getChosenAuton() {
     return autoChooser.get();
   }
-
-  // private void configureAutoChooser() {
-  // addSysIDRoutines();
-  // }
-
-  // private Command goToBranch() {
-  //   return GoToPose(0, 0)
-  // }
 
   public void configureNamedCommands() {
     NamedCommands.registerCommand("ReadyScoreSubsystemsL1", readyScoreSubsystems(1));
@@ -118,16 +110,15 @@ public class AutonSubsystem {
 
   private SequentialCommandGroup activateIntake() {
     return new ParallelRaceGroup(
-            mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
-            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
-            new SequentialCommandGroup(
-                mIntake.autonSetIndexCoralCmd(),
-                // new WaitCommand(0.1),
-                new ParallelCommandGroup(
-                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
-                    mClaw.intakeCoralCmd()),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
+        mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
+        mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+        new SequentialCommandGroup(
+            mIntake.autonSetIndexCoralCmd(),
+            new ParallelCommandGroup(
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                mClaw.intakeCoralCmd()),
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
         .andThen(new InstantCommand(() -> mIntake.setVoltsIntakeRoller(0)));
   }
 
@@ -167,14 +158,12 @@ public class AutonSubsystem {
             new WaitCommand(0.25), mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())),
         mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
         new ParallelCommandGroup(
-            // new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
             mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
             mClaw.autonThrowAlgae(mWrist, mElevator)));
   }
 
   private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
-    // Supplier<linearPoseOffsets> awayOffset = () -> intToOffsets(level);
     DoubleSupplier distAwayMeters = () -> 0.02;
     PoseOffsets branchOffset = isLeft ? PoseOffsets.AUTONLEFT : PoseOffsets.AUTONRIGHT;
 
@@ -194,24 +183,6 @@ public class AutonSubsystem {
         mDrive);
   }
 
-  // private SequentialCommandGroup GoToPose(String pathToFollowAfter, int tagID,
-  // double distAway, double distHorizontal) {
-  // try {
-  // PathPlannerPath pathToGoal = PathPlannerPath.fromPathFile(pathToFollowAfter);
-
-  // return new SequentialCommandGroup(
-  // new InstantCommand(() -> mDrive.stopAllCommands()),
-  // new GoToPose(
-  // () -> mVision.getPoseInFrontOfAprilTag(tagID, distAway, distHorizontal),
-  // () -> mDrive.getPose(),
-  // mDrive),
-  // AutoBuilder.followPath(pathToGoal));
-  // } catch (Exception e) {
-  // return new SequentialCommandGroup(
-  // new InstantCommand(() -> System.out.println("<<FAILED TO FIND GoToPose
-  // AUTONS>>")));
-  // }
-  // }
   private SequentialCommandGroup HPCoralIntake() {
     return new SequentialCommandGroup(
         new ParallelCommandGroup(

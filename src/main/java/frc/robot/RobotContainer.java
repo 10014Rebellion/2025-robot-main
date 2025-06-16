@@ -20,9 +20,12 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -37,7 +40,6 @@ public class RobotContainer {
   private final ControlsSubsystem mControls;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
-  private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mCLimb;
 
@@ -51,43 +53,45 @@ public class RobotContainer {
 
     switch (Constants.currentMode) {
       case REAL:
-        mDrive =
-            new DriveSubsystem(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFXandFXS(TunerConstants.FrontLeft),
-                new ModuleIOTalonFXandFXS(TunerConstants.FrontRight),
-                new ModuleIOTalonFXandFXS(TunerConstants.BackLeft),
-                new ModuleIOTalonFXandFXS(TunerConstants.BackRight),
-                mTelemetry);
+        mDrive = new DriveSubsystem(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFXandFXS(TunerConstants.FrontLeft),
+            new ModuleIOTalonFXandFXS(TunerConstants.FrontRight),
+            new ModuleIOTalonFXandFXS(TunerConstants.BackLeft),
+            new ModuleIOTalonFXandFXS(TunerConstants.BackRight),
+            mTelemetry);
         break;
 
       case SIM:
-        mDrive =
-            new DriveSubsystem(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight),
-                mTelemetry);
+        mDrive = new DriveSubsystem(
+            new GyroIO() {
+            },
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight),
+            mTelemetry);
         break;
 
       default:
-        mDrive =
-            new DriveSubsystem(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                mTelemetry);
+        mDrive = new DriveSubsystem(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            mTelemetry);
         break;
     }
 
-    mLEDs = new LEDSubsystem(mClaw, mIntake, mElevator, mWrist, mDrive);
+    new LEDSubsystem(mClaw, mIntake, mElevator, mWrist, mDrive);
 
-    mVision =
-        new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
+    mVision = new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
     mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
 
