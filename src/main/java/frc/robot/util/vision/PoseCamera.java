@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -24,8 +24,7 @@ public class PoseCamera {
       AprilTagFieldLayout aprilTagFieldLayout) {
     m_photonCamera = new PhotonCamera(cameraName);
     m_photonCamera.setDriverMode(false);
-    m_photonPoseEstimator =
-        new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, cameraTransform);
+    m_photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, poseStrategy, cameraTransform);
     m_photonPoseEstimator.setMultiTagFallbackStrategy(fallbackPoseStrategy);
   }
 
@@ -41,9 +40,9 @@ public class PoseCamera {
     if (m_photonCamera.getAllUnreadResults().size() > 0) {
       return m_photonPoseEstimator
           .update(m_photonCamera.getAllUnreadResults().get(0))
-          .get()
-          .estimatedPose;
-    } else return new Pose3d();
+          .get().estimatedPose;
+    } else
+      return new Pose3d();
   }
 
   public String getCameraName() {

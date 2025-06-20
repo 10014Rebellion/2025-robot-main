@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.misc;
 
 public class MiscUtils {
   public static boolean isValueInRange(double value, double minValue, double maxValue) {

@@ -248,10 +248,6 @@ public class IntakeSubsystem extends SubsystemBase {
         });
   }
 
-  // public Command setIndexCoralCmd() {
-  // return new AutoFunnelCoralCommand(this);
-  // }
-
   public FunctionalCommand setIndexCoralCmd() {
     return new FunctionalCommand(
         () -> {

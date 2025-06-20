@@ -13,9 +13,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.vision.VisionConstants.PoseOffsets;
 import frc.robot.subsystems.vision.VisionConstants.linearPoseOffsets;
-import frc.robot.util.AllianceFlipUtil;
-import frc.robot.util.MiscUtils;
-import frc.robot.util.PoseCamera;
+import frc.robot.util.arithmetic.AllianceFlipUtil;
+import frc.robot.util.misc.MiscUtils;
+import frc.robot.util.vision.PoseCamera;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleSupplier;

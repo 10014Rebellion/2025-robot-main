@@ -1,9 +1,10 @@
-package frc.robot.util;
+package frc.robot.util.telemetry;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Class for a tunable number. Gets value from dashboard in tuning mode, returns default if not or
+ * Class for a tunable number. Gets value from dashboard in tuning mode, returns
+ * default if not or
  * value not in dashboard.
  */
 public class TunableNumber {
@@ -65,8 +66,9 @@ public class TunableNumber {
   /**
    * Checks whether the number has changed since our last check
    *
-   * @return True if the number has changed since the last time this method was called, false
-   *     otherwise
+   * @return True if the number has changed since the last time this method was
+   *         called, false
+   *         otherwise
    */
   public boolean hasChanged() {
     double currentValue = get();

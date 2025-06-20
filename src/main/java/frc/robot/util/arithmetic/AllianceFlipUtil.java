@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package frc.robot.util;
+package frc.robot.util.arithmetic;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,7 +26,10 @@ public class AllianceFlipUtil {
     }
   }
 
-  /** Flips a translation to the correct side of the field based on the current alliance color. */
+  /**
+   * Flips a translation to the correct side of the field based on the current
+   * alliance color.
+   */
   public static Translation2d apply(Translation2d translation) {
     if (shouldFlip()) {
       return new Translation2d(
@@ -45,7 +48,10 @@ public class AllianceFlipUtil {
     }
   }
 
-  /** Flips a pose to the correct side of the field based on the current alliance color. */
+  /**
+   * Flips a pose to the correct side of the field based on the current alliance
+   * color.
+   */
   public static Pose2d apply(Pose2d pose) {
     if (shouldFlip()) {
       return new Pose2d(apply(pose.getTranslation()), apply(pose.getRotation()));
