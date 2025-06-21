@@ -26,5 +26,12 @@ public class ControlsConstants {
     // Climbing
     public static final int kClimbDescend = 8;
     public static final int kClimbAscend = 12;
+
+    public enum Direction {
+      FORWARD,
+      BACKWARD,
+      LEFT,
+      RIGHT
+    }
   }
 }

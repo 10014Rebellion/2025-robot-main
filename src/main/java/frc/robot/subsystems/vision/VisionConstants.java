@@ -26,12 +26,15 @@ public class VisionConstants {
   public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
   // public static final double kDistOffset = Units.inchesToMeters(0.0);
 
+  // NOTE: CLAW IS OFFSET 1 INCH TO THE RIGHT
+  public static final double kClawOffsetFromCenter = Units.inchesToMeters(1.0); // RIGHT +, LEFT -
+
   public enum PoseOffsets {
     AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0),
     AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0),
     LEFT(kDistBetweenBranchesCenter / 2.0),
-    CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0);
+    CENTER(kClawOffsetFromCenter),
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 + kClawOffsetFromCenter);
 
     public final double offset;
 
