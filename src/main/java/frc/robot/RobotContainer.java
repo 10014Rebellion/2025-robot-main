@@ -103,13 +103,14 @@ public class RobotContainer {
   }
 
   private void initTeleop() {
-    mControls.initDriverController();
-    mControls.initOperatorButtonboard();
-    mControls.initDrivebase();
+    // mControls.initDriverController();
+    // mControls.initOperatorButtonboard();
+    // mControls.initDrivebase();
+    mControls.initDriveTuning();
   }
 
   public void initTriggers() {
-    // mControls.initTriggers();
+    mControls.initTriggers();
   }
 
   public Command getAutonomousCommand() {

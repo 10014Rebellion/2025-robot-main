@@ -23,15 +23,17 @@ public class VisionConstants {
 
   public static final double kDistBetweenBranchesCenter =
       Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
-  public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
+  public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13);
   // public static final double kDistOffset = Units.inchesToMeters(0.0);
+  private static final double kClawOffset =
+      1.0; // Distance between the middle of the bot and the middle of the claw
 
   public enum PoseOffsets {
     AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0),
     AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0),
     LEFT(kDistBetweenBranchesCenter / 2.0),
     CENTER(0),
-    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0);
+    RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 + kClawOffset);
 
     public final double offset;
 
@@ -80,9 +82,11 @@ public class VisionConstants {
   public static final PoseStrategy kFallbackPoseStrategy = PoseStrategy.LOWEST_AMBIGUITY;
 
   // Vision measurement standard deviations
-  public static final Matrix<N3, N1> kVisionSingleTagStandardDeviations = VecBuilder.fill(1, 1, 2);
+  /* TODO: Remove if testing */
+  public static final Matrix<N3, N1> kVisionSingleTagStandardDeviations =
+      VecBuilder.fill(1, 1, Double.MAX_VALUE);
   public static final Matrix<N3, N1> kVisionMultiTagStandardDeviations =
-      VecBuilder.fill(0.5, 0.5, 1);
+      VecBuilder.fill(0.5, 0.5, Double.MAX_VALUE);
 
   // Max ambiguity for pose estimation
   public static final double kVisionMaxPoseAmbiguity = 0.2;

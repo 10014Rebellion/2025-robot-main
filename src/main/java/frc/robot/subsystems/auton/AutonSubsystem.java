@@ -175,7 +175,7 @@ public class AutonSubsystem {
 
   private AutonGoToPose goToClosestBranchPose(boolean isLeft, int level) {
     // Supplier<linearPoseOffsets> awayOffset = () -> intToOffsets(level);
-    DoubleSupplier distAwayMeters = () -> 0.02;
+    DoubleSupplier distAwayMeters = () -> 0.04;
     PoseOffsets branchOffset = isLeft ? PoseOffsets.AUTONLEFT : PoseOffsets.AUTONRIGHT;
 
     return new AutonGoToPose(

@@ -96,6 +96,7 @@ public class ControlsSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Levels/Current Coral Level", currentScoreLevel);
     SmartDashboard.putBoolean("Levels/GOTOBARGE", goingToBarge);
     SmartDashboard.putBoolean("Levels/Auto Score", doAutoScore);
+    SmartDashboard.putBoolean("IS FIELD ORIENTED", mSwerveFieldOriented);
   }
 
   public void initTriggers() {
@@ -312,7 +313,7 @@ public class ControlsSubsystem extends SubsystemBase {
     // driverController.button(7).onTrue(new InstantCommand(() -> mIntake.toggleIRSensor()));
   }
 
-  public void initTuningDrive() {
+  public void initDriveTuning() {
     mDrive.setDefaultCommand(
         DriveCommands.joystickDrive(
             mDrive,
@@ -346,13 +347,13 @@ public class ControlsSubsystem extends SubsystemBase {
         .povUp()
         .whileTrue(
             DriveCommands.joystickDrive(
-                mDrive, () -> -1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
+                mDrive, () -> 1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
 
     driverController
         .povDown()
         .whileTrue(
             DriveCommands.joystickDrive(
-                mDrive, () -> 1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
+                mDrive, () -> -1, () -> 0, () -> 0, () -> mSwerveFieldOriented));
 
     driverController
         .povLeft()
