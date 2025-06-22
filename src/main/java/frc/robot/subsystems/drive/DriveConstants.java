@@ -69,8 +69,8 @@ public class DriveConstants {
 
     public static final ModuleControlConfig kModuleControllerConfigs = RobotBase.isReal() ? 
         new ModuleControlConfig(
-            new PIDController(20.0, 0.0, 0.0), new SimpleMotorFeedforward(4.0, 0.0, 0.0),
-            new PIDController(200.0, 0.0, 0.5), new SimpleMotorFeedforward(0.0, 0.0, 0.0)) :
+            new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(4.0, 0.0, 0.0),
+            new PIDController(9.5, 0.0, 0.5), new SimpleMotorFeedforward(0.0, 0.0, 0.0)) :
         new ModuleControlConfig(
             new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), 
             new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.0));
@@ -83,28 +83,28 @@ public class DriveConstants {
             12, 
             22, 
             22,
-            -0.1196);
+            0.471);
 
     public static final ModuleHardwareConfig kFrontRightHardware =
         new ModuleHardwareConfig(
             11, 
             21, 
             31, 
-            0.468);
+            -0.932);
 
     public static final ModuleHardwareConfig kBackLeftHardware =
         new ModuleHardwareConfig(
             13, 
             23, 
             23,
-            0.428);
+            0.565);
 
     public static final ModuleHardwareConfig kBackRightHardware =
         new ModuleHardwareConfig(
             14, 
             24, 
             24,
-            -0.555);
+            0.954);
 
     public static record ModuleHardwareConfig(
         int driveID, int azimuthID, int encoderID, double offset) {}

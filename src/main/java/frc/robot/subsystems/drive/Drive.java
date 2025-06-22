@@ -1,14 +1,16 @@
 package frc.robot.subsystems.drive;
 
-import static frc.robot.FieldConstants.*;
 import static frc.robot.subsystems.drive.DriveConstants.*;
+import static frc.robot.FieldConstants.*;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -33,13 +35,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.drive.controllers.HeadingController;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
-import frc.robot.subsystems.drive.controllers.HeadingController;
-import frc.robot.subsystems.drive.controllers.HolonomicController;
-import frc.robot.subsystems.drive.controllers.ManualTeleopController;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.CHOOSER_STRATEGY;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
+import frc.robot.subsystems.drive.controllers.ManualTeleopController;
+import frc.robot.subsystems.drive.controllers.HolonomicController;
+
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.Vision.VisionObservation;
 import frc.robot.util.debugging.LoggedTunableNumber;
@@ -131,6 +134,7 @@ public class Drive extends SubsystemBase {
     private final static LoggedTunableNumber linearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
 
     Debouncer autoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
+    Debouncer autoAlignDelay = new Debouncer(0.1, DebounceType.kRising);
 
     public Drive(Module[] modules, GyroIO gyro, Vision vision) {
         this.modules = modules;
@@ -179,6 +183,38 @@ public class Drive extends SubsystemBase {
         SmartDashboard.putData(field);
 
         headingController.setHeadingGoal(() -> goalRotation);
+    }
+
+    public Command customFollowPathComamnd(PathPlannerPath path) {
+        return new FollowPathCommand(
+            path,
+            this::getPoseEstimate,
+            this::getRobotChassisSpeeds, 
+            (speeds, ff) -> {
+                ppDesiredSpeeds = speeds;
+                pathPlanningFF = ff;
+            }, 
+            new PPHolonomicDriveController( kPPTranslationPID, kPPRotationPID ), 
+            robotConfig, 
+            () -> DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == Alliance.Red, 
+            this);
+    }
+
+    public Command customFollowPathComamnd(PathPlannerPath path, PPHolonomicDriveController drivePID) {
+        return new FollowPathCommand(
+            path,
+            this::getPoseEstimate,
+            this::getRobotChassisSpeeds, 
+            (speeds, ff) -> {
+                ppDesiredSpeeds = speeds;
+                pathPlanningFF = ff;
+            }, 
+            drivePID, 
+            robotConfig, 
+            () -> DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == Alliance.Red, 
+            this);
     }
 
     /*
@@ -461,9 +497,9 @@ public class Drive extends SubsystemBase {
         
         Logger.recordOutput("Drive/Swerve/Setpoints", unOptimizedSetpointStates);
         Logger.recordOutput("Drive/Swerve/SetpointsOptimized", optimizedSetpointStates);
-        // Logger.recordOutput("Drive/Swerve/SetpointsChassisSpeeds", kKinematics.toChassisSpeeds(optimizedSetpointStates));
-        // Logger.recordOutput("Drive/Odometry/FieldSetpointChassisSpeed", ChassisSpeeds.fromRobotRelativeSpeeds(
-        //     kKinematics.toChassisSpeeds(optimizedSetpointStates), robotRotation));
+        Logger.recordOutput("Drive/Swerve/SetpointsChassisSpeeds", kKinematics.toChassisSpeeds(optimizedSetpointStates));
+        Logger.recordOutput("Drive/Odometry/FieldSetpointChassisSpeed", ChassisSpeeds.fromRobotRelativeSpeeds(
+            kKinematics.toChassisSpeeds(optimizedSetpointStates), robotRotation));
     }
 
     /* Calculates DriveFeedforward based off state */
@@ -516,7 +552,7 @@ public class Drive extends SubsystemBase {
     }
 
     public Command waitUnitllAutoAlignFinishes() {
-        return new WaitUntilCommand(()-> autoAlignController.atGoal());
+        return new WaitUntilCommand(()-> autoAlignDelay.calculate(autoAlignController.atGoal()));
     }
 
     public Command waitUnitllIntakeAutoAlignFinishes() {
@@ -626,7 +662,7 @@ public class Drive extends SubsystemBase {
 
     @AutoLogOutput(key = "Drive/Odometry/DistanceFromReef")
     public double distanceFromReefCenter(){
-        return getPoseEstimate().getTranslation().getDistance(kReefCenter.getTranslation());
+        return getPoseEstimate().getTranslation().getDistance(AllianceFlipUtil.apply(kReefCenter).getTranslation());
     }
 
     public void acceptJoystickInputs(DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier thetaSupplier, DoubleSupplier povSupplierDegrees) {
