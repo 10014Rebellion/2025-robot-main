@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveState;
+import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
+import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
@@ -116,6 +119,41 @@ public class TeleopCommands {
 			return new InstantCommand(() -> mIntake.toggleIRSensor());
 		}
 
+		/** */
+		public ParallelCommandGroup getGroundAlgae() {
+			return new ParallelCommandGroup(
+				mWrist
+					.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
+					.andThen(mWrist.enableFFCmd()),
+				new ParallelCommandGroup(
+					mClaw.intakeCoralCmd(),
+					mElevator.setPIDCmd(
+						ElevatorConstants.Setpoints.GROUNDALGAE))
+			);
+		}
+
+		/**  */
+		public Command getGoToReefCmd(SIDE side) {
+			return new SequentialCommandGroup(
+				GoalPoseChooser.setSideCommand(side),
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
+			);
+		}
+
+		/** */
+		public Command getStopDriveCmd() {
+			return mDrive.setDriveStateCommand(DriveState.TELEOP);
+		}
+
+    //       new ParallelCommandGroup(
+    //           new InstantCommand(() -> currentScoreLevel = 0),
+    //           mElevator.setPIDCmd(
+    //               ElevatorConstants.Setpoints.HOLD_ALGAE),
+    //           mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE)
+    //               .andThen(mWrist.enableFFCmd()),
+    //           mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE
+    //               .get())));
+
 		/** DO NOT USE THESE COMMANDS IN REAL MATCHES */
 		public class ControllerTuningCommands {
 			/** RESET GYRO: Basic rotation reset without accounting for alliance color */
@@ -123,5 +161,8 @@ public class TeleopCommands {
 				return Commands.runOnce(() -> mDrive.resetGyro());
 			}
 		}
+
+
+
 	}	
 }

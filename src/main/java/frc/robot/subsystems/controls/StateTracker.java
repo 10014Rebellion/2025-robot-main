@@ -5,19 +5,24 @@ import java.util.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StateTracker extends SubsystemBase {
-  private enum Branch {
-    B1, B2, B3;
+  private static enum GamePiece {
+    Coral,
+    Algae
   }
 
-  private enum Pipe {
+  private static enum CoralLevel {
+    T, B1, B2, B3;
+  }
+
+  private static enum Pipe {
     P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12;
   }
 
-  private enum AlgaeLevel {
-    A1, A2;
+  private static enum AlgaeLevel {
+    BR, A1, A2, N;
   }
 
-  private enum ReefFace {
+  private static enum ReefFace {
     F1(Pipe.P01, Pipe.P12, AlgaeLevel.A1),
     F2(Pipe.P03, Pipe.P02, AlgaeLevel.A2),
     F3(Pipe.P05, Pipe.P04, AlgaeLevel.A1),
@@ -36,13 +41,15 @@ public class StateTracker extends SubsystemBase {
     }
   }
 
-  private static final Map<Pipe, EnumSet<Branch>> mScoredPoles = new EnumMap<>(Pipe.class);
+  private static final Map<Pipe, EnumSet<CoralLevel>> mScoredPoles = new EnumMap<>(Pipe.class);
   private static final Map<Integer, ReefFace> mApriltagToFace = new HashMap<>();
 
+  private static CoralLevel mCurrentCoralLevel = CoralLevel.B3;
+  private static GamePiece mCurrentGamePiece = GamePiece.Coral; 
 
   public StateTracker() {
     for (Pipe Pipe : Pipe.values()) {
-      mScoredPoles.put(Pipe, EnumSet.noneOf(Branch.class));
+      mScoredPoles.put(Pipe, EnumSet.noneOf(CoralLevel.class));
     }
 
     // Red side
@@ -62,20 +69,32 @@ public class StateTracker extends SubsystemBase {
     mApriltagToFace.put(22, ReefFace.F2);
   }
 
+  public void setCurrentGamePiece(GamePiece pGamePiece) {
+    mCurrentGamePiece = pGamePiece;
+  }
+
+  public void setCurrentCoralLevel(CoralLevel pCoralLevel) {
+    mCurrentCoralLevel = pCoralLevel;
+  }
+
+  public CoralLevel getCurrentCoralLevel() {
+    return mCurrentCoralLevel;
+  }
+
   public ReefFace getFaceFromTag(int pTagID) {
     return mApriltagToFace.get(pTagID);
   }
 
-  public void markScored(Pipe pPipe, Branch pBranch) {
-    mScoredPoles.get(pPipe).add(pBranch);
+  public void markScored(Pipe pPipe, CoralLevel pCoralLevel) {
+    mScoredPoles.get(pPipe).add(pCoralLevel);
   }
 
-  public boolean isScored(Pipe pPipe, Branch pBranch) {
-    return mScoredPoles.get(pPipe).contains(pBranch);
+  public boolean isScored(Pipe pPipe, CoralLevel pCoralLevel) {
+    return mScoredPoles.get(pPipe).contains(pCoralLevel);
   }
 
   public boolean isPipeFullyScored(Pipe pipe) {
-    return mScoredPoles.get(pipe).containsAll(EnumSet.allOf(Branch.class));
+    return mScoredPoles.get(pipe).containsAll(EnumSet.allOf(CoralLevel.class));
   }
 
   public boolean isFaceFullyScored(ReefFace face) {
