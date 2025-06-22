@@ -16,6 +16,8 @@ import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOKraken;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.Drive.DriveState;
+
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -29,6 +31,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.util.debugging.LoggedTunableNumber;
 
 
 public class RobotContainer {
@@ -42,6 +45,8 @@ public class RobotContainer {
   private final IntakeSubsystem mIntake;
   // private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
+
+  private final LoggedTunableNumber ampValue = new LoggedTunableNumber("AMPERAGE TEST", 5);
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -109,6 +114,13 @@ public class RobotContainer {
 
       driverController.y()
         .onTrue(Commands.runOnce(() -> mDrive.resetGyro()));
+
+      driverController.x()
+        .onTrue(Commands.run(() -> {
+          mDrive.setDriveState(DriveState.SYSID_CHARACTERIZATION);
+          mDrive.setForwardAmperagesForAllModules(ampValue.getAsDouble());
+        }))
+        .onFalse(mDrive.setDriveStateCommand(DriveState.TELEOP));
 
     // initTeleop();
     // mControls.initTuningDrive();

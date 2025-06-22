@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.subsystems.controls.StateTracker;
+import frc.robot.subsystems.controls.StateTracker.ReefFace;
 import frc.robot.util.math.AllianceFlipUtil;
 
 /* Chooses pose based of strategy and psoe */ 
@@ -29,6 +31,7 @@ public class GoalPoseChooser {
     private static Pose2d customGoal = FieldConstants.AL;
     // @AutoLogOutput(key="GoalPoseChooser/Side")
     private static SIDE side = SIDE.RIGHT;
+    private static ReefFace reefFace = ReefFace.F4;
 
     public static Pose2d getGoalPose(CHOOSER_STRATEGY strategy, Pose2d pose) {
         switch(strategy) {
@@ -54,7 +57,7 @@ public class GoalPoseChooser {
         Pose2d goal;
         if(inBetween(-30.0, 30.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "D");
-            
+            reefFace = ReefFace.F1;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.DL;
             }
@@ -68,7 +71,7 @@ public class GoalPoseChooser {
         
         else if(inBetween(30.0, 90.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "E");
-
+            reefFace = ReefFace.F5;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.EL;
             }
@@ -82,7 +85,7 @@ public class GoalPoseChooser {
         
         else if(inBetween(90.0, 150.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "F");
-
+            reefFace = ReefFace.F6;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.FL;
             }
@@ -96,7 +99,7 @@ public class GoalPoseChooser {
         
         else if(inBetween(-150.0, -90.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "B");
-
+            reefFace = ReefFace.F2;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.BL;
             }
@@ -110,7 +113,7 @@ public class GoalPoseChooser {
         
         else if(inBetween(-90.0, -30.0, angleFromReefCenter.getDegrees())){
             Logger.recordOutput("Drive/ReefSide", "C");
-
+            reefFace = ReefFace.F3;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.CL;
             }
@@ -124,7 +127,7 @@ public class GoalPoseChooser {
         
         else {
             Logger.recordOutput("Drive/ReefSide", "A");
-
+            reefFace = ReefFace.F4;
             if(side.equals(SIDE.LEFT)) {
                 goal = FieldConstants.AL;
             }
@@ -195,6 +198,10 @@ public class GoalPoseChooser {
     } 
 
     private static boolean inBetween(double min, double max, double val) {
-        return (val > min) && (val < max);
+        return (val >= min) && (val < max);
     }
+
+    public static StateTracker.ReefFace getReefFace() {
+        return reefFace;
+    } 
 }
