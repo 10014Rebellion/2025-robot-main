@@ -8,6 +8,7 @@ import frc.robot.generated.TunerConstants;
 // import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.controls.ButtonBindings;
 // import frc.robot.subsystems.controls.ControlsSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -50,6 +51,7 @@ public class RobotContainer {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
+  private final ButtonBindings mBindings;
 
   public RobotContainer() {
     mTelemetry = new TelemetrySubsystem();
@@ -99,6 +101,8 @@ public class RobotContainer {
         break;
     }
 
+    mBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb);
+
     // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     // mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
 
@@ -106,27 +110,12 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-      mDrive.acceptJoystickInputs(
-            () -> - driverController.getLeftY(),
-            () -> - driverController.getLeftX(),
-            () -> driverController.getRightX(),
-            () -> driverController.getHID().getPOV());
-
-      driverController.y()
-        .onTrue(Commands.runOnce(() -> mDrive.resetGyro()));
-
-      driverController.x()
-        .onTrue(Commands.run(() -> {
-          mDrive.setDriveState(DriveState.SYSID_CHARACTERIZATION);
-          mDrive.setForwardAmperagesForAllModules(ampValue.getAsDouble());
-        }))
-        .onFalse(mDrive.setDriveStateCommand(DriveState.TELEOP));
-
-    // initTeleop();
-    // mControls.initTuningDrive();
-    // mControls.initIntakeTuning();
-    // mControls.initElevatorTuning();
-    // mControls.initWristTuning();
+    initDriverBindings();
+  }
+  
+  private void initDriverBindings() {
+    mBindings.initDriverJoysticks();
+    mBindings.initDriverButtons();
   }
 
   // private void initTeleop() {

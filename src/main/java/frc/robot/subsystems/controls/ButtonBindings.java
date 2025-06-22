@@ -15,6 +15,7 @@ import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.DriverController;
 import frc.robot.subsystems.controls.TeleopCommands.ActionCommands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -74,6 +75,21 @@ public class ButtonBindings {
       .leftBumper()
         .whileTrue(mActionCommands.getOuttakeCoralCmd())
         .whileFalse(mActionCommands.getStopIndexerAndRollersCmd());
+    
+    mDriverController
+      .leftTrigger()
+        .whileTrue(mActionCommands.getGoToReefCmd(SIDE.LEFT))
+        .onFalse(mActionCommands.getStopDriveCmd());
+
+    mDriverController
+      .rightTrigger()
+        .whileTrue(mActionCommands.getGoToReefCmd(SIDE.RIGHT))
+        .onFalse(mActionCommands.getStopDriveCmd());
+
+    mDriverController
+      .a()
+        .whileTrue(mActionCommands.getGoToReefCmd(SIDE.ALGAE))
+        .onFalse(mActionCommands.getStopDriveCmd());
 
     // mDriverController
     //   .y()
