@@ -16,6 +16,8 @@ public final class Constants {
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
   public static final boolean tuningMode = true; // CHANGE THIS IF YOU WANT TO ENABLE TUNING PID
 
+  public static final String kCanbusName = "drivetrain";
+
   public static final AprilTagFieldLayout kFieldLayout = AprilTagFieldLayout
       .loadField(AprilTagFields.k2025ReefscapeAndyMark);
 

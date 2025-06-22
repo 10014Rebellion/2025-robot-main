@@ -1,73 +1,73 @@
-package frc.robot.subsystems.LEDs;
+// package frc.robot.subsystems.LEDs;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Robot;
-import frc.robot.subsystems.LEDs.LEDConstants.ledColor;
-import frc.robot.subsystems.claw.ClawSubsystem;
-import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.wrist.WristSubsystem;
+// import edu.wpi.first.wpilibj.AddressableLED;
+// import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+// import edu.wpi.first.wpilibj.LEDPattern;
+// import edu.wpi.first.wpilibj2.command.InstantCommand;
+// import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+// import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import edu.wpi.first.wpilibj2.command.button.Trigger;
+// import frc.robot.Robot;
+// import frc.robot.subsystems.LEDs.LEDConstants.ledColor;
+// import frc.robot.subsystems.claw.ClawSubsystem;
+// import frc.robot.subsystems.drive.DriveSubsystem;
+// import frc.robot.subsystems.elevator.ElevatorSubsystem;
+// import frc.robot.subsystems.intake.IntakeSubsystem;
+// import frc.robot.subsystems.wrist.WristSubsystem;
 
-public class LEDSubsystem extends SubsystemBase {
+// public class LEDSubsystem extends SubsystemBase {
 
-  private final AddressableLED mLED;
-  private final AddressableLEDBuffer mLEDBuffer;
+//   private final AddressableLED mLED;
+//   private final AddressableLEDBuffer mLEDBuffer;
 
-  private final int kLEDLength = 30; // TUNE ME
+//   private final int kLEDLength = 30; // TUNE ME
 
-  private ledColor defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
+//   private ledColor defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
 
-  public LEDSubsystem(
-      ClawSubsystem clawSubsystem,
-      IntakeSubsystem intakeSubsystem,
-      ElevatorSubsystem elevatorSubsystem,
-      WristSubsystem wristSubsystem,
-      DriveSubsystem driveSubsystem) {
+//   public LEDSubsystem(
+//       ClawSubsystem clawSubsystem,
+//       IntakeSubsystem intakeSubsystem,
+//       ElevatorSubsystem elevatorSubsystem,
+//       WristSubsystem wristSubsystem,
+//       DriveSubsystem driveSubsystem) {
 
-    mLED = new AddressableLED(0);
+//     mLED = new AddressableLED(0);
 
-    mLEDBuffer = new AddressableLEDBuffer(kLEDLength);
-    mLED.setLength(mLEDBuffer.getLength());
+//     mLEDBuffer = new AddressableLEDBuffer(kLEDLength);
+//     mLED.setLength(mLEDBuffer.getLength());
 
-    setSolid(defaultColor);
+//     setSolid(defaultColor);
 
-    mLED.start();
+//     mLED.start();
 
-    initTriggers(clawSubsystem, intakeSubsystem, elevatorSubsystem, wristSubsystem, driveSubsystem);
-  }
+//     initTriggers(clawSubsystem, intakeSubsystem, elevatorSubsystem, wristSubsystem, driveSubsystem);
+//   }
 
-  private void setSolid(ledColor pColor) {
-    LEDPattern pattern = LEDPattern.solid(pColor.getColorObj());
-    pattern.applyTo(mLEDBuffer);
-    mLED.setData(mLEDBuffer);
-  }
+//   private void setSolid(ledColor pColor) {
+//     LEDPattern pattern = LEDPattern.solid(pColor.getColorObj());
+//     pattern.applyTo(mLEDBuffer);
+//     mLED.setData(mLEDBuffer);
+//   }
 
-  private void initTriggers(
-      ClawSubsystem clawSubsystem,
-      IntakeSubsystem intakeSubsystem,
-      ElevatorSubsystem elevatorSubsystem,
-      WristSubsystem wristSubsystem,
-      DriveSubsystem driveSubsystem) {
-    new Trigger(() -> clawSubsystem.getBeamBreak())
-        .whileTrue(new InstantCommand(() -> setSolid(ledColor.YELLOW)))
-        .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
+//   private void initTriggers(
+//       ClawSubsystem clawSubsystem,
+//       IntakeSubsystem intakeSubsystem,
+//       ElevatorSubsystem elevatorSubsystem,
+//       WristSubsystem wristSubsystem,
+//       DriveSubsystem driveSubsystem) {
+//     new Trigger(() -> clawSubsystem.getBeamBreak())
+//         .whileTrue(new InstantCommand(() -> setSolid(ledColor.YELLOW)))
+//         .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
 
-    new Trigger(() -> driveSubsystem.isAtPose)
-        .whileTrue(
-            new ParallelCommandGroup(
-                new InstantCommand(() -> setSolid(ledColor.GREEN))))
-        .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
-  }
+//     new Trigger(() -> driveSubsystem.isAtPose)
+//         .whileTrue(
+//             new ParallelCommandGroup(
+//                 new InstantCommand(() -> setSolid(ledColor.GREEN))))
+//         .whileFalse(new InstantCommand(() -> setSolid(defaultColor)));
+//   }
 
-  @Override
-  public void periodic() {
-    defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
-  }
-}
+//   @Override
+//   public void periodic() {
+//     defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
+//   }
+// }

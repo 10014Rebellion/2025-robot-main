@@ -1,22 +1,32 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.LEDs.LEDSubsystem;
-import frc.robot.subsystems.auton.AutonSubsystem;
+// import frc.robot.subsystems.LEDs.LEDSubsystem;
+// import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
-import frc.robot.subsystems.controls.ControlsSubsystem;
-import frc.robot.subsystems.drive.DriveSubsystem;
+// import frc.robot.subsystems.controls.ControlsSubsystem;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
+import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOKraken;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFXandFXS;
+import static frc.robot.subsystems.drive.DriveConstants.*;
+import static frc.robot.subsystems.AV.VisionConstants.*;
+import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.AV.CameraIO;
+import frc.robot.subsystems.AV.CameraIOPV;
+import frc.robot.subsystems.AV.Vision;
+import frc.robot.subsystems.AV.VisionConstants;
+import frc.robot.subsystems.AV.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
 /**
@@ -32,16 +42,19 @@ public class RobotContainer {
   // Axes Multipler
 
   // Subsystems
-  private final DriveSubsystem mDrive;
+  private final Drive mDrive;
   private final ClawSubsystem mClaw;
   private final WristSubsystem mWrist;
-  private final VisionSubsystem mVision;
+  // private final Vision mVision;
   private final ElevatorSubsystem mElevator;
-  private final ControlsSubsystem mControls;
+  // private final ControlsSubsystem mControls;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
-  private final AutonSubsystem mAutons;
+  // private final AutonSubsystem mAutons;
   private final ClimbSubsystem mCLimb;
+
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   public RobotContainer() {
     mTelemetry = new TelemetrySubsystem();
@@ -53,74 +66,82 @@ public class RobotContainer {
 
     switch (Constants.currentMode) {
       case REAL:
-        mDrive = new DriveSubsystem(
-            new GyroIOPigeon2(),
-            new ModuleIOTalonFXandFXS(TunerConstants.FrontLeft),
-            new ModuleIOTalonFXandFXS(TunerConstants.FrontRight),
-            new ModuleIOTalonFXandFXS(TunerConstants.BackLeft),
-            new ModuleIOTalonFXandFXS(TunerConstants.BackRight),
-            mTelemetry);
+         mDrive = new Drive( 
+              new Module[] {
+                    new Module("FL", new ModuleIOFXFXS(kFrontLeftHardware )),
+                    new Module("FR", new ModuleIOFXFXS(kFrontRightHardware)),
+                    new Module("BL", new ModuleIOFXFXS(kBackLeftHardware  )),
+                    new Module("BR", new ModuleIOFXFXS(kBackRightHardware ))
+              }, 
+              new GyroIOPigeon2(), 
+              new Vision(new CameraIO[] {
+                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.BACK), 
+                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.BACK)
+                }));
         break;
 
       case SIM:
-        mDrive = new DriveSubsystem(
-            new GyroIO() {
-            },
-            new ModuleIOSim(TunerConstants.FrontLeft),
-            new ModuleIOSim(TunerConstants.FrontRight),
-            new ModuleIOSim(TunerConstants.BackLeft),
-            new ModuleIOSim(TunerConstants.BackRight),
-            mTelemetry);
+        mDrive = new Drive( new Module[] {
+          new Module("FL", new ModuleIOSim()),
+          new Module("FR", new ModuleIOSim()),
+          new Module("BL", new ModuleIOSim()),
+          new Module("BR", new ModuleIOSim())
+        }, new GyroIO() {}, new Vision(new CameraIO[] {
+          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.FRONT), 
+          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.FRONT)
+        }));
         break;
 
       default:
-        mDrive = new DriveSubsystem(
-            new GyroIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            new ModuleIO() {
-            },
-            mTelemetry);
+        mDrive = new Drive( new Module[] {
+          new Module("FL", new ModuleIO() {}),
+          new Module("FR", new ModuleIO() {}),
+          new Module("BL", new ModuleIO() {}),
+          new Module("BR", new ModuleIO() {})
+        }, new GyroIO() {}, new Vision(new CameraIO[] {
+          new CameraIO() {}, new CameraIO() {}
+        }));
         break;
     }
 
-    new LEDSubsystem(mClaw, mIntake, mElevator, mWrist, mDrive);
-
-    mVision = new VisionSubsystem(mDrive, () -> mDrive.getRotation(), () -> mDrive.getModulePositions());
-    mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
-    mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
+    // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
+    // mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
-    initTeleop();
+      mDrive.acceptJoystickInputs(
+            () -> - driverController.getLeftY(),
+            () -> - driverController.getLeftX(),
+            () -> driverController.getRightX(),
+            () -> driverController.getHID().getPOV());
+
+      driverController.y()
+        .onTrue(Commands.runOnce(() -> mDrive.resetGyro()));
+
+    // initTeleop();
     // mControls.initTuningDrive();
     // mControls.initIntakeTuning();
     // mControls.initElevatorTuning();
     // mControls.initWristTuning();
   }
 
-  private void initTeleop() {
-    mControls.initDriverController();
-    mControls.initOperatorButtonboard();
-    mControls.initDrivebase();
-  }
+  // private void initTeleop() {
+  //   mControls.initDriverController();
+  //   mControls.initOperatorButtonboard();
+  //   mControls.initDrivebase();
+  // }
 
   public void initTriggers() {
     // mControls.initTriggers();
   }
 
-  public Command getAutonomousCommand() {
-    return mAutons.getChosenAuton();
-  }
+  // public Command getAutonomousCommand() {
+  //   return mAutons.getChosenAuton();
+  // }
 
-  public DriveSubsystem getDrivetrain() {
+  public Drive getDrivetrain() {
     return mDrive;
   }
 
@@ -128,7 +149,7 @@ public class RobotContainer {
     return mTelemetry;
   }
 
-  public Command getPathPlannerAuto() {
-    return mAutons.getChosenAuton();
-  }
+  // public Command getPathPlannerAuto() {
+  //   return mAutons.getChosenAuton();
+  // }
 }
