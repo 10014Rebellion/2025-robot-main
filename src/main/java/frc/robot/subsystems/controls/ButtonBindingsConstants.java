@@ -1,10 +1,14 @@
 package frc.robot.subsystems.controls;
 
-import edu.wpi.first.wpilibj.GenericHID;
 
-public class ControlsConstants {
+public class ButtonBindingsConstants {
+  public static class DriverController {
+    public static final int kDriverControllerPort = 0;
+  }
+
   public static class Buttonboard {
-    public static final GenericHID buttonboard = new GenericHID(1);
+    public static final int kButtonboardPort = 1;
+
     // Algae
     public static final int kAlgaePickupL2 = 9;
     public static final int kAlgaePickupL3 = 3;
@@ -26,12 +30,5 @@ public class ControlsConstants {
     // Climbing
     public static final int kClimbDescend = 8;
     public static final int kClimbAscend = 12;
-
-    public enum Direction {
-      FORWARD,
-      BACKWARD,
-      LEFT,
-      RIGHT
-    }
   }
 }
