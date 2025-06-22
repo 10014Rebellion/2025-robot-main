@@ -5,24 +5,24 @@ import java.util.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StateTracker extends SubsystemBase {
-  private static enum GamePiece {
+  public static enum GamePiece {
     Coral,
     Algae
   }
 
-  private static enum CoralLevel {
+  public static enum CoralLevel {
     T, B1, B2, B3;
   }
 
-  private static enum Pipe {
+  public static enum Pipe {
     P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12;
   }
 
-  private static enum AlgaeLevel {
+  public static enum AlgaeLevel {
     BR, A1, A2, N;
   }
 
-  private static enum ReefFace {
+  public static enum ReefFace {
     F1(Pipe.P01, Pipe.P12, AlgaeLevel.A1),
     F2(Pipe.P03, Pipe.P02, AlgaeLevel.A2),
     F3(Pipe.P05, Pipe.P04, AlgaeLevel.A1),
