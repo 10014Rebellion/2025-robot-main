@@ -207,6 +207,7 @@ public class Drive extends SubsystemBase {
             this::getPoseEstimate,
             this::getRobotChassisSpeeds, 
             (speeds, ff) -> {
+                driveState = DriveState.AUTON;
                 ppDesiredSpeeds = speeds;
                 pathPlanningFF = ff;
             }, 
