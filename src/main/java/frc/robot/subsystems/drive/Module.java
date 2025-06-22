@@ -4,8 +4,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.subsystems.drive.ModuleInputsAutoLogged;
-import frc.robot.util.anshul.debugging.LoggedTunableNumber;
+import frc.robot.util.debugging.LoggedTunableNumber;
 
 import static frc.robot.subsystems.drive.DriveConstants.kModuleControllerConfigs;
 

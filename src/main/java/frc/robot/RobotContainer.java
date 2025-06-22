@@ -17,16 +17,17 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOKraken;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import static frc.robot.subsystems.drive.DriveConstants.*;
-import static frc.robot.subsystems.AV.VisionConstants.*;
+import static frc.robot.subsystems.vision.VisionConstants.*;
+
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
-import frc.robot.subsystems.AV.CameraIO;
-import frc.robot.subsystems.AV.CameraIOPV;
-import frc.robot.subsystems.AV.Vision;
-import frc.robot.subsystems.AV.VisionConstants;
-import frc.robot.subsystems.AV.VisionConstants.Orientation;
+import frc.robot.subsystems.vision.CameraIO;
+import frc.robot.subsystems.vision.CameraIOPV;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
 /**
@@ -45,13 +46,12 @@ public class RobotContainer {
   private final Drive mDrive;
   private final ClawSubsystem mClaw;
   private final WristSubsystem mWrist;
-  // private final Vision mVision;
   private final ElevatorSubsystem mElevator;
   // private final ControlsSubsystem mControls;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
   // private final AutonSubsystem mAutons;
-  private final ClimbSubsystem mCLimb;
+  private final ClimbSubsystem mClimb;
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
@@ -62,7 +62,7 @@ public class RobotContainer {
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
-    mCLimb = new ClimbSubsystem();
+    mClimb = new ClimbSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:

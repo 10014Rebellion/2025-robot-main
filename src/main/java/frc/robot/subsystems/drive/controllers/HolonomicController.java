@@ -9,9 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import frc.robot.util.anshul.debugging.LoggedTunableNumber;
-import frc.robot.util.anshul.math.EqualsUtil;
-import frc.robot.util.anshul.math.GeomUtil;
+import frc.robot.util.debugging.LoggedTunableNumber;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;

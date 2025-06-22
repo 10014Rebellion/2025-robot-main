@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import frc.robot.util.anshul.debugging.LoggedTunableNumber;
+import frc.robot.util.debugging.LoggedTunableNumber;
 
 import java.util.function.Supplier;
 
@@ -85,8 +85,8 @@ public class HeadingController {
 
         Logger.recordOutput("Drive/HeadingController/unAdjustedOutput", output);
 
-        // Logger.recordOutput("Drive/HeadingController/setpointErrorDegrees", setpointErrorDegrees);
-        // Logger.recordOutput("Drive/HeadingController/goalErrorDegrees", goalErrorDegrees);
+        Logger.recordOutput("Drive/HeadingController/setpointErrorDegrees", setpointErrorDegrees);
+        Logger.recordOutput("Drive/HeadingController/goalErrorDegrees", goalErrorDegrees);
 
         Logger.recordOutput("Drive/HeadingController/adjustedOutput", adjustedOutput);
 
