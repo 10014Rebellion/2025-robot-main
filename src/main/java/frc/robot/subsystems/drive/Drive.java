@@ -671,7 +671,7 @@ public class Drive extends SubsystemBase {
     }
 
     public boolean atGoal(){
-        return autoAlignController.atGoal();
+        return autoAlignController.atGoal() && driveState == DriveState.DRIVE_TO_CORAL;
     }
 
     public boolean notAtGoal(){
