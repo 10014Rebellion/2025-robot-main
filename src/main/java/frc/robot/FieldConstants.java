@@ -1,14 +1,16 @@
 package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 
 public class FieldConstants {
     public static final Pose2d kReefCenter = new Pose2d(4.48249, Constants.kFieldWidthMeters / 2.0, Rotation2d.fromDegrees(0.0));
     public static final double kXNetLineMeters = 7.15;
+    public static final double kScoringOffsetMeters = -0.3;
 
-    public static final Pose2d AL = new Pose2d(3.22, 4.40, Rotation2d.k180deg);
-    public static final Pose2d AM = new Pose2d(3.22, 4.25, Rotation2d.k180deg);
-    public static final Pose2d AR = new Pose2d(3.22, 4.10, Rotation2d.k180deg);
+    public static final Pose2d AL = new Pose2d(3.22, 4.40 + kScoringOffsetMeters, Rotation2d.k180deg);
+    public static final Pose2d AM = new Pose2d(3.22, 4.25 + kScoringOffsetMeters, Rotation2d.k180deg);
+    public static final Pose2d AR = new Pose2d(3.22, 4.10 + kScoringOffsetMeters, Rotation2d.k180deg);
 
     public static final Pose2d BL = new Pose2d(4.20, 5.32, Rotation2d.fromDegrees(120.0));
     public static final Pose2d BM = new Pose2d(4.06, 5.24, Rotation2d.fromDegrees(120.0));

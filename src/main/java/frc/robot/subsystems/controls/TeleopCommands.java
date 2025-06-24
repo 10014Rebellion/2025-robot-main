@@ -175,8 +175,9 @@ public class TeleopCommands {
 				new DynamicCommand(() -> {
 					if (pCoralLevel == CoralLevel.B1) {
 						return new SequentialCommandGroup(
-							mElevator.coralLevelToPIDCmd(pCoralLevel),
-							mWrist.coralLevelToPIDCmd(pCoralLevel)
+							mWrist.coralLevelToPIDCmd(pCoralLevel),
+							mElevator.coralLevelToPIDCmd(pCoralLevel)
+							
 						);
 					}
 					return new ParallelCommandGroup(
