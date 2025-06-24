@@ -62,11 +62,11 @@ public class ButtonBindings {
   }
 
   public void initTriggers() {
-    new Trigger(
-      () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
-        .whileTrue(mActionCommands.getScoreCoralCmd());
+    // new Trigger(
+    //   () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
+    //     .whileTrue(mActionCommands.getScoreCoralCmd());
 
-        new Trigger(() -> mClaw.getBeamBreak())
+      new Trigger(() -> mClaw.getBeamBreak())
         .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
         .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 

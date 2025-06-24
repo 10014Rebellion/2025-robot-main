@@ -125,6 +125,7 @@ public class Drive extends SubsystemBase {
     private Rotation2d goalRotation = new Rotation2d();
 
     private HolonomicController autoAlignController = new HolonomicController();
+    
     @AutoLogOutput(key="Drive/HeadingController/GoalPose")
     private Pose2d goalPose = new Pose2d();
 
@@ -145,7 +146,6 @@ public class Drive extends SubsystemBase {
 
         odometry = new SwerveDriveOdometry(kKinematics, getRobotRotation(), getModulePositions());
         poseEstimator = new SwerveDrivePoseEstimator(kKinematics, getRobotRotation(), getModulePositions(), new Pose2d());
-
         try {
             /* Incase if pathplanner doesn't currently load */
             robotConfig = RobotConfig.fromGUISettings();

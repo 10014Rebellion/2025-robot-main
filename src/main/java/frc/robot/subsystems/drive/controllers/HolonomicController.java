@@ -36,7 +36,7 @@ public class HolonomicController {
         "AutoAlign/X/kV", 0.5);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/X/ToleranceMeters", 0.02);
+        "AutoAlign/X/ToleranceMeters", 0.05);
 
     public static final LoggedTunableNumber yP = new LoggedTunableNumber(
         "AutoAlign/Y/kP", 2.0);
@@ -59,7 +59,7 @@ public class HolonomicController {
         "AutoAlign/Y/kV", 0.5);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/Y/ToleranceMeters", 0.02);
+        "AutoAlign/Y/ToleranceMeters", 0.05);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
         "AutoAlign/Omega/kP", 2.0);
@@ -224,14 +224,14 @@ public class HolonomicController {
             Math.toRadians( omegaController.getSetpoint().velocity ) );
     }
 
-    // @AutoLogOutput(key = "Drive/HolonomicController/PoseError")
-    // public Pose2d getPoseError() {
-    //     return new Pose2d(
-    //         xController.getPositionError(),
-    //         yController.getPositionError(),
-    //         new Rotation2d(omegaController.getPositionError())
-    //     );
-    // }
+    @AutoLogOutput(key = "Drive/HolonomicController/PoseError")
+    public Pose2d getPoseError() {
+        return new Pose2d(
+            xController.getPositionError(),
+            yController.getPositionError(),
+            new Rotation2d(omegaController.getPositionError())
+        );
+    }
 
     ////////////////////////// SETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\
     public void updateAlignmentControllers() {
