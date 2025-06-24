@@ -16,7 +16,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class HolonomicController {
     public static final LoggedTunableNumber xP = new LoggedTunableNumber(
-        "AutoAlign/X/kP", 3.5);
+        "AutoAlign/X/kP", 2.0);
     public static final LoggedTunableNumber xD = new LoggedTunableNumber(
         "AutoAlign/X/kD", 0.0);
     public static final LoggedTunableNumber xI = new LoggedTunableNumber(
@@ -39,7 +39,7 @@ public class HolonomicController {
         "AutoAlign/X/ToleranceMeters", 0.02);
 
     public static final LoggedTunableNumber yP = new LoggedTunableNumber(
-        "AutoAlign/Y/kP", 3.5);
+        "AutoAlign/Y/kP", 2.0);
     public static final LoggedTunableNumber yD = new LoggedTunableNumber(
         "AutoAlign/Y/kD", 0.0);
     public static final LoggedTunableNumber yI = new LoggedTunableNumber(
@@ -62,7 +62,7 @@ public class HolonomicController {
         "AutoAlign/Y/ToleranceMeters", 0.02);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
-        "AutoAlign/Omega/kP", 3.0);
+        "AutoAlign/Omega/kP", 2.0);
     public static final LoggedTunableNumber omegaD = new LoggedTunableNumber(
         "AutoAlign/Omega/kD", 0.0);
 
@@ -141,7 +141,7 @@ public class HolonomicController {
         omegaController.reset(
             new State(
                 robotPose.getRotation().getDegrees(),
-                Math.toDegrees(robotChassisSpeeds.omegaRadiansPerSecond) ) );
+                0.0) );
     }
 
     public ChassisSpeeds calculate(Pose2d goalPose, Pose2d currentPose) {
@@ -165,7 +165,7 @@ public class HolonomicController {
                     goalSpeed.vyMetersPerSecond) )
             + yFeedforward.calculate(yController.getSetpoint().velocity)),
 
-            (Math.toRadians (omegaController.calculate( 
+            -(Math.toRadians (omegaController.calculate( 
                 currentPose.getRotation().getDegrees(), 
                 new TrapezoidProfile.State(
                     goalPose.getRotation().getDegrees(),
