@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 public class WristSubsystem extends SubsystemBase {
   private final SparkMax mWristSparkMax;
   private final ProfiledPIDController mWristProfiledPID;
@@ -113,6 +113,23 @@ public class WristSubsystem extends SubsystemBase {
         () -> isPIDAtGoal(),
         this);
   }
+
+  public FunctionalCommand coralLevelToPIDCmd(CoralLevel pCoralLevel) {
+    WristConstants.Setpoints elevatorSetpoint = WristConstants.Setpoints.L1;
+
+    if(pCoralLevel == CoralLevel.B3) {
+      elevatorSetpoint = WristConstants.Setpoints.L4;
+    } else
+    if(pCoralLevel == CoralLevel.B2) {
+      elevatorSetpoint = WristConstants.Setpoints.L3;
+    } else
+    if(pCoralLevel == CoralLevel.B1) {
+      elevatorSetpoint = WristConstants.Setpoints.L2;
+    } 
+
+    return setPIDCmd(elevatorSetpoint);
+  }
+
 
   // public FunctionalCommand setTunableCommand
 

@@ -29,7 +29,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   public static boolean gIsBlueAlliance;
-  private String autoName, newAutoName;
+  // private String autoName, newAutoName;
   Optional<Alliance> ally = DriverStation.getAlliance();
   Optional<Alliance> newAlly;
 

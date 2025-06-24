@@ -1,26 +1,18 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.generated.TunerConstants;
-// import frc.robot.subsystems.LEDs.LEDSubsystem;
-// import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
-// import frc.robot.subsystems.controls.ControlsSubsystem;
+import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOKraken;
 import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.Drive.DriveState;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -31,7 +23,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.util.debugging.LoggedTunableNumber;
 
 
 public class RobotContainer {
@@ -40,16 +31,12 @@ public class RobotContainer {
   private final ClawSubsystem mClaw;
   private final WristSubsystem mWrist;
   private final ElevatorSubsystem mElevator;
-  // private final ControlsSubsystem mControls;
+  private final ButtonBindings mButtonBindings;
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
+  private final LEDSubsystem mLEDs;
   // private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
-
-  private final LoggedTunableNumber ampValue = new LoggedTunableNumber("AMPERAGE TEST", 5);
-
-  private final CommandXboxController driverController = new CommandXboxController(0);
-  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   public RobotContainer() {
     mTelemetry = new TelemetrySubsystem();
@@ -58,6 +45,7 @@ public class RobotContainer {
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
     mClimb = new ClimbSubsystem();
+    mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
       case REAL:
@@ -99,49 +87,25 @@ public class RobotContainer {
         break;
     }
 
+    mButtonBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb, mLEDs);
+
     // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     // mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
   }
 
+  // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
   private void configureButtonBindings() {
-      mDrive.acceptJoystickInputs(
-            () -> - driverController.getLeftY(),
-            () -> - driverController.getLeftX(),
-            () -> driverController.getRightX(),
-            () -> driverController.getHID().getPOV());
-
-      driverController.y()
-        .onTrue(Commands.runOnce(() -> mDrive.resetGyro()));
-
-      driverController.x()
-        .onTrue(Commands.run(() -> {
-          mDrive.setDriveState(DriveState.SYSID_CHARACTERIZATION);
-          mDrive.setForwardAmperagesForAllModules(ampValue.getAsDouble());
-        }))
-        .onFalse(mDrive.setDriveStateCommand(DriveState.TELEOP));
-
-    // initTeleop();
-    // mControls.initTuningDrive();
-    // mControls.initIntakeTuning();
-    // mControls.initElevatorTuning();
-    // mControls.initWristTuning();
+    mButtonBindings.initDriverJoysticks();
+    mButtonBindings.initDriverButtons();
+    mButtonBindings.initOperatorButtons();
   }
 
-  // private void initTeleop() {
-  //   mControls.initDriverController();
-  //   mControls.initOperatorButtonboard();
-  //   mControls.initDrivebase();
-  // }
-
+  // Run this in robot.java
   public void initTriggers() {
-    // mControls.initTriggers();
+    mButtonBindings.initTriggers();
   }
-
-  // public Command getAutonomousCommand() {
-  //   return mAutons.getChosenAuton();
-  // }
 
   public Drive getDrivetrain() {
     return mDrive;

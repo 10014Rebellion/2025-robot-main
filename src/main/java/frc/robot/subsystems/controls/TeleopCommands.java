@@ -1,7 +1,5 @@
 package frc.robot.subsystems.controls;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -9,8 +7,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.controls.StateTracker.AlgaeScoringLevel;
+import frc.robot.subsystems.controls.StateTracker.CoralLevel;
+import frc.robot.subsystems.controls.StateTracker.GamePiece;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveState;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
@@ -21,7 +23,7 @@ import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.util.math.AllianceFlipUtil;
+import frc.robot.util.commands.DynamicCommand;
 
 public class TeleopCommands {
 	private final Drive mDrive;
@@ -105,12 +107,7 @@ public class TeleopCommands {
 		/** ALLIANCE RESET GYRO: Resets the rotation and flips rotation based on alliance color */
 		public Command getAllianceResetGyroCmd(){
 			return Commands.runOnce(
-				() -> mDrive.setPose(
-					new Pose2d(
-						mDrive.getPoseEstimate().getTranslation(), // Keeps current translation
-						AllianceFlipUtil.apply(new Rotation2d()) // Resets rotation and flips it if its on red alliance
-					)
-				),mDrive
+				() -> mDrive.resetGyro()
 			).ignoringDisable(true);
 		}
 		
@@ -119,8 +116,8 @@ public class TeleopCommands {
 			return new InstantCommand(() -> mIntake.toggleIRSensor());
 		}
 
-		/** */
-		public ParallelCommandGroup getGroundAlgae() {
+		/** GROUND ALGAE: Picks up the ground algae */
+		public ParallelCommandGroup getGroundAlgaeCmd() {
 			return new ParallelCommandGroup(
 				mWrist
 					.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
@@ -132,7 +129,18 @@ public class TeleopCommands {
 			);
 		}
 
-		/**  */
+		/** HOLD ALGAE: Holds the algae with the arm */
+		public ParallelCommandGroup getHoldAlgaeCmd() {
+			return new ParallelCommandGroup(
+			    new InstantCommand(() -> mStateTracker.setCurrentGamePiece(GamePiece.Algae)),
+			    mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+			    mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE)
+			        .andThen(mWrist.enableFFCmd()),
+			    mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())
+			);
+		}
+
+		/** GO TO REEF: Goes to the reef to a given side, LEFT, RIGHT, or ALGAE (center) */
 		public Command getGoToReefCmd(SIDE side) {
 			return new SequentialCommandGroup(
 				GoalPoseChooser.setSideCommand(side),
@@ -140,19 +148,44 @@ public class TeleopCommands {
 			);
 		}
 
-		/** */
+		/** STOP DRIVE: Stops the drive entirely, runs instantly */
 		public Command getStopDriveCmd() {
 			return mDrive.setDriveStateCommand(DriveState.TELEOP);
 		}
 
-    //       new ParallelCommandGroup(
-    //           new InstantCommand(() -> currentScoreLevel = 0),
-    //           mElevator.setPIDCmd(
-    //               ElevatorConstants.Setpoints.HOLD_ALGAE),
-    //           mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE)
-    //               .andThen(mWrist.enableFFCmd()),
-    //           mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE
-    //               .get())));
+		/////////////////// OPERATOR \\\\\\\\\\\\\\\\\\\\\
+		/** SCORE CORAL: Scores the coral based on the current level */
+		public DynamicCommand getScoreCoralCmd(){
+			return new DynamicCommand(() -> getScoreCmd(mStateTracker.getCurrentCoralLevel()));
+		}
+
+
+		/** SCORE BARGE: Moves the wrist and chucks in the barge */
+		public Command getScoreBargeCmd() {
+			return new ParallelCommandGroup(
+                new InstantCommand(() -> mStateTracker.setCurrentGamePiece(GamePiece.Algae)),
+                new DynamicCommand(() -> getScoreCmd(AlgaeScoringLevel.NET)));
+		}
+
+		/** PREP CORAL SCORE CMD: */
+		public Command getPrepCoralScoreCmd(CoralLevel pCoralLevel) {
+			return new SequentialCommandGroup(
+				new InstantCommand(() -> mStateTracker.setCurrentGamePiece(GamePiece.Coral)),
+				new InstantCommand(() -> mStateTracker.setCurrentCoralLevel(pCoralLevel)),
+				new DynamicCommand(() -> {
+					if (pCoralLevel == CoralLevel.B1) {
+						return new SequentialCommandGroup(
+							mElevator.coralLevelToPIDCmd(pCoralLevel),
+							mWrist.coralLevelToPIDCmd(pCoralLevel)
+						);
+					}
+					return new ParallelCommandGroup(
+						mElevator.coralLevelToPIDCmd(pCoralLevel),
+						mWrist.coralLevelToPIDCmd(pCoralLevel)
+					);
+				})
+			);
+		}
 
 		/** DO NOT USE THESE COMMANDS IN REAL MATCHES */
 		public class ControllerTuningCommands {
@@ -161,8 +194,47 @@ public class TeleopCommands {
 				return Commands.runOnce(() -> mDrive.resetGyro());
 			}
 		}
+	}
 
+	private Command getScoreCmd(CoralLevel pCoralLevel) {
+		// Trough
+		if (pCoralLevel == CoralLevel.T) {
+			return mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_L1.get());
+		
+		// Branch 1 / Level 2
+		} else if (pCoralLevel == CoralLevel.B1) {
+			return new ParallelCommandGroup(
+				mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE).andThen(mWrist.enableFFCmd()),
+				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0))
+			);
+		
+		// Branch 2 or 3 / Level 3 or 4
+		} else {
+			return new ParallelCommandGroup(
+				mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()),
+				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
+		}
+  	}
 
+	private Command getScoreCmd(AlgaeScoringLevel pAlgaeLevel) {
+		// Net
+	 	if (pAlgaeLevel == AlgaeScoringLevel.NET) {
+			return new SequentialCommandGroup(
+				mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+				new ParallelCommandGroup(
+					// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+					new SequentialCommandGroup(
+						mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
+					mClaw.throwAlgae(mWrist, mElevator)));
+		}
 
-	}	
+		// Processor
+		else {
+			return new ParallelCommandGroup(
+				mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+				mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
+				mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
+		} 
+	}
 }

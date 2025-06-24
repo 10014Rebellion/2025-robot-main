@@ -18,33 +18,39 @@ public class StateTracker extends SubsystemBase {
     P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12;
   }
 
-  public static enum AlgaeLevel {
-    BR, A1, A2, N;
+  public static enum AlgaePickupLevel {
+    A1, A2;
+  }
+
+  public static enum AlgaeScoringLevel {
+    PROCESSOR,
+    NET
   }
 
   public static enum ReefFace {
-    F1(Pipe.P01, Pipe.P12, AlgaeLevel.A1),
-    F2(Pipe.P03, Pipe.P02, AlgaeLevel.A2),
-    F3(Pipe.P05, Pipe.P04, AlgaeLevel.A1),
-    F4(Pipe.P07, Pipe.P06, AlgaeLevel.A2),
-    F5(Pipe.P09, Pipe.P08, AlgaeLevel.A1),
-    F6(Pipe.P11, Pipe.P10, AlgaeLevel.A2);
+    F1(Pipe.P01, Pipe.P12, AlgaePickupLevel.A1),
+    F2(Pipe.P03, Pipe.P02, AlgaePickupLevel.A2),
+    F3(Pipe.P05, Pipe.P04, AlgaePickupLevel.A1),
+    F4(Pipe.P07, Pipe.P06, AlgaePickupLevel.A2),
+    F5(Pipe.P09, Pipe.P08, AlgaePickupLevel.A1),
+    F6(Pipe.P11, Pipe.P10, AlgaePickupLevel.A2);
 
     public final Pipe left;
     public final Pipe right;
-    public final AlgaeLevel algaeLevel;
+    public final AlgaePickupLevel algaePickupLevel;
 
-    ReefFace(Pipe pLeft, Pipe pRight, AlgaeLevel pAlgaeLevel) {
+    ReefFace(Pipe pLeft, Pipe pRight, AlgaePickupLevel pAlgaePickupLevel) {
         this.left = pLeft;
         this.right = pRight;
-        this.algaeLevel = pAlgaeLevel;
+        this.algaePickupLevel = pAlgaePickupLevel;
     }
   }
 
   private static final Map<Pipe, EnumSet<CoralLevel>> mScoredPoles = new EnumMap<>(Pipe.class);
   private static final Map<Integer, ReefFace> mApriltagToFace = new HashMap<>();
 
-  private static CoralLevel mCurrentCoralLevel = CoralLevel.B3;
+  private static CoralLevel mCurrentCoralLevel = null;
+  private static AlgaeScoringLevel mCurrentAlgaeScoring = null;
   private static GamePiece mCurrentGamePiece = GamePiece.Coral; 
 
   public StateTracker() {
@@ -69,16 +75,28 @@ public class StateTracker extends SubsystemBase {
     mApriltagToFace.put(22, ReefFace.F2);
   }
 
-  public void setCurrentGamePiece(GamePiece pGamePiece) {
-    mCurrentGamePiece = pGamePiece;
-  }
-
   public void setCurrentCoralLevel(CoralLevel pCoralLevel) {
     mCurrentCoralLevel = pCoralLevel;
   }
 
+  public void setCurrentAlgaeLevel(AlgaeScoringLevel pAlgaeScoringLevel) {
+    mCurrentAlgaeScoring = pAlgaeScoringLevel;
+  }
+
+  public void setCurrentGamePiece(GamePiece pGamePiece) {
+    mCurrentGamePiece = pGamePiece;
+  }
+
   public CoralLevel getCurrentCoralLevel() {
     return mCurrentCoralLevel;
+  }
+
+  public AlgaeScoringLevel getCurrentAlgaeScoringLevel() {
+    return mCurrentAlgaeScoring;
+  }
+
+  public GamePiece getCurrentGamePieceLevel() {
+    return mCurrentGamePiece;
   }
 
   public ReefFace getFaceFromTag(int pTagID) {
