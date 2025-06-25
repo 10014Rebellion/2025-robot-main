@@ -14,12 +14,12 @@ public class ButtonBindingsConstants {
     public static final int kAlgaePickupL3 = 3;
 
     // Intake
-    public static final int kPickup = 4;
+    public static final int kPickup = 2;
     public static final int kScoreCoral = 10;
 
     // Barge
     public static final int kEjectAlgaeToBarge = 5;
-    public static final int kGoToBarge = 2;
+    public static final int kGoToBarge = 4;
 
     // Coral Scoring
     public static final int kSetScoreL4 = 6;

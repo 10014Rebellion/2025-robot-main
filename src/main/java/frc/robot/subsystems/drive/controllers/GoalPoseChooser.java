@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive.controllers;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -149,19 +151,19 @@ public class GoalPoseChooser {
         }
         // Logger.recordOutput("Drive/SelectedSide", side);
 
-        return goal;
+        return goal.plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
     }
 
     public static Pose2d getTargetPoseLeft(int pTagID) {
-        return getTargetPose(pTagID, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : PoseOffsets.LEFT.getOffsetM(), 0.0);
+        return getTargetPose(pTagID, 0.04, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : PoseOffsets.LEFT.getOffsetM());
     }
 
     public static Pose2d getTargetPoseRight(int pTagID) {
-        return getTargetPose(pTagID, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM(), 0.0);
+        return getTargetPose(pTagID, 0.04, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM());
     }
 
     public static Pose2d getTargetPose(int pTagID) {
-        return getTargetPose(pTagID, 0.0, 0.0);
+        return getTargetPose(pTagID, 0.04, 0.0);
     }
 
     public static Pose2d getTargetPose(int pTagID, double pXOffsetM, double pYOffsetM) {
@@ -172,7 +174,7 @@ public class GoalPoseChooser {
             tagPose.getTranslation()
                 .plus(
                     new Translation2d(
-                        (DriveConstants.kTrackWidthXMeters
+                        (DriveConstants.kRobotWidthXMeters
                             / 2.0), // Offset the robot length so the front is 0 meters away
                         0)
                     .rotateBy(tagPose.getRotation()));
@@ -262,14 +264,14 @@ public class GoalPoseChooser {
     public static final double kDistBetweenBranchesCenter =
         Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
     public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
-        // public static final double kDistOffset = Units.inchesToMeters(0.0);
+    public static final double kClawOffset = Units.inchesToMeters(0.5);
 
     public enum PoseOffsets {
-        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0),
-        AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0),
-        LEFT(kDistBetweenBranchesCenter / 2.0),
-        CENTER(0),
-        RIGHT(-1 * kDistBetweenBranchesCenter / 2.0);
+        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0 + kClawOffset),
+        AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset),
+        LEFT(kDistBetweenBranchesCenter / 2.0 + kClawOffset),
+        CENTER(0 + kClawOffset),
+        RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - kClawOffset);
 
         public final double offset;
 

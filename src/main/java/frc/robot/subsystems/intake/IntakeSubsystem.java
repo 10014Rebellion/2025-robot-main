@@ -241,7 +241,7 @@ public class IntakeSubsystem extends SubsystemBase {
           setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
         },
         (interrupted) -> {
-          setVoltsIndexer(1.0);
+          setVoltsIndexer(0.0);
         },
         () -> {
           return getCoralDetected();
@@ -266,7 +266,7 @@ public class IntakeSubsystem extends SubsystemBase {
           }
         },
         (interrupted) -> {
-          setVoltsIndexer(1.0);
+          setVoltsIndexer(0.0);
           mBackTriggered = false;
         },
         () -> {

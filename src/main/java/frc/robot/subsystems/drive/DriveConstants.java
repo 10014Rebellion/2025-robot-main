@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class DriveConstants {
     ///////////////////// DRIVE BASE \\\\\\\\\\\\\\\\\\\\\\\
     /* PHYSICAL CONSTANTS */
-    public static final double kRobotWidthMeters = 0.9144;
+    public static final double kRobotWidthXMeters = Units.inchesToMeters(35);
+    public static final double kRobotWidthYMeters = Units.inchesToMeters(37);
     public static final double kTrackWidthXMeters = Units.inchesToMeters(25);
     public static final double kTrackWidthYMeters = Units.inchesToMeters(27);
     public static final Translation2d[] kModuleTranslations = new Translation2d[] {
@@ -69,7 +70,7 @@ public class DriveConstants {
 
     public static final ModuleControlConfig kModuleControllerConfigs = RobotBase.isReal() ? 
         new ModuleControlConfig(
-            new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(7.0, 0.0, 0.0),
+            new PIDController(100.0, 0.0, 0.0), new SimpleMotorFeedforward(6.5, 0.0, 0.0),
             new PIDController(9.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.0, 0.0)) :
         new ModuleControlConfig(
             new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), 
