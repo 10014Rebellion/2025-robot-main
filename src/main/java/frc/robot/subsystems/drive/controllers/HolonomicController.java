@@ -9,6 +9,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.util.debugging.LoggedTunableNumber;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
@@ -150,6 +153,8 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
+        double realRotScalar = RobotBase.isReal() ? -1 : 1;
+
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             (xController.calculate( 
                 currentPose.getX(), 
@@ -165,7 +170,7 @@ public class HolonomicController {
                     goalSpeed.vyMetersPerSecond) )
             + yFeedforward.calculate(yController.getSetpoint().velocity)),
 
-            -(Math.toRadians (omegaController.calculate( 
+            realRotScalar * (Math.toRadians (omegaController.calculate( 
                 currentPose.getRotation().getDegrees(), 
                 new TrapezoidProfile.State(
                     goalPose.getRotation().getDegrees(),

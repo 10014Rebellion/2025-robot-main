@@ -2,6 +2,8 @@ package frc.robot.subsystems.controls;
 
 import java.util.*;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StateTracker extends SubsystemBase {
@@ -34,15 +36,45 @@ public class StateTracker extends SubsystemBase {
     public final Pipe right;
     public final AlgaeLevel algaeLevel;
 
+    private final Map<ReefFace, Integer> mBlueFaceToApriltag = new HashMap<>();
+    private final Map<ReefFace, Integer> mRedFaceToApriltag = new HashMap<>();
+
     ReefFace(Pipe pLeft, Pipe pRight, AlgaeLevel pAlgaeLevel) {
         this.left = pLeft;
         this.right = pRight;
         this.algaeLevel = pAlgaeLevel;
+
+
+    }
+
+    public int getAprilTagTag() {
+      return (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().equals(Alliance.Red))
+        ? mRedFaceToApriltag.get(this) : mBlueFaceToApriltag.get(this);
     }
   }
 
   private static final Map<Pipe, EnumSet<CoralLevel>> mScoredPoles = new EnumMap<>(Pipe.class);
   private static final Map<Integer, ReefFace> mApriltagToFace = new HashMap<>();
+
+  private static final Map<ReefFace, Integer> mBlueFaceToApriltag = new HashMap<>();
+  private  static final Map<ReefFace, Integer> mRedFaceToApriltag = new HashMap<>();
+
+  static {
+    mRedFaceToApriltag.put(ReefFace.F5, 6);
+    mRedFaceToApriltag.put(ReefFace.F4, 7);
+    mRedFaceToApriltag.put(ReefFace.F3, 8);
+    mRedFaceToApriltag.put(ReefFace.F2, 9);
+    mRedFaceToApriltag.put(ReefFace.F1, 10);
+    mRedFaceToApriltag.put(ReefFace.F6, 11);
+
+    // Blue side
+    mBlueFaceToApriltag.put(ReefFace.F3, 17);
+    mBlueFaceToApriltag.put(ReefFace.F4, 18);
+    mBlueFaceToApriltag.put(ReefFace.F5, 19);
+    mBlueFaceToApriltag.put(ReefFace.F6, 20);
+    mBlueFaceToApriltag.put(ReefFace.F1, 21);
+    mBlueFaceToApriltag.put(ReefFace.F2, 22);
+  }
 
   private static CoralLevel mCurrentCoralLevel = CoralLevel.B3;
   private static GamePiece mCurrentGamePiece = GamePiece.Coral; 
@@ -67,6 +99,11 @@ public class StateTracker extends SubsystemBase {
     mApriltagToFace.put(20, ReefFace.F6);
     mApriltagToFace.put(21, ReefFace.F1);
     mApriltagToFace.put(22, ReefFace.F2);
+  }
+
+  public static int faceToTag(ReefFace face) {
+    return (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red))
+      ? mRedFaceToApriltag.get(face) : mBlueFaceToApriltag.get(face);
   }
 
   public void setCurrentGamePiece(GamePiece pGamePiece) {

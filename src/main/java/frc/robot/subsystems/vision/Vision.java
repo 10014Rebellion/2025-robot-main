@@ -26,7 +26,7 @@ public class Vision {
     private static final LoggedTunableNumber kMultiXYStdev = new LoggedTunableNumber(
         "Vision/kMultiXYStdev", kMultiStdDevs.get(0));
 
-    private final AprilTagFieldLayout k2025Field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    public static final AprilTagFieldLayout k2025Field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
     public Vision(CameraIO[] cameras) {
         Logger.recordOutput("Vision/UseSingleTagTransform", KUseSingleTagTransform);
@@ -46,8 +46,9 @@ public class Vision {
             // Logger.recordOutput("Vision/"+camerasData[i].camName+"/Y", camerasData[i].latestEstimatedRobotPose.getRotation().getY());
             // Logger.recordOutput("Vision/"+camerasData[i].camName+"/Z", camerasData[i].latestEstimatedRobotPose.getRotation().getZ());
         }
-
     }
+
+
 
     // Gets the vision data. Standard Deviations are how much we trus the vision value
     public VisionObservation[] getVisionObservations() {
