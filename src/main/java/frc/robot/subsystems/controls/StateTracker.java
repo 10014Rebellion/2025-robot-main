@@ -20,21 +20,26 @@ public class StateTracker extends SubsystemBase {
     P01, P02, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12;
   }
 
-  public static enum AlgaeLevel {
-    BR, A1, A2, N;
+  public static enum AlgaePickupLevel {
+    A1, A2;
+  }
+
+  public static enum AlgaeScoringLevel {
+    PROCESSOR,
+    NET
   }
 
   public static enum ReefFace {
-    F1(Pipe.P01, Pipe.P12, AlgaeLevel.A1),
-    F2(Pipe.P03, Pipe.P02, AlgaeLevel.A2),
-    F3(Pipe.P05, Pipe.P04, AlgaeLevel.A1),
-    F4(Pipe.P07, Pipe.P06, AlgaeLevel.A2),
-    F5(Pipe.P09, Pipe.P08, AlgaeLevel.A1),
-    F6(Pipe.P11, Pipe.P10, AlgaeLevel.A2);
+    F1(Pipe.P01, Pipe.P12, AlgaePickupLevel.A1),
+    F2(Pipe.P03, Pipe.P02, AlgaePickupLevel.A2),
+    F3(Pipe.P05, Pipe.P04, AlgaePickupLevel.A1),
+    F4(Pipe.P07, Pipe.P06, AlgaePickupLevel.A2),
+    F5(Pipe.P09, Pipe.P08, AlgaePickupLevel.A1),
+    F6(Pipe.P11, Pipe.P10, AlgaePickupLevel.A2);
 
     public final Pipe left;
     public final Pipe right;
-    public final AlgaeLevel algaeLevel;
+    public final AlgaePickupLevel algaePickupLevel;
 
     private final Map<ReefFace, Integer> mBlueFaceToApriltag = new HashMap<>();
     private final Map<ReefFace, Integer> mRedFaceToApriltag = new HashMap<>();
@@ -114,8 +119,24 @@ public class StateTracker extends SubsystemBase {
     mCurrentCoralLevel = pCoralLevel;
   }
 
+  public void setCurrentAlgaeLevel(AlgaeScoringLevel pAlgaeScoringLevel) {
+    mCurrentAlgaeScoring = pAlgaeScoringLevel;
+  }
+
+  public void setCurrentGamePiece(GamePiece pGamePiece) {
+    mCurrentGamePiece = pGamePiece;
+  }
+
   public CoralLevel getCurrentCoralLevel() {
     return mCurrentCoralLevel;
+  }
+
+  public AlgaeScoringLevel getCurrentAlgaeScoringLevel() {
+    return mCurrentAlgaeScoring;
+  }
+
+  public GamePiece getCurrentGamePieceLevel() {
+    return mCurrentGamePiece;
   }
 
   public ReefFace getFaceFromTag(int pTagID) {

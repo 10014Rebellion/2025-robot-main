@@ -19,7 +19,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class HolonomicController {
     public static final LoggedTunableNumber xP = new LoggedTunableNumber(
-        "AutoAlign/X/kP", 2.0);
+        "AutoAlign/X/kP", 2.5);
     public static final LoggedTunableNumber xD = new LoggedTunableNumber(
         "AutoAlign/X/kD", 0.0);
     public static final LoggedTunableNumber xI = new LoggedTunableNumber(
@@ -42,7 +42,7 @@ public class HolonomicController {
         "AutoAlign/X/ToleranceMeters", 0.02);
 
     public static final LoggedTunableNumber yP = new LoggedTunableNumber(
-        "AutoAlign/Y/kP", 2.0);
+        "AutoAlign/Y/kP", 3.0);
     public static final LoggedTunableNumber yD = new LoggedTunableNumber(
         "AutoAlign/Y/kD", 0.0);
     public static final LoggedTunableNumber yI = new LoggedTunableNumber(
@@ -229,14 +229,14 @@ public class HolonomicController {
             Math.toRadians( omegaController.getSetpoint().velocity ) );
     }
 
-    // @AutoLogOutput(key = "Drive/HolonomicController/PoseError")
-    // public Pose2d getPoseError() {
-    //     return new Pose2d(
-    //         xController.getPositionError(),
-    //         yController.getPositionError(),
-    //         new Rotation2d(omegaController.getPositionError())
-    //     );
-    // }
+    @AutoLogOutput(key = "Drive/HolonomicController/PoseError")
+    public Pose2d getPoseError() {
+        return new Pose2d(
+            xController.getPositionError(),
+            yController.getPositionError(),
+            new Rotation2d(omegaController.getPositionError())
+        );
+    }
 
     ////////////////////////// SETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\
     public void updateAlignmentControllers() {

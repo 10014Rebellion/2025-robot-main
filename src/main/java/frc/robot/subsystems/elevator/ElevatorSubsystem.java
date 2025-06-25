@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private final SparkMax mElevatorSparkMax;
@@ -67,6 +68,22 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public boolean isPIDAtGoal() {
     return mElevatorProfiledPID.atGoal();
+  }
+
+  public FunctionalCommand coralLevelToPIDCmd(CoralLevel pCoralLevel) {
+    ElevatorConstants.Setpoints elevatorSetpoint = ElevatorConstants.Setpoints.L1;
+
+    if(pCoralLevel == CoralLevel.B3) {
+      elevatorSetpoint = ElevatorConstants.Setpoints.L4;
+    } else
+    if(pCoralLevel == CoralLevel.B2) {
+      elevatorSetpoint = ElevatorConstants.Setpoints.L3;
+    } else
+    if(pCoralLevel == CoralLevel.B1) {
+      elevatorSetpoint = ElevatorConstants.Setpoints.L2;
+    } 
+
+    return setPIDCmd(elevatorSetpoint);
   }
 
   public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {

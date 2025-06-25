@@ -254,9 +254,10 @@ public class IntakeSubsystem extends SubsystemBase {
           mBackTriggered = false;
         },
         () -> {
-          if (getCoralDetectedBack()) {
+          if (getCoralDetectedBack() || getCoralDetectedFront()) {
             mBackTriggered = true;
           }
+          
 
           if (mBackTriggered) {
             setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow);
