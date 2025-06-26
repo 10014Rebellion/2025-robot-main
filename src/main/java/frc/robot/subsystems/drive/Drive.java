@@ -158,6 +158,7 @@ public class Drive extends SubsystemBase {
             kMaxAzimuthAngularRadiansPS // The max rotation velocity of a swerve module in radians per second.
         );
 
+        //4.29
         /* Sets up pathplanner to load paths. No need for choreo set-up as its handled internally by Pathplanner */
         /* Refer to getTrajectory() in AutonCommands */
         AutoBuilder.configure(
@@ -165,7 +166,12 @@ public class Drive extends SubsystemBase {
             this::setPose, 
             this::getRobotChassisSpeeds, 
             (speeds, ff) -> {
-                ppDesiredSpeeds = speeds;
+                driveState = DriveState.AUTON;
+                ppDesiredSpeeds = new ChassisSpeeds(
+                    speeds.vxMetersPerSecond,
+                    speeds.vyMetersPerSecond,
+                    speeds.omegaRadiansPerSecond
+                );
                 pathPlanningFF = ff;
             }, 
             new PPHolonomicDriveController( kPPTranslationPID, kPPRotationPID ), 
@@ -349,9 +355,9 @@ public class Drive extends SubsystemBase {
             case RIGHT:
                 desiredSpeeds = new ChassisSpeeds(0.0, 0.5, teleopSpeeds.omegaRadiansPerSecond);
                 break;
-            case STOP:
-                desiredSpeeds = new ChassisSpeeds();
-                break;
+            // case STOP:
+            //     desiredSpeeds = new ChassisSpeeds();
+            //     break;
             case DRIFT_TEST:
                 desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(linearTestSpeedMPS.get(), 0.0, 
@@ -365,6 +371,11 @@ public class Drive extends SubsystemBase {
             case WHEEL_CHARACTERIZATION:
                 /* If null, then PID isn't set, so characterization can set motors w/o interruption */
                 desiredSpeeds = null;
+            case STOP:
+                for(int i = 0; i < modules.length; i++) {
+                    modules[i].setDesiredState(
+                        new SwerveModuleState(0.0, modules[i].getCurrentState().angle));
+                }
                 break;
             default:
                 /* Defaults to Teleop control if no other cases are run*/
@@ -508,7 +519,7 @@ public class Drive extends SubsystemBase {
         switch(driveState) {
             case AUTON:
                 /* No need to optimize for Choreo, as it handles it under the hood */
-                return SwerveUtils.convertChoreoNewtonsToAmps(currentState, pathPlanningFF, i);
+                // return SwerveUtils.convertChoreoNewtonsToAmps(currentState, pathPlanningFF, i);
             case DRIVE_TO_CORAL:           
             case DRIVE_TO_INTAKE:
                 return 0.0;// return pathPlanningFF.torqueCurrentsAmps()[i];

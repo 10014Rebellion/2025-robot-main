@@ -10,10 +10,14 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.intake.IntakeConstants.Beambreak;
 import frc.robot.subsystems.intake.IntakeConstants.Indexer;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePivot;
@@ -35,6 +39,8 @@ public class IntakeSubsystem extends SubsystemBase {
   private ArmFeedforward mIntakePivotFF;
 
   private boolean mBackTriggered;
+  private boolean mFrontTriggered;
+  private Timer mCoralStuckTimer;
 
   public IntakeSubsystem() {
     mBackTriggered = false;
@@ -84,6 +90,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
     mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
+
+    mCoralStuckTimer = new Timer();
+    mCoralStuckTimer.stop();
+    mCoralStuckTimer.reset();
   }
 
   public FunctionalCommand enableFFCmd() {
@@ -236,15 +246,25 @@ public class IntakeSubsystem extends SubsystemBase {
   public FunctionalCommand autonSetIndexCoralCmd() {
     return new FunctionalCommand(
         () -> {
+          mBackTriggered = false;
         },
         () -> {
-          setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          if (getCoralDetectedBack() || getCoralDetectedFront()) {
+            mBackTriggered = true;
+          }
+          
+          if (mBackTriggered) {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow);
+          } 
+          else {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          }
         },
         (interrupted) -> {
           setVoltsIndexer(0.0);
         },
         () -> {
-          return getCoralDetected();
+          return getCoralDetectedFront();
         });
   }
 
@@ -270,9 +290,53 @@ public class IntakeSubsystem extends SubsystemBase {
           mBackTriggered = false;
         },
         () -> {
-          return getCoralDetected();
+          return getCoralDetectedFront();
         });
   }
+  /* 
+  public RepeatCommand setIndexCoralCmd() {
+    return new RepeatCommand(
+      new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeStuckTime), initialIndexCommand())
+      .andThen(new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeReverseTime), reverseIndexCommand()))
+    );
+  }
+
+  private FunctionalCommand initialIndexCommand() {
+    return new FunctionalCommand(
+        () -> {
+          mBackTriggered = getCoralDetectedBack();
+          mFrontTriggered = getCoralDetectedFront();
+        },
+        () -> {
+          if (getCoralDetectedBack()) {
+            mBackTriggered = true;
+          }
+          if(getCoralDetectedFront()) {
+            mFrontTriggered = true;
+          }
+          if (mFrontTriggered = true) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsHold);
+          else if (mBackTriggered) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow); 
+          else setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+        },
+        (interrupted) -> {
+          setVoltsIndexer(0.0);
+          mBackTriggered = false;
+        },
+        () -> {
+          return getCoralDetectedFront();
+        });
+  } 
+
+  private FunctionalCommand reverseIndexCommand() {
+    return new FunctionalCommand(
+      () -> {}, 
+      () -> {
+        setVoltsIndexer(IntakeConstants.Indexer.kOuttakeVolts);
+      }, 
+      (interrupted) -> setVoltsIndexer(0.0), 
+      () -> getCoralDetectedBack());
+  }
+      */
 
   private double filterVoltageIntakePivot(double pVoltage) {
     return filterToLimitsIntakePivot(MathUtil.clamp(pVoltage, -12.0, 12.0));
@@ -313,9 +377,6 @@ public class IntakeSubsystem extends SubsystemBase {
     return mDisableIR ? true : !mCoralSensorBack.get();
   }
 
-  public boolean getCoralDetected() {
-    return getCoralDetectedFront();
-  }
 
   public FunctionalCommand setPivotCmd(double pVoltage) {
     return new FunctionalCommand(
@@ -359,7 +420,7 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot Current", mIntakePivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Pivot Voltage", mIntakePivotMotor.getBusVoltage());
     SmartDashboard.putNumber("Intake/Roller Current", mIntakeRollerMotor.getOutputCurrent());
-    SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetected());
+    SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetectedFront());
     SmartDashboard.putNumber("Intake/Pivot Setpoint", mIntakePivotProfiledPID.getGoal().position);
     SmartDashboard.putBoolean("Intake/IR Disabled", mDisableIR);
   }

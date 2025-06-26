@@ -107,16 +107,16 @@ public class CameraIOPV implements CameraIO {
 
                     latestEstimatedRobotPose.ifPresent(est -> {
 
-                        if(orientation.equals(Orientation.FRONT)){
-                            inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose;
-                        }
+                        // if(orientation.equals(Orientation.FRONT)){
+                        //     inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose;
+                        // }
 
-                        else{
+                        // else{
                             inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose
                             // Rotate by 180 to account for camera being on back, needs to be come parameter in constructor later
                                 .transformBy(new Transform3d(
-                                    new Translation3d(), new Rotation3d(0.0, 0.0, Math.PI)));
-                        }
+                                    new Translation3d(), new Rotation3d(0.0, 0.0, 0.0)));
+                        // }
 
                         ArrayList<Transform3d> tagTs = new ArrayList<>();
                         double[] ambiguities = new double[latestEstimatedRobotPose.get().targetsUsed.size()];

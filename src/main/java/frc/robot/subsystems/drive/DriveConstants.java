@@ -1,11 +1,14 @@
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -48,14 +51,14 @@ public class DriveConstants {
 
     public static final boolean kDoExtraLogging = false;
 
-    public static final PIDConstants kPPTranslationPID = new PIDConstants(1.6, 0.0, 0.0);
-    public static final PIDConstants kPPRotationPID = new PIDConstants(2.5, 0.0, 0.0);
+    public static final PIDConstants kPPTranslationPID = new PIDConstants(1.0, 0.0, 0.01);
+    public static final PIDConstants kPPRotationPID = new PIDConstants(0.8, 0.0, 0.0);
 
     ///////////////////// MODULES \\\\\\\\\\\\\\\\\\\\\\\
     /* GENERAL SWERVE MODULE CONSTANTS */
     public static final boolean kTurnMotorInvert = false;
     public static final double kAzimuthMotorGearing = 1;
-    public static final double kDriveMotorGearing = 5.08 / 1.0;
+    public static final double kDriveMotorGearing = 4.29 / 1.0;
     public static final double kWheelRadiusMeters = Units.inchesToMeters(1.4175);
     public static final double kWheelCircumferenceMeters = 2 * Math.PI * kWheelRadiusMeters;
 
@@ -77,6 +80,7 @@ public class DriveConstants {
             new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.0));
 
 
+            
     /* MODULE SPECIFIC CONSTANTS */
     /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when he did it */
     public static final ModuleHardwareConfig kFrontLeftHardware =
@@ -84,33 +88,33 @@ public class DriveConstants {
             12, 
             22, 
             22,
-            0.471);
+            0.971);
 
     public static final ModuleHardwareConfig kFrontRightHardware =
         new ModuleHardwareConfig(
             11, 
             21, 
             31, 
-            -0.932);
+            -0.432);
 
     public static final ModuleHardwareConfig kBackLeftHardware =
         new ModuleHardwareConfig(
             13, 
             23, 
             23,
-            0.565);
+            0.065);
 
     public static final ModuleHardwareConfig kBackRightHardware =
         new ModuleHardwareConfig(
             14, 
             24, 
             24,
-            0.954);
+            0.454);
 
     public static record ModuleHardwareConfig(
         int driveID, int azimuthID, int encoderID, double offset) {}
 
-
+    
     public static record ModuleControlConfig(
         PIDController driveController,
         SimpleMotorFeedforward driveFF,

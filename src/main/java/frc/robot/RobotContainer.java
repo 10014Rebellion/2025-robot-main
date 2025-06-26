@@ -9,9 +9,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.Drive.DriveState;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -23,6 +25,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.subsystems.auton.AutonSubsystem;
 
 
 public class RobotContainer {
@@ -35,7 +38,7 @@ public class RobotContainer {
   private final TelemetrySubsystem mTelemetry;
   private final IntakeSubsystem mIntake;
   private final LEDSubsystem mLEDs;
-  // private final AutonSubsystem mAutons;
+  private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
 
   public RobotContainer() {
@@ -90,7 +93,7 @@ public class RobotContainer {
     mButtonBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb, mLEDs);
 
     // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
-    // mAutons = new AutonSubsystem(mDrive, mWrist, mVision, mClaw, mElevator, mIntake);
+    mAutons = new AutonSubsystem(mDrive, mWrist, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
   }
@@ -105,6 +108,7 @@ public class RobotContainer {
   // Run this in robot.java
   public void initTriggers() {
     mButtonBindings.initTriggers();
+    mDrive.setDriveState(DriveState.TELEOP);
   }
 
   public Drive getDrivetrain() {
@@ -115,7 +119,11 @@ public class RobotContainer {
     return mTelemetry;
   }
 
-  // public Command getPathPlannerAuto() {
-  //   return mAutons.getChosenAuton();
-  // }
+  public Command getPathPlannerAuto() {
+    return mAutons.getChosenAuton();
+  }
+
+  public Command getAutonomousCommand() {
+    return mAutons.getChosenAuton();
+  }
 }

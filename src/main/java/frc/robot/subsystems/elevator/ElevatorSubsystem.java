@@ -61,7 +61,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           double calculatedOutput = mElevatorFF.calculate(0);
           setVolts(calculatedOutput);
         },
-        (interrupted) -> setVolts(0),
+        (interrupted) -> setVolts(mElevatorFF.calculate(0)),
         () -> false,
         this);
   }

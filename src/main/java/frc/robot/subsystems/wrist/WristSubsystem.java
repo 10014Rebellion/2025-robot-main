@@ -67,7 +67,7 @@ public class WristSubsystem extends SubsystemBase {
           double calculatedOutput = mWristFF.calculate(Units.degreesToRadians(getEncReading()), 0);
           setVolts(calculatedOutput);
         },
-        (interrupted) -> setVolts(0),
+        (interrupted) -> setVolts(mWristFF.calculate(Units.degreesToRadians(getEncReading()), 0)),
         () -> false,
         this);
   }
@@ -150,7 +150,7 @@ public class WristSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("Wrist/FF Output", calculatedFF);
           setVolts(calculatedPID + calculatedFF);
         },
-        (interrupted) -> setVolts(0),
+        (interrupted) -> setVolts(mWristFF.calculate(Math.toRadians(getEncReading()), 0.0)),
         () -> isPIDAtGoal(),
         this);
   }

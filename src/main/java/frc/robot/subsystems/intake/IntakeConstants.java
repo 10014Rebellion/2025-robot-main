@@ -18,7 +18,11 @@ public class IntakeConstants {
 
     public static double kIntakeVolts = 9.5;
     public static double kIntakeVoltsSlow = 2.5;
+    public static double kIntakeVoltsHold = 1.0;
     public static double kOuttakeVolts = -6;
+
+    public static double kIntakeStuckTime = 0.5;
+    public static double kIntakeReverseTime = 0.25;
 
     public static final SparkMaxConfig kIndexerConfig = new SparkMaxConfig();
 

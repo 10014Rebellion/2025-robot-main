@@ -56,7 +56,7 @@ public class ButtonBindings {
     mDrive.acceptJoystickInputs(
 			() -> - mDriverController.getLeftY(),
 			() -> - mDriverController.getLeftX(),
-			() -> mDriverController.getRightX(),
+			() -> - mDriverController.getRightX(),
 			() -> mDriverController.getHID().getPOV()
     );
   }

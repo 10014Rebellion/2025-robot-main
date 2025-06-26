@@ -39,7 +39,7 @@ public class HolonomicController {
         "AutoAlign/X/kV", 0.5);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/X/ToleranceMeters", 0.02);
+        "AutoAlign/X/ToleranceMeters", 0.03);
 
     public static final LoggedTunableNumber yP = new LoggedTunableNumber(
         "AutoAlign/Y/kP", 2.5);
@@ -62,7 +62,7 @@ public class HolonomicController {
         "AutoAlign/Y/kV", 0.5);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/Y/ToleranceMeters", 0.02);
+        "AutoAlign/Y/ToleranceMeters", 0.03);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
         "AutoAlign/Omega/kP", 3.0);
@@ -87,7 +87,7 @@ public class HolonomicController {
         "AutoAlign/Omega/kV", 0.5);
 
     public static final LoggedTunableNumber omegaToleranceDegrees = new LoggedTunableNumber(
-        "AutoAlign/Omega/ToleranceDegrees", 3.0);
+        "AutoAlign/Omega/ToleranceDegrees", 1.0);
 
     private ProfiledPIDController xController;
     private ProfiledPIDController yController;
@@ -153,7 +153,7 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
-        double realRotScalar = RobotBase.isReal() ? -1 : 1;
+        // double realRotScalar = RobotBase.isReal() ? -1 : 1;
 
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             (xController.calculate( 
@@ -170,7 +170,7 @@ public class HolonomicController {
                     goalSpeed.vyMetersPerSecond) )
             + yFeedforward.calculate(yController.getSetpoint().velocity)),
 
-            realRotScalar * (Math.toRadians (omegaController.calculate( 
+            (Math.toRadians (omegaController.calculate( 
                 currentPose.getRotation().getDegrees(), 
                 new TrapezoidProfile.State(
                     goalPose.getRotation().getDegrees(),

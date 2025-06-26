@@ -1,5 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.struct.parser.ParseException;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Threads;
@@ -7,7 +10,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.telemetry.Elastic;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -15,6 +24,10 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,7 +42,7 @@ public class Robot extends LoggedRobot {
   private Command autonomousCommand;
   private RobotContainer robotContainer;
   public static boolean gIsBlueAlliance;
-  // private String autoName, newAutoName;
+  private String autoName, newAutoName;
   Optional<Alliance> ally = DriverStation.getAlliance();
   Optional<Alliance> newAlly;
 
@@ -122,58 +135,58 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    // ally = DriverStation.getAlliance();
-    // newAutoName = robotContainer.getAutonomousCommand().getName();
-    // if (autoName != newAutoName | ally != newAlly) {
-    //   newAlly = ally;
-    //   autoName = newAutoName;
-    //   if (AutoBuilder.getAllAutoNames().contains(autoName)) {
-    //     System.out.println("Displaying " + autoName);
-    //     try {
-    //       List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
-    //       List<Pose2d> poses = new ArrayList<>();
-    //       for (PathPlannerPath path : pathPlannerPaths) {
-    //         if (gIsBlueAlliance) {
-    //           poses.addAll(
-    //               path.getAllPathPoints().stream()
-    //                   .map(
-    //                       point -> new Pose2d(
-    //                           point.position.getX(), point.position.getY(), new Rotation2d()))
-    //                   .collect(Collectors.toList()));
-    //         } else if (ally.get() == Alliance.Red) {
-    //           poses.addAll(
-    //               path.getAllPathPoints().stream()
-    //                   .map(
-    //                       point -> new Pose2d(
-    //                           PoseConstants.WeldedField.kFieldLengthM - point.position.getX(),
-    //                           PoseConstants.WeldedField.kFieldWidthM - point.position.getY(),
-    //                           new Rotation2d()))
-    //                   .collect(Collectors.toList()));
-    //         }
-    //       }
+    ally = DriverStation.getAlliance();
+    newAutoName = robotContainer.getAutonomousCommand().getName();
+    if (autoName != newAutoName | ally != newAlly) {
+      newAlly = ally;
+      autoName = newAutoName;
+      if (AutoBuilder.getAllAutoNames().contains(autoName)) {
+        System.out.println("Displaying " + autoName);
+        try {
+          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+          List<Pose2d> poses = new ArrayList<>();
+          for (PathPlannerPath path : pathPlannerPaths) {
+            if (gIsBlueAlliance) {
+              poses.addAll(
+                  path.getAllPathPoints().stream()
+                      .map(
+                          point -> new Pose2d(
+                              point.position.getX(), point.position.getY(), new Rotation2d()))
+                      .collect(Collectors.toList()));
+            } else if (ally.get() == Alliance.Red) {
+              poses.addAll(
+                  path.getAllPathPoints().stream()
+                      .map(
+                          point -> new Pose2d(
+                              PoseConstants.WeldedField.kFieldLengthM - point.position.getX(),
+                              PoseConstants.WeldedField.kFieldWidthM - point.position.getY(),
+                              new Rotation2d()))
+                      .collect(Collectors.toList()));
+            }
+          }
 
-    //       robotContainer.getTelemetry().getAutonPreviewField().getObject("path").setPoses(poses);
-    //       robotContainer
-    //           .getTelemetry()
-    //           .updateAutonFieldPose(
-    //               new Pose2d(
-    //                   poses.get(0).getX(),
-    //                   poses.get(0).getY(),
-    //                   gIsBlueAlliance ? Rotation2d.k180deg : Rotation2d.kZero));
-    //     } catch (IOException e) {
-    //       e.printStackTrace();
-    //     } catch (Exception e) {
-    //       if (e instanceof ParseException) {
-    //         e.printStackTrace();
-    //       } else {
-    //         e.printStackTrace();
-    //       }
-    //     }
-    //   }
-    // }
-    // // Pose2d pose = robotContainer.getDrivetrain().getPose();
-    // // robotContainer.getTelemetry().add(pose);
-    // SmartDashboard.putData(robotContainer.getTelemetry().getAutonPreviewField());
+          robotContainer.getTelemetry().getAutonPreviewField().getObject("path").setPoses(poses);
+          robotContainer
+              .getTelemetry()
+              .updateAutonFieldPose(
+                  new Pose2d(
+                      poses.get(0).getX(),
+                      poses.get(0).getY(),
+                      gIsBlueAlliance ? Rotation2d.k180deg : Rotation2d.kZero));
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (Exception e) {
+          if (e instanceof ParseException) {
+            e.printStackTrace();
+          } else {
+            e.printStackTrace();
+          }
+        }
+      }
+    }
+    // Pose2d pose = robotContainer.getDrivetrain().getPose();
+    // robotContainer.getTelemetry().add(pose);
+    SmartDashboard.putData(robotContainer.getTelemetry().getAutonPreviewField());
   }
 
   /**
@@ -182,7 +195,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void autonomousInit() {
-    // autonomousCommand = robotContainer.getAutonomousCommand();
+    autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {

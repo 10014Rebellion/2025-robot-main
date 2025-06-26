@@ -35,7 +35,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class VisionConstants {
     // From CAD and decided by you in configuration
     public static final String kLeftCamName = "FrontLeft-OV9281";
-    public static final Orientation kLeftCamOrientation = Orientation.FRONT;
+    public static final Orientation kLeftCamOrientation = Orientation.BACK;
     public static final Transform3d kLeftCamTransform = new Transform3d(
         new Translation3d(
             Units.inchesToMeters(10.284), // X: inches forward
@@ -50,7 +50,7 @@ public class VisionConstants {
     );
   
     public static final String kRightCamName = "FrontRight-OV9281";
-    public static final Orientation kRightCamOrientation = Orientation.FRONT;
+    public static final Orientation kRightCamOrientation = Orientation.BACK;
     public static final Transform3d kRightCamTransform = new Transform3d(
         new Translation3d(
             Units.inchesToMeters(9.7965), // X: inches forward

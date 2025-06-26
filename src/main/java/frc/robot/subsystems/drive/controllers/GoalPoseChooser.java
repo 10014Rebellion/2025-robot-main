@@ -151,7 +151,7 @@ public class GoalPoseChooser {
         }
         // Logger.recordOutput("Drive/SelectedSide", side);
 
-        return goal.plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
+        return goal;  // .plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
     }
 
     public static Pose2d getTargetPoseLeft(int pTagID) {
@@ -266,10 +266,11 @@ public class GoalPoseChooser {
     public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
     public static final double kClawOffset = Units.inchesToMeters(0.5);
 
+    // Positive to the left, negative to thr right, all in meters
     public enum PoseOffsets {
-        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0 + kClawOffset),
+        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset - Units.inchesToMeters(1.25)),
         AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset),
-        LEFT(kDistBetweenBranchesCenter / 2.0 + kClawOffset),
+        LEFT(kDistBetweenBranchesCenter / 2.0 - kClawOffset - Units.inchesToMeters(1.25)),
         CENTER(0 + kClawOffset),
         RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - kClawOffset);
 

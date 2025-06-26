@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -82,6 +83,8 @@ public class AutonSubsystem {
         NamedCommands.registerCommand("GoToLeftPose", goToClosestBranchPose(true, 4));
         NamedCommands.registerCommand("GoToRightPose", goToClosestBranchPose(false, 4));
         NamedCommands.registerCommand("GoToCenterPose", goToClosestCenterPose());
+
+        NamedCommands.registerCommand("STOP", mDrive.setDriveStateCommand(DriveState.STOP));
     }
 
     private InstantCommand holdCoral() {
@@ -154,11 +157,11 @@ public class AutonSubsystem {
     }
 
     private Command goToClosestBranchPose(boolean isLeft, int level) {
-        GoalPoseChooser.SIDE branchOffset = isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.LEFT;
+        GoalPoseChooser.SIDE branchOffset = isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT;
         GoalPoseChooser.setSide(branchOffset);
 
-        return mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-            .withDeadline(mDrive.waitUnitllIntakeAutoAlignFinishes());
+        return Commands.runOnce(() -> GoalPoseChooser.setSide( isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT)).andThen(mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
+            .withDeadline(mDrive.waitUnitllIntakeAutoAlignFinishes()));
     }
 
     private Command goToClosestCenterPose() {
@@ -166,7 +169,7 @@ public class AutonSubsystem {
         GoalPoseChooser.setSide(branchOffset);
 
         return mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-            .withDeadline(mDrive.waitUnitllIntakeAutoAlignFinishes());
+            .withDeadline(mDrive.waitUnitllAutoAlignFinishes());
     }
 
     private SequentialCommandGroup HPCoralIntake() {
