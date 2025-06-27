@@ -98,7 +98,12 @@ public class AutonSubsystem {
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
-            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING));
+            // Added an additional command telling the intake to run the rollers.
+            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+            new SequentialCommandGroup(
+              new WaitCommand(0.3),
+              mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed)
+            ));
     }
 
     private SequentialCommandGroup activateIntake() {
@@ -106,7 +111,11 @@ public class AutonSubsystem {
             mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
             new SequentialCommandGroup(
-                mIntake.autonSetIndexCoralCmd(),
+                //Added an additional command to make sure the elevator is at the right height before trying to pickup the piece.
+                new ParallelCommandGroup(
+                    mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
+                    mIntake.autonSetIndexCoralCmd()
+                ),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
@@ -160,8 +169,21 @@ public class AutonSubsystem {
         GoalPoseChooser.SIDE branchOffset = isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT;
         GoalPoseChooser.setSide(branchOffset);
 
-        return Commands.runOnce(() -> GoalPoseChooser.setSide( isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT)).andThen(mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-            .withDeadline(mDrive.waitUnitllIntakeAutoAlignFinishes()));
+        return Commands.runOnce(() -> GoalPoseChooser.setSide( isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT))
+            .andThen(
+                new ParallelCommandGroup(
+                    mWrist.setPIDCmd(intToWristPos(level)), 
+                    mElevator.setPIDCmd(intToElevatorPos(level)),
+                    mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
+                    .withDeadline(
+                        new ParallelRaceGroup(
+                            mDrive.waitUnitllAutoAlignFinishes(),
+                            new WaitCommand(2.0)
+                            // added a deadline to hopefully force end the aligning command if something goes wrong.
+                        ))
+                    )
+                );
+                    
     }
 
     private Command goToClosestCenterPose() {
@@ -194,8 +216,8 @@ public class AutonSubsystem {
     private ParallelDeadlineGroup scoreCoral() {
         return new ParallelDeadlineGroup(
             new WaitCommand(0.5),
-            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()),
-            new WaitCommand(0.1).andThen(mClaw.setClawCmd(0.0)));
+            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()));
+            //new WaitCommand(0.1).andThen(mClaw.setClawCmd(0.0)));
     }
 
     private SequentialCommandGroup intakeCoral() {
@@ -249,7 +271,6 @@ public class AutonSubsystem {
                 return ElevatorConstants.Setpoints.L4;
         }
     }
-
 //   private linearPoseOffsets intToOffsets(int level) {
 //     int curLevel = MathUtil.clamp(level, 1, 5);
 //     switch (curLevel) {

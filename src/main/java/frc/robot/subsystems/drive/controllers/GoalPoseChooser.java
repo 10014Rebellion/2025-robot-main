@@ -163,7 +163,7 @@ public class GoalPoseChooser {
     }
 
     public static Pose2d getTargetPose(int pTagID) {
-        return getTargetPose(pTagID, 0.04, 0.0);
+        return getTargetPose(pTagID, 0.02, 0.0);
     }
 
     public static Pose2d getTargetPose(int pTagID, double pXOffsetM, double pYOffsetM) {
@@ -263,15 +263,17 @@ public class GoalPoseChooser {
 
     public static final double kDistBetweenBranchesCenter =
         Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
-    public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13.5);
+    public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13);
+    // made the auton positions no longer have the extra 0.5 inch distance between branches
     public static final double kClawOffset = Units.inchesToMeters(0.5);
 
     // Positive to the left, negative to thr right, all in meters
     public enum PoseOffsets {
-        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset - Units.inchesToMeters(1.25)),
+        
+        AUTONLEFT(kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset),
         AUTONRIGHT(-1 * kDistBetweenBranchesCenterWithAlgae / 2.0 - kClawOffset),
-        LEFT(kDistBetweenBranchesCenter / 2.0 - kClawOffset - Units.inchesToMeters(1.25)),
-        CENTER(0 + kClawOffset),
+        LEFT(kDistBetweenBranchesCenter / 2.0 - kClawOffset),
+        CENTER(0 - kClawOffset),
         RIGHT(-1 * kDistBetweenBranchesCenter / 2.0 - kClawOffset);
 
         public final double offset;

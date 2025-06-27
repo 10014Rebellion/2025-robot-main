@@ -26,7 +26,7 @@
         {
           "type": "named",
           "data": {
-            "name": "GoToLeftPose"
+            "name": "GoToRightPose"
           }
         },
         {
@@ -42,7 +42,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "C3-RHPS"
+                  "pathName": "C3-HPS"
                 }
               },
               {
@@ -74,83 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RHPS-F3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ActivateIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "ReadyScoreSubsystemsL4"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "GoToLeftPose"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "ScoreCoral"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "C4-CHPS"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "DeployIntake"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ActivateIntake"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CHPS-F3"
+                  "pathName": "HPS-F3"
                 }
               },
               {
@@ -188,9 +112,85 @@
           }
         },
         {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "C4-HPS"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "DeployIntake"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "ActivateIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HPS-F3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ActivateIntake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ReadyScoreSubsystemsL4"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "GoToLeftPose"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ScoreCoral"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "C5-RHPS"
+            "pathName": "C5-HPS"
           }
         }
       ]

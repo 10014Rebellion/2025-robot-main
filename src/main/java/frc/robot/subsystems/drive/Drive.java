@@ -567,10 +567,10 @@ public class Drive extends SubsystemBase {
         return new WaitUntilCommand(()-> autoAlignDelay.calculate(autoAlignController.atGoal()));
     }
 
-    public Command waitUnitllIntakeAutoAlignFinishes() {
-        return new WaitUntilCommand(()-> autoAlignController.atGoal() || 
-            autoAlignTimeout.calculate(autoAlignController.atPositionTimeout()));
-    }
+    // public Command waitUnitllIntakeAutoAlignFinishes() {
+    //     return new WaitUntilCommand(()-> autoAlignController.atGoal() || 
+    //         autoAlignTimeout.calculate(autoAlignController.atPositionTimeout()));
+    // }
 
     public BooleanSupplier waitUnitllAutoAlignFinishesSupplier() {
         return ()-> autoAlignController.atGoal();

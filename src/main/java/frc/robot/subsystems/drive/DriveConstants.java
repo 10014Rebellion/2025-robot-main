@@ -60,6 +60,7 @@ public class DriveConstants {
     public static final double kAzimuthMotorGearing = 1;
     public static final double kDriveMotorGearing = 4.29 / 1.0;
     public static final double kWheelRadiusMeters = Units.inchesToMeters(1.4175);
+    // POSSIBLE CAUSE OF ODOMETRY ISSUE: (Intended)1.5/(measured)1.4175 = 1.05
     public static final double kWheelCircumferenceMeters = 2 * Math.PI * kWheelRadiusMeters;
 
     public static final double kPeakVoltage = 12.0;
