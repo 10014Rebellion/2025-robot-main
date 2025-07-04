@@ -12,8 +12,8 @@ public class WristConstants {
   public static IdleMode kIdleMode = IdleMode.kBrake;
   public static boolean kMotorInverted = true;
 
-  public static int kCurrentLimit = 60; // CHANGED: 80
-  public static double kP = 0.22; // 0.0015 without coral
+  public static int kCurrentLimit = 60;
+  public static double kP = 0.22;
   public static double kD = 0.01;
 
   public static double kMaxAcceleration = 1000;
@@ -25,15 +25,15 @@ public class WristConstants {
   public static double kElevatorDownLimit = -30;
   public static double throwAlgaePos = 50;
 
-  public static double kEncoderOffsetDeg = -162.95; // 81.9;
+  public static double kEncoderOffsetDeg = -162.95;
   public static boolean kEncoderInverted = true;
 
   public static double kPositionConversionFactor = 360.0;
-  public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0; // RPM -> MPS
+  public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0;
 
   public static double kS = 0.02;
-  public static double kG = 0.4; // 0.29 without coral
-  public static double kV = 0.003; // 0.78 without coral
+  public static double kG = 0.4;
+  public static double kV = 0.003;
   public static double kA = 0.0;
 
   public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
@@ -71,8 +71,7 @@ public class WristConstants {
   static {
     kWristConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kMotorInverted);
 
-    kWristConfig
-        .absoluteEncoder
+    kWristConfig.absoluteEncoder
         .positionConversionFactor(1)
         .velocityConversionFactor(1)
         .zeroOffset(0);

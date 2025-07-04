@@ -23,8 +23,6 @@ public class ClawSubsystem extends SubsystemBase {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
     this.mBeamBreak = new DigitalInput(ClawConstants.kBeamBreakDIOPort);
 
-    // this.setDefaultCommand(holdCoralCmd());
-
     mClawSparkMax.configure(
         ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -34,12 +32,13 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public void setClaw(double pVoltage) {
-    mClawSparkMax.setVoltage(pVoltage); // MathUtil.clamp(pVoltage, -12, 12));
+    mClawSparkMax.setVoltage(pVoltage);
   }
 
   public FunctionalCommand setClawCmd(double pVoltage) {
     return new FunctionalCommand(
-        () -> setClaw(pVoltage), () -> setClaw(pVoltage), (interrupted) -> {}, () -> false, this);
+        () -> setClaw(pVoltage), () -> setClaw(pVoltage), (interrupted) -> {
+        }, () -> false, this);
   }
 
   public FunctionalCommand holdCoralCmd() {
@@ -53,13 +52,10 @@ public class ClawSubsystem extends SubsystemBase {
 
   public FunctionalCommand intakeCoralCmd() {
     return new FunctionalCommand(
-        () ->
-            setClaw(
-                ClawConstants.RollerSpeed
-                    .INTAKE_CORAL), // Start the command by setting the claw to coral speed
+        () -> setClaw(
+            ClawConstants.RollerSpeed.INTAKE_CORAL),
         () -> {
-          // if (; // igetBeamBreak()) setClaw(0.0)f we detect a coral, stop the roller
-          setClaw(ClawConstants.RollerSpeed.INTAKE_CORAL); // if we dont, try and intake
+          setClaw(ClawConstants.RollerSpeed.INTAKE_CORAL);
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.HOLD_CORAL),
         () -> getBeamBreak(),
@@ -105,14 +101,12 @@ public class ClawSubsystem extends SubsystemBase {
         () -> {
           if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
-          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
         },
         (interrupted) -> {
           if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
-          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
         },
-        () -> false, // (mWrist.getEncReading() > WristConstants.throwAlgaePos),
+        () -> false,
         this);
   }
 
@@ -122,19 +116,15 @@ public class ClawSubsystem extends SubsystemBase {
         () -> {
           if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
-          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
         },
         (interrupted) -> {
           if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
-          // else setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE);
         },
         () -> (mWrist.getEncReading() > WristConstants.throwAlgaePos + 6),
         this);
   }
 
-  // returns true when beambreak is broken (Coral is in the claw)
-  // returns false when beambreak is intact (Coral is not in the claw)
   public boolean getBeamBreak() {
     return !mBeamBreak.get();
   }

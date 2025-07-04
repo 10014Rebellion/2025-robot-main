@@ -17,10 +17,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private final AbsoluteEncoder mClimbEncoder;
   private final DigitalInput mBeamBreak;
 
-  // private boolean mHasExtended;
-
-  // private double kExtendTime;
-
   public ClimbSubsystem() {
     mClimbMotor = new SparkMax(ClimbConstants.Pulley.kMotorID, ClimbConstants.Pulley.kMotorType);
     mBeamBreak = new DigitalInput(ClimbConstants.Grabber.kClimbBeamBreakID);
@@ -30,19 +26,14 @@ public class ClimbSubsystem extends SubsystemBase {
         PersistMode.kPersistParameters);
 
     mClimbEncoder = mClimbMotor.getAbsoluteEncoder();
-    // mClimbEncoder.
-    mGrabberMotor =
-        new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
+    mGrabberMotor = new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
     mGrabberMotor.configure(
         ClimbConstants.Grabber.kClimbConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    // mHasExtended = false;
   }
 
-  // returns true when beambreak is broken (Coral is in the claw)
-  // returns false when beambreak is intact (Coral is not in the claw)
   public boolean getBeamBroken() {
     return !mBeamBreak.get();
   }
@@ -53,7 +44,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
     return new FunctionalCommand(
-        () -> {},
+        () -> {
+        },
         () -> {
           setGrabberVolts(pVolts);
         },
@@ -71,7 +63,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public FunctionalCommand setPulleyVoltsCmd(double pVolts) {
     return new FunctionalCommand(
-        () -> {},
+        () -> {
+        },
         () -> {
           setPulleyVolts(pVolts);
         },
@@ -89,28 +82,23 @@ public class ClimbSubsystem extends SubsystemBase {
 
   private double getEncReading() {
     double encoderMeasurement = mClimbEncoder.getPosition();
-    if (encoderMeasurement > 180.0) encoderMeasurement -= 360.0;
+    if (encoderMeasurement > 180.0)
+      encoderMeasurement -= 360.0;
     return encoderMeasurement;
   }
 
   public FunctionalCommand climbToSetpoint(Pulley.Setpoints pSetpoint) {
     return new FunctionalCommand(
-        () -> {}, // Start the command by setting the claw to coral speed
+        () -> {
+        },
         () -> {
           double encReading = getEncReading();
-          // This is a bang bang controller, TAHA had no part in this, he advised against it but
-          // they didnt do PID, I'm sorry );
           if (encReading > pSetpoint.getPos()) {
             setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND.getVolts());
           }
           if (encReading < pSetpoint.getPos()) {
             setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND.getVolts());
           }
-          // if (encReading <= ClimbConstants.Pulley.Setpoints.STARTROLLING.getPos()) {
-          //   setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
-          // } else {
-          //   setGrabberVolts(0.0);
-          // }
         },
         (interrupted) -> {
           setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
@@ -122,10 +110,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public FunctionalCommand climbUntilRetracted() {
     return new FunctionalCommand(
-        () ->
-            setPulleyVolts(
-                ClimbConstants.Pulley.VoltageSetpoints
-                    .ASCEND), // Start the command by setting the claw to coral speed
+        () -> setPulleyVolts(
+            ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
         () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
         (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
         () -> getEncReading() >= ClimbConstants.Pulley.Setpoints.CLIMBED.getPos(),
@@ -134,10 +120,8 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public FunctionalCommand retractClimb() {
     return new FunctionalCommand(
-        () ->
-            setPulleyVolts(
-                ClimbConstants.Pulley.VoltageSetpoints
-                    .ASCEND), // Start the command by setting the claw to coral speed
+        () -> setPulleyVolts(
+            ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
         () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
         (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
         () -> getEncReading() > ClimbConstants.Pulley.Setpoints.STOWED.getPos(),
