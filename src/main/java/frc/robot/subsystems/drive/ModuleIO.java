@@ -1,55 +1,51 @@
-// Copyright 2021-2025 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleIO {
-  @AutoLog
-  public static class ModuleIOInputs {
-    public boolean driveConnected = false;
-    public double drivePositionRad = 0.0;
-    public double driveVelocityRadPerSec = 0.0;
-    public double driveAppliedVolts = 0.0;
-    public double driveCurrentAmps = 0.0;
+    @AutoLog
+    public static class ModuleInputs {
+        public boolean isDriveConnected = true;
+        public double drivePositionM = 0.0;
+        public double driveVelocityMPS = 0.0;
+        public double driveStatorCurrentAmps = 0.0;
+        public double driveSupplyCurrentAmps = 0.0;
+        public double driveTorqueCurrentAmps = 0.0;
+        public double driveTemperatureCelsius = 0.0;
+        public double driveAppliedVolts = 0.0;
+        public double driveMotorVolts = 0.0;
+        public double driveAccelerationMPSS = 0.0;
 
-    public boolean turnConnected = false;
-    public boolean turnEncoderConnected = false;
-    public Rotation2d turnAbsolutePosition = new Rotation2d();
-    public Rotation2d turnPosition = new Rotation2d();
-    public double turnVelocityRadPerSec = 0.0;
-    public double turnAppliedVolts = 0.0;
-    public double turnCurrentAmps = 0.0;
+        public boolean isAzimuthConnected = true;
+        public Rotation2d azimuthPosition = new Rotation2d();
+        public Rotation2d azimuthVelocity = new Rotation2d();
+        public double azimuthStatorCurrentAmps = 0.0;
+        public double azimuthSupplyCurrentAmps = 0.0;
+        // public double azimuthTorqueCurrentAmps = 0.0;
+        public double azimuthTemperatureCelsius = 0.0;
+        public double azimuthAppliedVolts = 0.0;
+        public double azimuthMotorVolts = 0.0;
 
-    public double[] odometryTimestamps = new double[] {};
-    public double[] odometryDrivePositionsRad = new double[] {};
-    public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
-  }
+        public boolean isCancoderConnected = true;
+        public Rotation2d azimuthAbsolutePosition = new Rotation2d();
+    }
 
-  /** Updates the set of loggable inputs. */
-  public default void updateInputs(ModuleIOInputs inputs) {}
+    public default void updateInputs(ModuleInputs inputs) {}
 
-  /** Run the drive motor at the specified open loop value. */
-  public default void setDriveOpenLoop(double output) {}
+    public default void setDriveVelocity(double velocityMPS, double feedforward) {}
 
-  /** Run the turn motor at the specified open loop value. */
-  public default void setTurnOpenLoop(double output) {}
+    public default void setDriveVolts(double volts) {}
 
-  /** Run the drive motor at the specified velocity. */
-  public default void setDriveVelocity(double velocityRadPerSec) {}
+    public default void setDriveAmperage(double amps) {}
 
-  /** Run the turn motor to the specified rotation. */
-  public default void setTurnPosition(Rotation2d rotation) {}
+    public default void setDrivePID(double kP, double kI, double kD) {}
+
+    public default void setAzimuthVolts(double votls) {}
+
+    public default void setAzimuthPosition(Rotation2d rotation, double feedforward) {}
+
+    public default void resetAzimuthEncoder() {}
+
+    public default void setAzimuthPID(double kP, double kI, double kD) {}
 }

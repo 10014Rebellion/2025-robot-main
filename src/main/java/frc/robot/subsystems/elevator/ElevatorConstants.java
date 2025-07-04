@@ -37,7 +37,7 @@ public class ElevatorConstants {
   public enum Setpoints {
     BOTTOM(0),
     HPINTAKE(2),
-    PREINTAKE(23.0),
+    PREINTAKE(25.0),
     POSTINTAKE(18.0),
     GROUNDALGAE(8),
     L1(27),

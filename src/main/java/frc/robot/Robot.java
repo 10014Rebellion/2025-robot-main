@@ -1,23 +1,22 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.struct.parser.ParseException;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.util.Elastic;
+import frc.robot.util.telemetry.Elastic;
+
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -26,10 +25,17 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
  * project.
  */
 public class Robot extends LoggedRobot {
@@ -41,10 +47,9 @@ public class Robot extends LoggedRobot {
   Optional<Alliance> newAlly;
 
   private static void updateAlliance() {
-    gIsBlueAlliance =
-        DriverStation.getAlliance().isPresent()
-            ? DriverStation.getAlliance().get().equals(Alliance.Blue)
-            : true;
+    gIsBlueAlliance = DriverStation.getAlliance().isPresent()
+        ? DriverStation.getAlliance().get().equals(Alliance.Blue)
+        : true;
   }
 
   public Robot() {
@@ -124,7 +129,8 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -137,27 +143,24 @@ public class Robot extends LoggedRobot {
       if (AutoBuilder.getAllAutoNames().contains(autoName)) {
         System.out.println("Displaying " + autoName);
         try {
-          List<PathPlannerPath> pathPlannerPaths =
-              PathPlannerAuto.getPathGroupFromAutoFile(autoName);
+          List<PathPlannerPath> pathPlannerPaths = PathPlannerAuto.getPathGroupFromAutoFile(autoName);
           List<Pose2d> poses = new ArrayList<>();
           for (PathPlannerPath path : pathPlannerPaths) {
             if (gIsBlueAlliance) {
               poses.addAll(
                   path.getAllPathPoints().stream()
                       .map(
-                          point ->
-                              new Pose2d(
-                                  point.position.getX(), point.position.getY(), new Rotation2d()))
+                          point -> new Pose2d(
+                              point.position.getX(), point.position.getY(), new Rotation2d()))
                       .collect(Collectors.toList()));
             } else if (ally.get() == Alliance.Red) {
               poses.addAll(
                   path.getAllPathPoints().stream()
                       .map(
-                          point ->
-                              new Pose2d(
-                                  PoseConstants.WeldedField.kFieldLengthM - point.position.getX(),
-                                  PoseConstants.WeldedField.kFieldWidthM - point.position.getY(),
-                                  new Rotation2d()))
+                          point -> new Pose2d(
+                              PoseConstants.WeldedField.kFieldLengthM - point.position.getX(),
+                              PoseConstants.WeldedField.kFieldWidthM - point.position.getY(),
+                              new Rotation2d()))
                       .collect(Collectors.toList()));
             }
           }
@@ -186,7 +189,10 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData(robotContainer.getTelemetry().getAutonPreviewField());
   }
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
@@ -201,7 +207,8 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -221,7 +228,8 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
@@ -232,13 +240,16 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }

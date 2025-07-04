@@ -10,16 +10,19 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.intake.IntakeConstants.Beambreak;
 import frc.robot.subsystems.intake.IntakeConstants.Indexer;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePivot;
 import frc.robot.subsystems.intake.IntakeConstants.IntakeRoller;
 import frc.robot.subsystems.wrist.WristConstants;
-import frc.robot.util.*;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final SparkMax mIntakePivotMotor;
@@ -32,17 +35,12 @@ public class IntakeSubsystem extends SubsystemBase {
   private final DigitalInput mCoralSensorFront;
   private final DigitalInput mCoralSensorBack;
 
-  private Controllers mCurrentController;
   private final ProfiledPIDController mIntakePivotProfiledPID;
   private ArmFeedforward mIntakePivotFF;
 
   private boolean mBackTriggered;
-
-  private enum Controllers {
-    ProfiledPID,
-    Feedforward,
-    Manual
-  }
+  private boolean mFrontTriggered;
+  private Timer mCoralStuckTimer;
 
   public IntakeSubsystem() {
     mBackTriggered = false;
@@ -52,15 +50,13 @@ public class IntakeSubsystem extends SubsystemBase {
     // this.mEncoder.
     this.mIntakeRollerMotor = new SparkFlex(IntakeRoller.kRollerID, IntakeRoller.kMotorType);
     this.mIndexerMotor = new SparkFlex(Indexer.kIndexerID, Indexer.kMotorType);
-    this.mIntakePivotProfiledPID =
-        new ProfiledPIDController(
-            IntakePivot.kP,
-            0,
-            IntakePivot.kD,
-            new Constraints(IntakePivot.kMaxVelocity, IntakePivot.kMaxAcceleration));
+    this.mIntakePivotProfiledPID = new ProfiledPIDController(
+        IntakePivot.kP,
+        0,
+        IntakePivot.kD,
+        new Constraints(IntakePivot.kMaxVelocity, IntakePivot.kMaxAcceleration));
     this.mIntakePivotProfiledPID.setTolerance(IntakeConstants.IntakePivot.kTolerance);
-    this.mIntakePivotFF =
-        new ArmFeedforward(IntakePivot.kS, IntakePivot.kG, IntakePivot.kV, IntakePivot.kA);
+    this.mIntakePivotFF = new ArmFeedforward(IntakePivot.kS, IntakePivot.kG, IntakePivot.kV, IntakePivot.kA);
 
     mIntakePivotMotor.configure(
         IntakePivot.kPivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -94,23 +90,24 @@ public class IntakeSubsystem extends SubsystemBase {
 
     mCoralSensorFront = new DigitalInput(Beambreak.kFrontSensorDIOPort);
     mCoralSensorBack = new DigitalInput(Beambreak.kBackSensorDIOPort);
+
+    mCoralStuckTimer = new Timer();
+    mCoralStuckTimer.stop();
+    mCoralStuckTimer.reset();
   }
 
   public FunctionalCommand enableFFCmd() {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.Feedforward;
           double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
-          mIntakePivotFF =
-              new ArmFeedforward(
-                  IntakeConstants.IntakePivot.kS,
-                  newKg,
-                  IntakeConstants.IntakePivot.kV,
-                  IntakeConstants.IntakePivot.kA);
+          mIntakePivotFF = new ArmFeedforward(
+              IntakeConstants.IntakePivot.kS,
+              newKg,
+              IntakeConstants.IntakePivot.kV,
+              IntakeConstants.IntakePivot.kA);
         },
         () -> {
-          double calculatedOutput =
-              mIntakePivotFF.calculate(Math.toRadians(getEncoderReading() - 10.0), 0.0);
+          double calculatedOutput = mIntakePivotFF.calculate(Math.toRadians(getEncoderReading() - 10.0), 0.0);
           setVoltsIntakePivot(calculatedOutput);
         },
         (interrupted) -> setVoltsIntakePivot(0),
@@ -129,34 +126,30 @@ public class IntakeSubsystem extends SubsystemBase {
   public FunctionalCommand setPIDIntakePivotCmd(IntakePivot.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.ProfiledPID;
           double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
           double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
           double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
-          mIntakePivotFF =
-              new ArmFeedforward(
-                  IntakeConstants.IntakePivot.kS,
-                  newKg,
-                  IntakeConstants.IntakePivot.kV,
-                  IntakeConstants.IntakePivot.kA);
+          mIntakePivotFF = new ArmFeedforward(
+              IntakeConstants.IntakePivot.kS,
+              newKg,
+              IntakeConstants.IntakePivot.kV,
+              IntakeConstants.IntakePivot.kA);
           mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
           mIntakePivotProfiledPID.reset(getEncoderReading());
           mIntakePivotProfiledPID.setGoal(pSetpoint.getPos());
         },
         () -> {
           double encoderReading = getEncoderReading();
-          double calculatedFF =
-              mIntakePivotFF.calculate(
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
+          double calculatedFF = mIntakePivotFF.calculate(
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
           double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
           setVoltsIntakePivot(calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Intake/PID Output", calculatedPID);
           SmartDashboard.putNumber("Intake/FF Output", calculatedFF);
         },
-        (interrupted) ->
-            setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
+        (interrupted) -> setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
         () -> false, // isPIDAtGoalIntakePivot(),
         this);
   }
@@ -164,34 +157,30 @@ public class IntakeSubsystem extends SubsystemBase {
   public FunctionalCommand setEndablePIDIntakePivotCmd(IntakePivot.Setpoints pSetpoint) {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.ProfiledPID;
           double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
           double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
           double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
-          mIntakePivotFF =
-              new ArmFeedforward(
-                  IntakeConstants.IntakePivot.kS,
-                  newKg,
-                  IntakeConstants.IntakePivot.kV,
-                  IntakeConstants.IntakePivot.kA);
+          mIntakePivotFF = new ArmFeedforward(
+              IntakeConstants.IntakePivot.kS,
+              newKg,
+              IntakeConstants.IntakePivot.kV,
+              IntakeConstants.IntakePivot.kA);
           mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
           mIntakePivotProfiledPID.reset(getEncoderReading());
           mIntakePivotProfiledPID.setGoal(pSetpoint.getPos());
         },
         () -> {
           double encoderReading = getEncoderReading();
-          double calculatedFF =
-              mIntakePivotFF.calculate(
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
+          double calculatedFF = mIntakePivotFF.calculate(
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
           double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
           setVoltsIntakePivot(calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Intake/PID Output", calculatedPID);
           SmartDashboard.putNumber("Intake/FF Output", calculatedFF);
         },
-        (interrupted) ->
-            setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
+        (interrupted) -> setVoltsIntakePivot(mIntakePivotFF.calculate(Math.toRadians(getEncoderReading()), 0.0)),
         () -> isPIDAtGoalIntakePivot(),
         this);
   }
@@ -203,19 +192,16 @@ public class IntakeSubsystem extends SubsystemBase {
   public FunctionalCommand setTunablePIDIntakeCommand(double pSetpoint) {
     return new FunctionalCommand(
         () -> {
-          mCurrentController = Controllers.ProfiledPID;
           double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakeConstants.IntakePivot.kP);
           double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakeConstants.IntakePivot.kD);
           double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakeConstants.IntakePivot.kG);
           double newKa = SmartDashboard.getNumber("Intake/PivotKa", IntakeConstants.IntakePivot.kA);
           double newKv = SmartDashboard.getNumber("Intake/PivotKv", IntakeConstants.IntakePivot.kV);
           double newKs = SmartDashboard.getNumber("Intake/PivotKs", IntakeConstants.IntakePivot.kS);
-          double newMaxVel =
-              SmartDashboard.getNumber(
-                  "Intake/Max Velocity", IntakeConstants.IntakePivot.kMaxVelocity);
-          double newMaxAccel =
-              SmartDashboard.getNumber(
-                  "Intake/Max Acceleration", IntakeConstants.IntakePivot.kMaxAcceleration);
+          double newMaxVel = SmartDashboard.getNumber(
+              "Intake/Max Velocity", IntakeConstants.IntakePivot.kMaxVelocity);
+          double newMaxAccel = SmartDashboard.getNumber(
+              "Intake/Max Acceleration", IntakeConstants.IntakePivot.kMaxAcceleration);
           mIntakePivotFF = new ArmFeedforward(newKs, newKg, newKv, newKa);
           mIntakePivotProfiledPID.setConstraints(new Constraints(newMaxVel, newMaxAccel));
           mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
@@ -224,10 +210,9 @@ public class IntakeSubsystem extends SubsystemBase {
         },
         () -> {
           double encoderReading = getEncoderReading();
-          double calculatedFF =
-              mIntakePivotFF.calculate(
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position),
-                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
+          double calculatedFF = mIntakePivotFF.calculate(
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position),
+              Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
           double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
           setVoltsIntakePivot(calculatedPID + calculatedFF);
           SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
@@ -242,7 +227,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public InstantCommand setVoltsIntakePivotCmd(double pVoltage) {
     return new InstantCommand(
         () -> {
-          mCurrentController = Controllers.Manual;
           setVoltsIntakePivot(pVoltage);
         });
   }
@@ -261,21 +245,28 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public FunctionalCommand autonSetIndexCoralCmd() {
     return new FunctionalCommand(
-        () -> {},
         () -> {
-          setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          mBackTriggered = false;
+        },
+        () -> {
+          if (getCoralDetectedBack() || getCoralDetectedFront()) {
+            mBackTriggered = true;
+          }
+          
+          if (mBackTriggered) {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow);
+          } 
+          else {
+            setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+          }
         },
         (interrupted) -> {
-          setVoltsIndexer(1.0);
+          setVoltsIndexer(0.0);
         },
         () -> {
-          return getCoralDetected();
+          return getCoralDetectedFront();
         });
   }
-
-  // public Command setIndexCoralCmd() {
-  //   return new AutoFunnelCoralCommand(this);
-  // }
 
   public FunctionalCommand setIndexCoralCmd() {
     return new FunctionalCommand(
@@ -283,9 +274,10 @@ public class IntakeSubsystem extends SubsystemBase {
           mBackTriggered = false;
         },
         () -> {
-          if (getCoralDetectedBack()) {
+          if (getCoralDetectedBack() || getCoralDetectedFront()) {
             mBackTriggered = true;
           }
+          
 
           if (mBackTriggered) {
             setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow);
@@ -294,13 +286,57 @@ public class IntakeSubsystem extends SubsystemBase {
           }
         },
         (interrupted) -> {
-          setVoltsIndexer(1.0);
+          setVoltsIndexer(0.0);
           mBackTriggered = false;
         },
         () -> {
-          return getCoralDetected();
+          return getCoralDetectedFront();
         });
   }
+  /* 
+  public RepeatCommand setIndexCoralCmd() {
+    return new RepeatCommand(
+      new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeStuckTime), initialIndexCommand())
+      .andThen(new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeReverseTime), reverseIndexCommand()))
+    );
+  }
+
+  private FunctionalCommand initialIndexCommand() {
+    return new FunctionalCommand(
+        () -> {
+          mBackTriggered = getCoralDetectedBack();
+          mFrontTriggered = getCoralDetectedFront();
+        },
+        () -> {
+          if (getCoralDetectedBack()) {
+            mBackTriggered = true;
+          }
+          if(getCoralDetectedFront()) {
+            mFrontTriggered = true;
+          }
+          if (mFrontTriggered = true) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsHold);
+          else if (mBackTriggered) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow); 
+          else setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
+        },
+        (interrupted) -> {
+          setVoltsIndexer(0.0);
+          mBackTriggered = false;
+        },
+        () -> {
+          return getCoralDetectedFront();
+        });
+  } 
+
+  private FunctionalCommand reverseIndexCommand() {
+    return new FunctionalCommand(
+      () -> {}, 
+      () -> {
+        setVoltsIndexer(IntakeConstants.Indexer.kOuttakeVolts);
+      }, 
+      (interrupted) -> setVoltsIndexer(0.0), 
+      () -> getCoralDetectedBack());
+  }
+      */
 
   private double filterVoltageIntakePivot(double pVoltage) {
     return filterToLimitsIntakePivot(MathUtil.clamp(pVoltage, -12.0, 12.0));
@@ -341,9 +377,6 @@ public class IntakeSubsystem extends SubsystemBase {
     return mDisableIR ? true : !mCoralSensorBack.get();
   }
 
-  public boolean getCoralDetected() {
-    return getCoralDetectedFront();
-  }
 
   public FunctionalCommand setPivotCmd(double pVoltage) {
     return new FunctionalCommand(
@@ -355,11 +388,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public FunctionalCommand setTunablePivotCmd() {
     return new FunctionalCommand(
-        () -> {},
-        () ->
-            setVoltsIntakePivot(
-                SmartDashboard.getNumber("Intake/Tunable Pivot Voltage", 0.0)
-                    + IntakeConstants.IntakePivot.kS),
+        () -> {
+        },
+        () -> setVoltsIntakePivot(
+            SmartDashboard.getNumber("Intake/Tunable Pivot Voltage", 0.0)
+                + IntakeConstants.IntakePivot.kS),
         (interrupted) -> setVoltsIntakePivot(0.0),
         () -> false,
         this);
@@ -387,7 +420,7 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot Current", mIntakePivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Pivot Voltage", mIntakePivotMotor.getBusVoltage());
     SmartDashboard.putNumber("Intake/Roller Current", mIntakeRollerMotor.getOutputCurrent());
-    SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetected());
+    SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetectedFront());
     SmartDashboard.putNumber("Intake/Pivot Setpoint", mIntakePivotProfiledPID.getGoal().position);
     SmartDashboard.putBoolean("Intake/IR Disabled", mDisableIR);
   }

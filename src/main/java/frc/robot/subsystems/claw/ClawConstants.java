@@ -8,14 +8,12 @@ public class ClawConstants {
 
   public static final int kClawID = 43;
   public static final int kBeamBreakDIOPort = 2;
-  // public static final double kEncoderOffset = 48.5; // TODO: TUNE
-
   public static final MotorType kMotorType = MotorType.kBrushless;
   public static final IdleMode kIdleMode = IdleMode.kBrake;
   public static final int kCurrentLimit = 80;
   public static final boolean kInverted = true;
-  public static final double kP = 0.01; // TODO: Configure me!
-  public static final double kD = 0.0; // TODO: Configure me!
+  public static final double kP = 0.01;
+  public static final double kD = 0.0;
 
   public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
