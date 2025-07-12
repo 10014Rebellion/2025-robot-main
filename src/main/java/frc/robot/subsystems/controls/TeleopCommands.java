@@ -2,6 +2,7 @@ package frc.robot.subsystems.controls;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -144,14 +145,11 @@ public class TeleopCommands {
 		public Command getGoToReefCmd(SIDE side) {
 			return new SequentialCommandGroup(
 				GoalPoseChooser.setSideCommand(side),
-				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-			);
-		}
-		public Command getGoToAlgaeCmd(SIDE side) {
-			return new SequentialCommandGroup(
-				GoalPoseChooser.setSideCommand(side),
-				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_ALGAE)
-			);
+				new ConditionalCommand( 
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL),
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_ALGAE),
+				() -> !side.equals(SIDE.ALGAE)
+			));
 		}
 
 		/** STOP DRIVE: Stops the drive entirely, runs instantly */

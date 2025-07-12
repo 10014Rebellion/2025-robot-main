@@ -110,7 +110,7 @@ public class ButtonBindings {
 
     mDriverController
       .a()
-        .whileTrue(mActionCommands.getGoToAlgaeCmd(SIDE.ALGAE))
+        .whileTrue(mActionCommands.getGoToReefCmd(SIDE.ALGAE))
         .onFalse(mActionCommands.getStopDriveCmd());
 
     mDriverController
