@@ -1,5 +1,10 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -27,8 +32,8 @@ import frc.robot.subsystems.wrist.WristConstants;
 public class IntakeSubsystem extends SubsystemBase {
   private final SparkMax mIntakePivotMotor;
   private final AbsoluteEncoder mEncoder;
-  private final SparkFlex mIntakeRollerMotor;
-  private final SparkFlex mIndexerMotor;
+  private final TalonFX mIntakeRollerMotor;
+  private final TalonFX mIndexerMotor;
   private boolean mDisableIR;
 
   // private final DigitalInput mCoralSensor1;
@@ -48,8 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
     this.mIntakePivotMotor = new SparkMax(IntakePivot.kPivotID, IntakePivot.kMotorType);
     this.mEncoder = mIntakePivotMotor.getAbsoluteEncoder();
     // this.mEncoder.
-    this.mIntakeRollerMotor = new SparkFlex(IntakeRoller.kRollerID, IntakeRoller.kMotorType);
-    this.mIndexerMotor = new SparkFlex(Indexer.kIndexerID, Indexer.kMotorType);
+
     this.mIntakePivotProfiledPID = new ProfiledPIDController(
         IntakePivot.kP,
         0,
@@ -58,16 +62,41 @@ public class IntakeSubsystem extends SubsystemBase {
     this.mIntakePivotProfiledPID.setTolerance(IntakeConstants.IntakePivot.kTolerance);
     this.mIntakePivotFF = new ArmFeedforward(IntakePivot.kS, IntakePivot.kG, IntakePivot.kV, IntakePivot.kA);
 
-    mIntakePivotMotor.configure(
-        IntakePivot.kPivotConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    this.mIntakeRollerMotor =new TalonFX(IntakeRoller.kRollerID);
+    mIntakeRollerMotor.getConfigurator().apply(new TalonFXConfiguration());
+    TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
+        // Apply configurations
+    rollerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    rollerConfig.CurrentLimits.SupplyCurrentLimit = IntakeRoller.kRollerCurrentLimit;
+    rollerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    rollerConfig.CurrentLimits.StatorCurrentLimit = IntakeRoller.kRollerCurrentLimit;
+    rollerConfig.Voltage.PeakForwardVoltage = 12;
+    rollerConfig.Voltage.PeakReverseVoltage = -12;
 
-    mIntakeRollerMotor.configure(
-        IntakeRoller.kRollerConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    rollerConfig.MotorOutput.Inverted =  IntakeRoller.kInverted 
+        ? InvertedValue.CounterClockwise_Positive 
+        : InvertedValue.Clockwise_Positive;
 
-    mIndexerMotor.configure(
-        Indexer.kIndexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
+
+    this.mIndexerMotor = new TalonFX(Indexer.kIndexerID);
+    mIndexerMotor.getConfigurator().apply(new TalonFXConfiguration());
+    TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
+    // Apply configurations
+    indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    indexerConfig.CurrentLimits.SupplyCurrentLimit = Indexer.kCurrentLimit;
+    indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    indexerConfig.CurrentLimits.StatorCurrentLimit = Indexer.kCurrentLimit;
+    indexerConfig.Voltage.PeakForwardVoltage = 12;
+    indexerConfig.Voltage.PeakReverseVoltage = -12;
+
+    indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    indexerConfig.MotorOutput.Inverted =  IntakeRoller.kInverted 
+        ? InvertedValue.CounterClockwise_Positive 
+        : InvertedValue.Clockwise_Positive;
+
+    mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
 
     this.setDefaultCommand(enableFFCmd());
 
@@ -419,7 +448,7 @@ public class IntakeSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot Position", getEncoderReading());
     SmartDashboard.putNumber("Intake/Pivot Current", mIntakePivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Intake/Pivot Voltage", mIntakePivotMotor.getBusVoltage());
-    SmartDashboard.putNumber("Intake/Roller Current", mIntakeRollerMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Intake/Roller Current", mIntakeRollerMotor.getStatorCurrent().getValueAsDouble());
     SmartDashboard.putBoolean("Intake/Coral Detected", getCoralDetectedFront());
     SmartDashboard.putNumber("Intake/Pivot Setpoint", mIntakePivotProfiledPID.getGoal().position);
     SmartDashboard.putBoolean("Intake/IR Disabled", mDisableIR);
