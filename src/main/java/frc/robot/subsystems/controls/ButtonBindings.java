@@ -3,6 +3,7 @@ package frc.robot.subsystems.controls;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -64,7 +65,7 @@ public class ButtonBindings {
   public void initTriggers() {
     new Trigger(
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
-        .whileTrue(mActionCommands.getScoreCoralCmd());
+        .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
       new Trigger(() -> mClaw.getBeamBreak())
         .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
@@ -109,7 +110,7 @@ public class ButtonBindings {
 
     mDriverController
       .a()
-        .whileTrue(mActionCommands.getGoToReefCmd(SIDE.ALGAE))
+        .whileTrue(mActionCommands.getGoToAlgaeCmd(SIDE.ALGAE))
         .onFalse(mActionCommands.getStopDriveCmd());
 
     mDriverController
@@ -140,8 +141,11 @@ public class ButtonBindings {
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     mOperatorButtonboard
-      .button(ButtonBindingsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.EXTENDED));
+      .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
+        .whileTrue(
+          new ParallelCommandGroup(
+            mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.EXTENDED),
+            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)));
     // .whileFalse();
 
     mOperatorButtonboard

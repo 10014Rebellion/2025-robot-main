@@ -39,7 +39,7 @@ public class IntakeConstants {
     public static boolean kInverted = false;
     public static double kIntakeSpeed = 12;
 
-    public static int kRollerCurrentLimit = 80;
+    public static int kRollerCurrentLimit = 60;
 
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 

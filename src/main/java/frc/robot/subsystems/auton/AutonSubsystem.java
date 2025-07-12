@@ -85,6 +85,8 @@ public class AutonSubsystem {
         NamedCommands.registerCommand("GoToCenterPose", goToClosestCenterPose());
 
         NamedCommands.registerCommand("STOP", mDrive.setDriveStateCommand(DriveState.STOP));
+
+        NamedCommands.registerCommand("StowArm", stowArm());
     }
 
     private InstantCommand holdCoral() {
@@ -190,8 +192,10 @@ public class AutonSubsystem {
         GoalPoseChooser.SIDE branchOffset = GoalPoseChooser.SIDE.ALGAE;
         GoalPoseChooser.setSide(branchOffset);
 
-        return mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-            .withDeadline(mDrive.waitUnitllAutoAlignFinishes());
+        return mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_ALGAE)
+            .withDeadline(
+                new ParallelRaceGroup(mDrive.waitUnitllAutoAlignFinishes(),
+                new WaitCommand(1.0)));
     }
 
     private SequentialCommandGroup HPCoralIntake() {
@@ -235,6 +239,12 @@ public class AutonSubsystem {
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
                 mClaw.intakeCoralCmd()),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
+    }
+
+    private ParallelCommandGroup stowArm() {
+        return new ParallelCommandGroup(
+            mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)
+        );
     }
 
     private ParallelCommandGroup readyFunnelSubsystem() {

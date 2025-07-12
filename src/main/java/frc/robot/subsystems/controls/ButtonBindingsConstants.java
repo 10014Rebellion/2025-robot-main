@@ -28,7 +28,7 @@ public class ButtonBindingsConstants {
     public static final int kSetScoreL1 = 11;
 
     // Climbing
-    public static final int kClimbDescend = 8;
+    public static final int kClimbDeploy = 8;
     public static final int kClimbAscend = 12;
   }
 }

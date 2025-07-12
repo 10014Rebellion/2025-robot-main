@@ -20,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -329,16 +330,17 @@ public class Drive extends SubsystemBase {
                 );
                 break;
             case DRIVE_TO_ALGAE:
-                ChassisSpeeds algaeAlignSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
-                double forwardJoy = (goalPose.getX() > AllianceFlipUtil.apply(FieldConstants.kReefCenter.getX()))
-                ? -teleopSpeeds.vxMetersPerSecond: teleopSpeeds.vxMetersPerSecond;
-                if(AllianceFlipUtil.shouldFlip()) forwardJoy *= -1;
-                desiredSpeeds = new ChassisSpeeds(
-                    /* Flips speed to preserve field relative. Not best solution, but probably good enough? */
-                    forwardJoy,
-                    algaeAlignSpeeds.vyMetersPerSecond,
-                    algaeAlignSpeeds.omegaRadiansPerSecond
-                );
+                desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+                // ChassisSpeeds algaeAlignSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+                // double forwardJoy = (goalPose.getX() > AllianceFlipUtil.apply(FieldConstants.kReefCenter.getX()))
+                // ? -teleopSpeeds.vxMetersPerSecond: teleopSpeeds.vxMetersPerSecond;
+                // if(AllianceFlipUtil.shouldFlip()) forwardJoy *= -1;
+                // desiredSpeeds = new ChassisSpeeds(
+                //     /* Flips speed to preserve field relative. Not best solution, but probably good enough? */
+                //     forwardJoy,
+                //     algaeAlignSpeeds.vyMetersPerSecond,
+                //     algaeAlignSpeeds.omegaRadiansPerSecond
+                // );
                 break;
             case AUTON:
                 desiredSpeeds = ppDesiredSpeeds;
@@ -415,12 +417,10 @@ public class Drive extends SubsystemBase {
                 goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
                 break;
             case DRIVE_TO_ALGAE:
-                GoalPoseChooser.setSide(SIDE.ALGAE);
                 autoAlignController.reset(
                     getPoseEstimate(),
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), 
-                        getPoseEstimate().getRotation()));
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
                 goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
                 break;
             case DRIVE_TO_INTAKE:
@@ -521,6 +521,7 @@ public class Drive extends SubsystemBase {
                 /* No need to optimize for Choreo, as it handles it under the hood */
                 // return SwerveUtils.convertChoreoNewtonsToAmps(currentState, pathPlanningFF, i);
             case DRIVE_TO_CORAL:           
+            case DRIVE_TO_ALGAE:
             case DRIVE_TO_INTAKE:
                 return 0.0;// return pathPlanningFF.torqueCurrentsAmps()[i];
             default:
@@ -534,7 +535,7 @@ public class Drive extends SubsystemBase {
         robotRotation = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red) ? 
             Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
         gyro.resetGyro(robotRotation);
-        setPose(new Pose2d(getPoseEstimate().getTranslation(), robotRotation));
+        setPose(new Pose2d(new Translation2d(), robotRotation));
     }
 
     public void setPose(Pose2d pose) {

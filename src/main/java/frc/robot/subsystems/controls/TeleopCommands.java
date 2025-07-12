@@ -147,6 +147,12 @@ public class TeleopCommands {
 				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
 			);
 		}
+		public Command getGoToAlgaeCmd(SIDE side) {
+			return new SequentialCommandGroup(
+				GoalPoseChooser.setSideCommand(side),
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_ALGAE)
+			);
+		}
 
 		/** STOP DRIVE: Stops the drive entirely, runs instantly */
 		public Command getStopDriveCmd() {
@@ -222,10 +228,17 @@ public class TeleopCommands {
 	 	if (pAlgaeLevel == AlgaeScoringLevel.NET) {
 			return new SequentialCommandGroup(
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+				// new ParallelCommandGroup(
+				// 	// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+				// 	new SequentialCommandGroup(
+				// 		mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+				// 		mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
+				// 	mClaw.throwAlgae(mWrist, mElevator)));
 				new ParallelCommandGroup(
 					// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+					mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
 					new SequentialCommandGroup(
-						mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+						new WaitCommand(0.25),
 						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
 					mClaw.throwAlgae(mWrist, mElevator)));
 		}

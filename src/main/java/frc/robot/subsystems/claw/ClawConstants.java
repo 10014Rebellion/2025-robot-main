@@ -10,7 +10,7 @@ public class ClawConstants {
   public static final int kBeamBreakDIOPort = 2;
   public static final MotorType kMotorType = MotorType.kBrushless;
   public static final IdleMode kIdleMode = IdleMode.kBrake;
-  public static final int kCurrentLimit = 80;
+  public static final int kCurrentLimit = 60;
   public static final boolean kInverted = true;
   public static final double kP = 0.01;
   public static final double kD = 0.0;
