@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.util.debugging.LoggedTunableNumber;
 
 import static frc.robot.subsystems.drive.DriveConstants.kModuleControllerConfigs;
@@ -82,6 +83,8 @@ public class Module {
             Logger.recordOutput("Drive/"+kModuleName+"/SimpleFeedforward", ffOutput);
             io.setAzimuthPosition(azimuthSetpointAngle, ffOutput);
         }
+
+        if(DriverStation.isDisabled()) stop();
 
         // Updates PID values for drive and azimuth
         LoggedTunableNumber.ifChanged(

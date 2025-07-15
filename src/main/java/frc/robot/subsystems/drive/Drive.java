@@ -239,24 +239,18 @@ public class Drive extends SubsystemBase {
     public void periodic() {
         ///////////////////// DATA COLLECTION AND UPDATE CONTROLLERS AND ODOMETRY \\\\\\\\\\\\\\\\\\
         /* Modules */
-        for (Module module : modules) {
-            module.periodic();
-            if (DriverStation.isDisabled()) module.stop();
-        }
+        for (Module module : modules) module.periodic();
 
         /* GYRO */
         gyro.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
-        if (gyroInputs.connected) {
-            robotRotation = gyroInputs.yawPosition;
-        } else {
-            robotRotation = Rotation2d.fromRadians(
-                (poseEstimator.getEstimatedPosition().getRotation().getRadians()
-                /* D=vt. Uses modules and IK to estimate turn */
-                    + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02) 
-                    /* Scopes result between 0 and 360 */
-                    % 360.0);
-        }
+        if (gyroInputs.connected) robotRotation = gyroInputs.yawPosition;
+        else robotRotation = Rotation2d.fromRadians(
+            (poseEstimator.getEstimatedPosition().getRotation().getRadians()
+            /* D=vt. Uses modules and IK to estimate turn */
+            + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02) 
+                /* Scopes result between 0 and 360 */
+                % 360.0);
 
         /* VISION */
         vision.periodic(poseEstimator.getEstimatedPosition(), odometry.getPoseMeters());
@@ -330,17 +324,17 @@ public class Drive extends SubsystemBase {
                 );
                 break;
             case DRIVE_TO_ALGAE:
-                desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
-                // ChassisSpeeds algaeAlignSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
-                // double forwardJoy = (goalPose.getX() > AllianceFlipUtil.apply(FieldConstants.kReefCenter.getX()))
-                // ? -teleopSpeeds.vxMetersPerSecond: teleopSpeeds.vxMetersPerSecond;
-                // if(AllianceFlipUtil.shouldFlip()) forwardJoy *= -1;
-                // desiredSpeeds = new ChassisSpeeds(
-                //     /* Flips speed to preserve field relative. Not best solution, but probably good enough? */
-                //     forwardJoy,
-                //     algaeAlignSpeeds.vyMetersPerSecond,
-                //     algaeAlignSpeeds.omegaRadiansPerSecond
-                // );
+                // desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+                ChassisSpeeds algaeAlignSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+                double forwardJoy = (goalPose.getX() > AllianceFlipUtil.apply(FieldConstants.kReefCenter.getX()))
+                ? -teleopSpeeds.vxMetersPerSecond: teleopSpeeds.vxMetersPerSecond;
+                if(AllianceFlipUtil.shouldFlip()) forwardJoy *= -1;
+                desiredSpeeds = new ChassisSpeeds(
+                    /* Flips speed to preserve field relative. Not best solution, but probably good enough? */
+                    forwardJoy,
+                    algaeAlignSpeeds.vyMetersPerSecond,
+                    algaeAlignSpeeds.omegaRadiansPerSecond
+                );
                 break;
             case AUTON:
                 desiredSpeeds = ppDesiredSpeeds;
@@ -357,9 +351,6 @@ public class Drive extends SubsystemBase {
             case RIGHT:
                 desiredSpeeds = new ChassisSpeeds(0.0, 0.5, teleopSpeeds.omegaRadiansPerSecond);
                 break;
-            // case STOP:
-            //     desiredSpeeds = new ChassisSpeeds();
-            //     break;
             case DRIFT_TEST:
                 desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(linearTestSpeedMPS.get(), 0.0, 
