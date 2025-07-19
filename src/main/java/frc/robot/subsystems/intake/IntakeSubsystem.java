@@ -82,7 +82,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     this.mIndexerMotor = new SparkFlex(Indexer.kIndexerID, Indexer.kMotorType);
     mIndexerMotor.configure(
-        Indexer.kIndexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        Indexer.kIndexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
 
