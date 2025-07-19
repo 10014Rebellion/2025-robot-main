@@ -82,7 +82,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.mElevatorSparkMax.configure(
         ElevatorConstants.kElevatorConfig,
         ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+        PersistMode.kPersistParameters);
   }
 
   public FunctionalCommand enableFFCmd() {
