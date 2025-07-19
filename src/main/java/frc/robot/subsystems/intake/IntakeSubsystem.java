@@ -62,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
     this.mIntakePivotProfiledPID.setTolerance(IntakeConstants.IntakePivot.kTolerance);
     this.mIntakePivotFF = new ArmFeedforward(IntakePivot.kS, IntakePivot.kG, IntakePivot.kV, IntakePivot.kA);
 
-    this.mIntakeRollerMotor =new TalonFX(IntakeRoller.kRollerID);
+    this.mIntakeRollerMotor =new TalonFX(IntakeRoller.kRollerID, "drivetrain");
     mIntakeRollerMotor.getConfigurator().apply(new TalonFXConfiguration());
     TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
         // Apply configurations
@@ -84,7 +84,7 @@ public class IntakeSubsystem extends SubsystemBase {
     mIndexerMotor.configure(
         Indexer.kIndexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
+    // mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
 
     this.setDefaultCommand(enableFFCmd());
 
