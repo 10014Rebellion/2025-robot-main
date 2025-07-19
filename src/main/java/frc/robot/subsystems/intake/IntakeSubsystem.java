@@ -33,7 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final SparkMax mIntakePivotMotor;
   private final AbsoluteEncoder mEncoder;
   private final TalonFX mIntakeRollerMotor;
-  private final TalonFX mIndexerMotor;
+  private final SparkFlex mIndexerMotor;
   private boolean mDisableIR;
 
   // private final DigitalInput mCoralSensor1;
@@ -80,21 +80,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
 
-    this.mIndexerMotor = new TalonFX(Indexer.kIndexerID);
-    mIndexerMotor.getConfigurator().apply(new TalonFXConfiguration());
-    TalonFXConfiguration indexerConfig = new TalonFXConfiguration();
-    // Apply configurations
-    indexerConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    indexerConfig.CurrentLimits.SupplyCurrentLimit = Indexer.kCurrentLimit;
-    indexerConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    indexerConfig.CurrentLimits.StatorCurrentLimit = Indexer.kCurrentLimit;
-    indexerConfig.Voltage.PeakForwardVoltage = 12;
-    indexerConfig.Voltage.PeakReverseVoltage = -12;
-
-    indexerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    indexerConfig.MotorOutput.Inverted =  IntakeRoller.kInverted 
-        ? InvertedValue.CounterClockwise_Positive 
-        : InvertedValue.Clockwise_Positive;
+    this.mIndexerMotor = new SparkFlex(Indexer.kIndexerID, Indexer.kMotorType);
+    mIndexerMotor.configure(
+        Indexer.kIndexerConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
     mIntakeRollerMotor.getConfigurator().apply(rollerConfig, 1.0);
 
