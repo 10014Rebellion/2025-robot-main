@@ -41,6 +41,7 @@ import frc.robot.FieldConstants;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.CHOOSER_STRATEGY;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
+import frc.robot.subsystems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.subsystems.drive.controllers.ManualTeleopController;
 import frc.robot.subsystems.drive.controllers.HolonomicController;
 
@@ -401,32 +402,40 @@ public class Drive extends SubsystemBase {
                 headingController.reset(getPoseEstimate().getRotation(), gyroInputs.yawVelocityPS);
                 break;
             case DRIVE_TO_CORAL:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.LINEAR, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(),
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
-                break;
-            case DRIVE_TO_ALGAE:
-                autoAlignController.reset(
-                    getPoseEstimate(),
-                    ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             case DRIVE_TO_INTAKE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kIntake, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.LINEAR, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(), 
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kIntake, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
+                break;
+            case DRIVE_TO_ALGAE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
+                autoAlignController.reset(
+                    getPoseEstimate(),
+                    ChassisSpeeds.fromRobotRelativeSpeeds(
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             case DRIVE_TO_BARGE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kNet, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(), 
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kNet, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             default:
         }
