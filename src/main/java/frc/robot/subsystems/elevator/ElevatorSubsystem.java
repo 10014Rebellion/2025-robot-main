@@ -37,7 +37,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber k0S = new LoggedTunableNumber("Elevator/Slot0/S", ElevatorConstants.k0S);
   private static final LoggedTunableNumber k0V = new LoggedTunableNumber("Elevator/Slot0/V", ElevatorConstants.k0V);
   private static final LoggedTunableNumber k0A = new LoggedTunableNumber("Elevator/Slot0/A", ElevatorConstants.k0A);
-  private static final LoggedTunableNumber k0G = new LoggedTunableNumber("Elevator/Slot0/A", ElevatorConstants.k0G);
+  private static final LoggedTunableNumber k0G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k0G);
 
   private static final LoggedTunableNumber k1P = new LoggedTunableNumber("Elevator/Slot1/P", ElevatorConstants.k1P);
   private static final LoggedTunableNumber k1I = new LoggedTunableNumber("Elevator/Slot1/I", ElevatorConstants.k1I);
@@ -47,7 +47,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber k1S = new LoggedTunableNumber("Elevator/Slot1/S", ElevatorConstants.k1S);
   private static final LoggedTunableNumber k1V = new LoggedTunableNumber("Elevator/Slot1/V", ElevatorConstants.k1V);
   private static final LoggedTunableNumber k1A = new LoggedTunableNumber("Elevator/Slot1/A", ElevatorConstants.k1A);
-  private static final LoggedTunableNumber k1G = new LoggedTunableNumber("Elevator/Slot0/A", ElevatorConstants.k1G);
+  private static final LoggedTunableNumber k1G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k1G);
 
   private static final LoggedTunableNumber k2P = new LoggedTunableNumber("Elevator/Slot2/P", ElevatorConstants.k2P);
   private static final LoggedTunableNumber k2I = new LoggedTunableNumber("Elevator/Slot2/I", ElevatorConstants.k2I);
@@ -57,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber k2S = new LoggedTunableNumber("Elevator/Slot2/S", ElevatorConstants.k2S);
   private static final LoggedTunableNumber k2V = new LoggedTunableNumber("Elevator/Slot2/V", ElevatorConstants.k2V);
   private static final LoggedTunableNumber k2A = new LoggedTunableNumber("Elevator/Slot2/A", ElevatorConstants.k2A);
-  private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/A", ElevatorConstants.k2G);
+  private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/G", ElevatorConstants.k2G);
 
   private final SparkMax mElevatorSparkMax;
   private final ProfiledPIDController mElevatorProfiledPID;
@@ -264,6 +264,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void updatePIDandFF(double kP, double kI, double kD, double kMaxV, double kMaxA, double kS, double kV, double kA, double kG) {
     mElevatorProfiledPID.setPID(kP, kI, kD);
     mElevatorProfiledPID.setConstraints(new Constraints(kMaxV, kMaxA));
-    mElevatorFF = new ElevatorFeedforward(kS, kA, kV, kG);
+    mElevatorFF = new ElevatorFeedforward(kS, kG, kV, kA);
   }
 }
