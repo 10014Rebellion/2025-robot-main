@@ -13,6 +13,7 @@ import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbConstants.Pulley.Setpoints;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.DriverController;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
@@ -130,13 +131,14 @@ public class ButtonBindings {
       .button(ButtonBindingsConstants.Buttonboard.kScoreCoral)
         .whileTrue(mActionCommands.getScoreCoralCmd());
 
-    mOperatorButtonboard
-      .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
+    // mOperatorButtonboard
+    //   .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)()
+    new Trigger(() -> mClimb.getBeamBroken() && mClimb.getTolerance(Setpoints.CLIMBED))
         .whileTrue(
             new ParallelCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.CLIMBED),
+                mClimb.climbToSetpointRetracted(ClimbConstants.Pulley.Setpoints.CLIMBED),
                 mClimb.setGrabberVoltsCmd(0.0),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 

@@ -108,6 +108,31 @@ public class ClimbSubsystem extends SubsystemBase {
         this);
   }
 
+  public boolean getTolerance(Pulley.Setpoints pSetpoint) {
+    return (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance);
+  }
+
+  public FunctionalCommand climbToSetpointRetracted(Pulley.Setpoints pSetpoint) {
+    return new FunctionalCommand(
+        () -> {
+        },
+        () -> {
+          double encReading = getEncReading();
+          if (encReading > pSetpoint.getPos()) {
+            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND.getVolts());
+          }
+          if (encReading < pSetpoint.getPos()) {
+            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP.getVolts());
+          }
+        },
+        (interrupted) -> {
+          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
+          setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
+        },
+        () -> (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance),
+        this);
+  }
+
   public FunctionalCommand climbUntilRetracted() {
     return new FunctionalCommand(
         () -> setPulleyVolts(
