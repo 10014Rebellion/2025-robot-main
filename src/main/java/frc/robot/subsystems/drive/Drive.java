@@ -403,7 +403,7 @@ public class Drive extends SubsystemBase {
                 break;
             case DRIVE_TO_CORAL:
                 goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
-                autoAlignController.setConstraintType(ConstraintType.LINEAR, getPoseEstimate(), goalPose);
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(),
                     ChassisSpeeds.fromRobotRelativeSpeeds(
@@ -412,7 +412,7 @@ public class Drive extends SubsystemBase {
                 break;
             case DRIVE_TO_INTAKE:
                 goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kIntake, getPoseEstimate());
-                autoAlignController.setConstraintType(ConstraintType.LINEAR, getPoseEstimate(), goalPose);
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(), 
                     ChassisSpeeds.fromRobotRelativeSpeeds(

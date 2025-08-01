@@ -163,6 +163,8 @@ public class HolonomicController {
             yController.setConstraints(new TrapezoidProfile.Constraints(
                 distanceMaxVMPS.get() *  heading.getSin(), 
                 distanceMaxAMPSS.get() * heading.getSin()));
+        } else {
+            xController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
         }
 
         xController.reset( 
