@@ -87,70 +87,36 @@ public class ClimbSubsystem extends SubsystemBase {
     return encoderMeasurement;
   }
 
-  public FunctionalCommand climbToSetpoint(Pulley.Setpoints pSetpoint) {
+  public FunctionalCommand deployClimb() {
     return new FunctionalCommand(
-        () -> {
-        },
-        () -> {
-          double encReading = getEncReading();
-          if (encReading > pSetpoint.getPos()) {
-            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND.getVolts());
-          }
-          if (encReading < pSetpoint.getPos()) {
-            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND.getVolts());
-          }
-        },
-        (interrupted) -> {
-          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
+      () -> {},
+      () -> {
+        if (getEncReading() > ClimbConstants.Pulley.Setpoints.STARTROLLING.getPos())
           setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
-        },
-        () -> (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance),
-        this);
+
+        if (getEncReading() > ClimbConstants.Pulley.Setpoints.EXTENDED.getPos())
+          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.GO.getVolts());
+        
+      }, (interrupted) -> {
+        setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
+        setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
+      }, 
+        () -> isInTolerance(ClimbConstants.Pulley.Setpoints.EXTENDED), this);
   }
 
-  public boolean getTolerance(Pulley.Setpoints pSetpoint) {
+  public FunctionalCommand pullClimb() {
+    return new FunctionalCommand(
+      () -> {},
+      () -> {
+        if (getEncReading() < ClimbConstants.Pulley.Setpoints.CLIMBED.getPos())
+          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.GO.getVolts());
+        
+      }, (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP), 
+        () -> isInTolerance(ClimbConstants.Pulley.Setpoints.CLIMBED), this);
+  }
+
+  public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
     return (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance);
-  }
-
-  public FunctionalCommand climbToSetpointRetracted(Pulley.Setpoints pSetpoint) {
-    return new FunctionalCommand(
-        () -> {
-        },
-        () -> {
-          double encReading = getEncReading();
-          if (encReading > pSetpoint.getPos()) {
-            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.DESCEND.getVolts());
-          }
-          if (encReading < pSetpoint.getPos()) {
-            setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP.getVolts());
-          }
-        },
-        (interrupted) -> {
-          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
-          setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
-        },
-        () -> (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance),
-        this);
-  }
-
-  public FunctionalCommand climbUntilRetracted() {
-    return new FunctionalCommand(
-        () -> setPulleyVolts(
-            ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
-        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
-        (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
-        () -> getEncReading() >= ClimbConstants.Pulley.Setpoints.CLIMBED.getPos(),
-        this);
-  }
-
-  public FunctionalCommand retractClimb() {
-    return new FunctionalCommand(
-        () -> setPulleyVolts(
-            ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
-        () -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.ASCEND),
-        (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP),
-        () -> getEncReading() > ClimbConstants.Pulley.Setpoints.STOWED.getPos(),
-        this);
   }
 
   @Override

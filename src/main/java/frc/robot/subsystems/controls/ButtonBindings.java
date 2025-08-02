@@ -68,9 +68,16 @@ public class ButtonBindings {
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
-      new Trigger(() -> mClaw.getBeamBreak())
-        .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
-        .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
+    new Trigger(() -> mClaw.getBeamBreak())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
+      .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
+    
+    new Trigger(() -> mClimb.getBeamBroken()).and(() -> mClimb.isInTolerance(Setpoints.CLIMBED))
+      .onTrue(new InstantCommand(() -> mClimb.setGrabberVolts(0)));
+
+    new Trigger(() -> mClimb.getBeamBroken())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.GREEN)))
+      .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 
     new Trigger(() -> mDrive.atGoal())
         .whileTrue(
@@ -119,11 +126,11 @@ public class ButtonBindings {
         .whileTrue(mActionCommands.getGroundAlgaeCmd())
         .whileFalse(mActionCommands.getHoldAlgaeCmd());
 
-    mDriverController
-      .povUp()
-        .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
+    // mDriverController
+    //   .povUp()
+    //     .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
 
-    mDriverController.povDown().whileTrue(mClimb.retractClimb());
+    // mDriverController.povDown().whileTrue(mClimb.retractClimb());
   }
 
   public void initOperatorButtons() {
@@ -131,14 +138,15 @@ public class ButtonBindings {
       .button(ButtonBindingsConstants.Buttonboard.kScoreCoral)
         .whileTrue(mActionCommands.getScoreCoralCmd());
 
-    // mOperatorButtonboard
-    //   .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)()
-    new Trigger(() -> mClimb.getBeamBroken() && mClimb.getTolerance(Setpoints.CLIMBED))
+    //
+
+    mOperatorButtonboard
+      .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
             new ParallelCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.climbToSetpointRetracted(ClimbConstants.Pulley.Setpoints.CLIMBED),
+                mClimb.pullClimb(),
                 mClimb.setGrabberVoltsCmd(0.0),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
@@ -146,7 +154,7 @@ public class ButtonBindings {
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
         .whileTrue(
           new ParallelCommandGroup(
-            mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.EXTENDED),
+            mClimb.deployClimb(),
             mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)));
     // .whileFalse();
 
