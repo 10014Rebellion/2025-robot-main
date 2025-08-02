@@ -72,6 +72,8 @@ public class ModuleIOFXFXS implements ModuleIO {
         driveConfig.CurrentLimits.StatorCurrentLimit = kDriveStatorAmpLimit;
         driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         driveConfig.CurrentLimits.SupplyCurrentLimit = kDriveSupplyAmpLimit;
+        driveConfig.CurrentLimits.SupplyCurrentLowerLimit = 60.0;
+        driveConfig.CurrentLimits.SupplyCurrentLowerTime = 5.0;
 
         // foc
         driveConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;

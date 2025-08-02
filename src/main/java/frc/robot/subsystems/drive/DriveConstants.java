@@ -67,7 +67,7 @@ public class DriveConstants {
 
     public static final double kDriveStatorAmpLimit = 80.0;
     public static final double kDriveFOCAmpLimit = 80.0;
-    public static final double kDriveSupplyAmpLimit = 60.0;
+    public static final double kDriveSupplyAmpLimit = 80.0;
 
     public static final double kAzimuthStatorAmpLimit = 40.0;
     public static final double kAzimuthFOCAmpLimit = -30.0;

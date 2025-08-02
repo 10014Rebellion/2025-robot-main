@@ -14,6 +14,7 @@ import frc.robot.subsystems.drive.Drive.DriveState;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -100,6 +101,10 @@ public class RobotContainer {
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
   private void configureButtonBindings() {
+    CommandXboxController controller = new CommandXboxController(3);
+    controller.a().onTrue(mElevator.setSlotCommand(0));
+    controller.x().onTrue(mElevator.setSlotCommand(1));
+    controller.y().onTrue(mElevator.setSlotCommand(2));
     mButtonBindings.initDriverJoysticks();
     mButtonBindings.initDriverButtons();
     mButtonBindings.initOperatorButtons();

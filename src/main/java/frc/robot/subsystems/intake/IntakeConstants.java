@@ -36,10 +36,10 @@ public class IntakeConstants {
 
     public static MotorType kMotorType = MotorType.kBrushless;
     public static IdleMode kIdleMode = IdleMode.kCoast;
-    public static boolean kInverted = false;
+    public static boolean kInverted = true;
     public static double kIntakeSpeed = 12;
 
-    public static int kRollerCurrentLimit = 80;
+    public static int kRollerCurrentLimit = 60;
 
     public static final SparkMaxConfig kRollerConfig = new SparkMaxConfig();
 

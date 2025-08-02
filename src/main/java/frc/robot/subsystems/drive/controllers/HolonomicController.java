@@ -18,6 +18,11 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 public class HolonomicController {
+    public static enum ConstraintType {
+        AXIS,
+        LINEAR
+    }
+
     public static final LoggedTunableNumber xP = new LoggedTunableNumber(
         "AutoAlign/X/kP", 2.5);
     public static final LoggedTunableNumber xD = new LoggedTunableNumber(
@@ -36,7 +41,7 @@ public class HolonomicController {
     public static final LoggedTunableNumber xS = new LoggedTunableNumber(
         "AutoAlign/X/kS", 0.0);
     public static final LoggedTunableNumber xV = new LoggedTunableNumber(
-        "AutoAlign/X/kV", 0.5);
+        "AutoAlign/X/kV", 0.8);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/X/ToleranceMeters", 0.03);
@@ -59,7 +64,7 @@ public class HolonomicController {
     public static final LoggedTunableNumber yS = new LoggedTunableNumber(
         "AutoAlign/Y/kS", 0.0);
     public static final LoggedTunableNumber yV = new LoggedTunableNumber(
-        "AutoAlign/Y/kV", 0.5);
+        "AutoAlign/Y/kV", 0.8);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Y/ToleranceMeters", 0.03);
@@ -84,10 +89,18 @@ public class HolonomicController {
     public static final LoggedTunableNumber omegaS = new LoggedTunableNumber(
         "AutoAlign/Omega/kS", 0.0);
     public static final LoggedTunableNumber omegaV = new LoggedTunableNumber(
-        "AutoAlign/Omega/kV", 0.5);
+        "AutoAlign/Omega/kV", 1.0);
 
     public static final LoggedTunableNumber omegaToleranceDegrees = new LoggedTunableNumber(
         "AutoAlign/Omega/ToleranceDegrees", 1.0);
+
+    public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
+        "AutoAlign/Distance/kMaxVMPS", 4.0);
+    public static final LoggedTunableNumber distanceMaxAMPSS = new LoggedTunableNumber(
+        "AutoAlign/Distance/kMaxVMPSS", 10.0);
+    
+    public static final LoggedTunableNumber distanceToleranceMeters = new LoggedTunableNumber(
+        "AutoAlign/Distance/ToleranceMeters", 0.03);
 
     private ProfiledPIDController xController;
     private ProfiledPIDController yController;
@@ -97,7 +110,10 @@ public class HolonomicController {
     private SimpleMotorFeedforward yFeedforward;
     private SimpleMotorFeedforward omegaFeedforward;
 
+    private ConstraintType type = ConstraintType.AXIS;
+
     public HolonomicController() {
+
         this.xController = new ProfiledPIDController(xP.get(), xI.get(), xD.get(), new Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
         xController.setIntegratorRange(-xIRange.get(), xIRange.get());
         xController.setIZone(xIZone.get());
@@ -121,16 +137,37 @@ public class HolonomicController {
         this.omegaFeedforward = new SimpleMotorFeedforward(omegaS.get(), omegaV.get());
     }
 
-    public void reset(Pose2d startPose) {
-        reset( startPose, new ChassisSpeeds() );
+    /* WHEN USING LINEAR CONSTRAINT, GOAL */
+    public void setConstraintType(ConstraintType type, Pose2d robotPose, Pose2d goalPose) {
+        this.type = type;
+    }
+
+    public void reset(Pose2d startPose, Pose2d goalPose) {
+        reset( startPose, new ChassisSpeeds(), goalPose );
     }
 
     /* 
      * Resets the robot based on the position and the speed of the robot 
      * Resetting with the speed allows the robot to stay controlled
      * while the driver is moving before drive to pose is activated
+     * GOAL POSE IS ONLY UTLIIZED WHEN IN LINEAR CONSTRAINT
      */
-    public void reset(Pose2d robotPose, ChassisSpeeds robotChassisSpeeds) {
+    public void reset(Pose2d robotPose, ChassisSpeeds robotChassisSpeeds, Pose2d goalPose) {
+        if(type.equals(ConstraintType.LINEAR)) {
+            Rotation2d heading = new Rotation2d(goalPose.getX() - robotPose.getX(), goalPose.getY() - robotPose.getY());
+
+            xController.setConstraints(new TrapezoidProfile.Constraints(
+                distanceMaxVMPS.get() *  heading.getCos(), 
+                distanceMaxAMPSS.get() * heading.getCos()));
+
+            yController.setConstraints(new TrapezoidProfile.Constraints(
+                distanceMaxVMPS.get() *  heading.getSin(), 
+                distanceMaxAMPSS.get() * heading.getSin()));
+        } else {
+            xController.setConstraints(new TrapezoidProfile.Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
+            yController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
+        }
+
         xController.reset( 
             new State(
                 robotPose.getX(),
@@ -153,8 +190,6 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
-        // double realRotScalar = RobotBase.isReal() ? -1 : 1;
-
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             (xController.calculate( 
                 currentPose.getX(), 
@@ -244,7 +279,7 @@ public class HolonomicController {
             xController.setPID(xP.get(), xI.get(), xD.get());
             xController.setIntegratorRange(-xIRange.get(), xIRange.get());
             xController.setIZone(xIZone.get());
-            xController.setConstraints(new Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
+            if(type.equals(ConstraintType.LINEAR)) xController.setConstraints(new Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
         }, xP, xI, xD, xIRange, xIZone, xMaxVMPS, xMaxAMPSS);
 
         LoggedTunableNumber.ifChanged(hashCode(), () -> {
@@ -255,7 +290,7 @@ public class HolonomicController {
             yController.setPID(yP.get(), yI.get(), yD.get());
             yController.setIntegratorRange(-yIRange.get(), yIRange.get());
             yController.setIZone(yIZone.get());
-            xController.setConstraints(new Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
+            if(type.equals(ConstraintType.LINEAR)) yController.setConstraints(new Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
         }, yP, yI, yD, yIRange, yIZone, yMaxVMPS, yMaxAMPSS);
 
         LoggedTunableNumber.ifChanged(hashCode(), () -> {
@@ -266,7 +301,7 @@ public class HolonomicController {
             omegaController.setPID(omegaP.get(), omegaI.get(), omegaD.get());
             omegaController.setIntegratorRange(-omegaIRange.get(), omegaIRange.get());
             omegaController.setIZone(omegaIZone.get());
-            omegaController.setConstraints(new Constraints(omegaMaxVDPS.get(), omegaMaxADPSS.get()));
+                omegaController.setConstraints(new Constraints(omegaMaxVDPS.get(), omegaMaxADPSS.get()));
         }, omegaP, omegaI, omegaD, omegaIRange, omegaIZone, omegaMaxVDPS, omegaMaxADPSS);
 
         LoggedTunableNumber.ifChanged(hashCode(), () -> {
