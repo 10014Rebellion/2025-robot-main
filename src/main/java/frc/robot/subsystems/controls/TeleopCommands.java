@@ -2,6 +2,7 @@ package frc.robot.subsystems.controls;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -144,8 +145,11 @@ public class TeleopCommands {
 		public Command getGoToReefCmd(SIDE side) {
 			return new SequentialCommandGroup(
 				GoalPoseChooser.setSideCommand(side),
-				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
-			);
+				new ConditionalCommand( 
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL),
+				mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_ALGAE),
+				() -> !side.equals(SIDE.ALGAE)
+			));
 		}
 
 		/** STOP DRIVE: Stops the drive entirely, runs instantly */
@@ -222,10 +226,17 @@ public class TeleopCommands {
 	 	if (pAlgaeLevel == AlgaeScoringLevel.NET) {
 			return new SequentialCommandGroup(
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
+				// new ParallelCommandGroup(
+				// 	// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+				// 	new SequentialCommandGroup(
+				// 		mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+				// 		mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
+				// 	mClaw.throwAlgae(mWrist, mElevator)));
 				new ParallelCommandGroup(
 					// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
+					mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
 					new SequentialCommandGroup(
-						mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
+						new WaitCommand(0.25),
 						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
 					mClaw.throwAlgae(mWrist, mElevator)));
 		}

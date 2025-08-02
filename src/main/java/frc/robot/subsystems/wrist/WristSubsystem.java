@@ -41,7 +41,7 @@ public class WristSubsystem extends SubsystemBase {
     this.mWristSparkMax.configure(
         WristConstants.kWristConfig,
         ResetMode.kResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+        PersistMode.kPersistParameters);
 
     this.setDefaultCommand(enableFFCmd());
 

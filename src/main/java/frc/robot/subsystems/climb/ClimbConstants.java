@@ -18,8 +18,8 @@ public class ClimbConstants {
     public static final SparkMaxConfig kClimbConfig = new SparkMaxConfig();
 
     public enum VoltageSetpoints {
-      PULL_IN(4.0),
-      SPIN_FREE(2);
+      PULL_IN(4.0);
+      // SPIN_FREE(2);
 
       public final double setpoint;
 
@@ -55,8 +55,8 @@ public class ClimbConstants {
     public static final SparkMaxConfig kClimbConfig = new SparkMaxConfig();
 
     public enum VoltageSetpoints {
-      ASCEND(12),
-      DESCEND(-12),
+      // ASCEND(0.0),
+      GO(7),
       STOP(0.0);
 
       public final double setpoint;

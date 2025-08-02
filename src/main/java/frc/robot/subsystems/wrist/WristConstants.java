@@ -16,7 +16,7 @@ public class WristConstants {
   public static double kP = 0.22;
   public static double kD = 0.01;
 
-  public static double kMaxAcceleration = 1000;
+  public static double kMaxAcceleration = 1100; // was 500. kinda slow
   public static double kMaxVelocity = 800;
   public static double kTolerance = 1.5;
 
@@ -51,11 +51,12 @@ public class WristConstants {
     L2SCORE(9),
     BARGE(71),
     L2ALGAE(-28),
-    L3ALGAE(-13),
+    L3ALGAE(-16),
     HOLD_ALGAE(0),
     THROW_ALGAE(90),
     CLIMB(-15),
-    GROUNDALGAE(-31);
+    GROUNDALGAE(-31),
+    STOWED(90);
 
     public final double setpoint;
 

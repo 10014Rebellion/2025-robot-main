@@ -3,6 +3,7 @@ package frc.robot.subsystems.controls;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -12,6 +13,7 @@ import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbConstants.Pulley.Setpoints;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.DriverController;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
@@ -64,11 +66,18 @@ public class ButtonBindings {
   public void initTriggers() {
     new Trigger(
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
-        .whileTrue(mActionCommands.getScoreCoralCmd());
+        .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
-      new Trigger(() -> mClaw.getBeamBreak())
-        .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
-        .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
+    new Trigger(() -> mClaw.getBeamBreak())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
+      .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
+    
+    new Trigger(() -> mClimb.getBeamBroken()).and(() -> mClimb.isInTolerance(Setpoints.CLIMBED))
+      .onTrue(new InstantCommand(() -> mClimb.setGrabberVolts(0)));
+
+    new Trigger(() -> mClimb.getBeamBroken())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.GREEN)))
+      .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 
     new Trigger(() -> mDrive.atGoal())
         .whileTrue(
@@ -117,11 +126,11 @@ public class ButtonBindings {
         .whileTrue(mActionCommands.getGroundAlgaeCmd())
         .whileFalse(mActionCommands.getHoldAlgaeCmd());
 
-    mDriverController
-      .povUp()
-        .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
+    // mDriverController
+    //   .povUp()
+    //     .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
 
-    mDriverController.povDown().whileTrue(mClimb.retractClimb());
+    // mDriverController.povDown().whileTrue(mClimb.retractClimb());
   }
 
   public void initOperatorButtons() {
@@ -129,19 +138,24 @@ public class ButtonBindings {
       .button(ButtonBindingsConstants.Buttonboard.kScoreCoral)
         .whileTrue(mActionCommands.getScoreCoralCmd());
 
+    //
+
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
             new ParallelCommandGroup(
                 mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.CLIMBED),
+                mClimb.pullClimb(),
                 mClimb.setGrabberVoltsCmd(0.0),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     mOperatorButtonboard
-      .button(ButtonBindingsConstants.Buttonboard.kClimbDescend)
-        .whileTrue(mClimb.climbToSetpoint(ClimbConstants.Pulley.Setpoints.EXTENDED));
+      .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
+        .whileTrue(
+          new ParallelCommandGroup(
+            mClimb.deployClimb(),
+            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)));
     // .whileFalse();
 
     mOperatorButtonboard

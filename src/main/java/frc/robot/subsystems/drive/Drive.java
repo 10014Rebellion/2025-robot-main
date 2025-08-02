@@ -20,6 +20,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -40,6 +41,7 @@ import frc.robot.FieldConstants;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.CHOOSER_STRATEGY;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
+import frc.robot.subsystems.drive.controllers.HolonomicController.ConstraintType;
 import frc.robot.subsystems.drive.controllers.ManualTeleopController;
 import frc.robot.subsystems.drive.controllers.HolonomicController;
 
@@ -238,24 +240,18 @@ public class Drive extends SubsystemBase {
     public void periodic() {
         ///////////////////// DATA COLLECTION AND UPDATE CONTROLLERS AND ODOMETRY \\\\\\\\\\\\\\\\\\
         /* Modules */
-        for (Module module : modules) {
-            module.periodic();
-            if (DriverStation.isDisabled()) module.stop();
-        }
+        for (Module module : modules) module.periodic();
 
         /* GYRO */
         gyro.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
-        if (gyroInputs.connected) {
-            robotRotation = gyroInputs.yawPosition;
-        } else {
-            robotRotation = Rotation2d.fromRadians(
-                (poseEstimator.getEstimatedPosition().getRotation().getRadians()
-                /* D=vt. Uses modules and IK to estimate turn */
-                    + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02) 
-                    /* Scopes result between 0 and 360 */
-                    % 360.0);
-        }
+        if (gyroInputs.connected) robotRotation = gyroInputs.yawPosition;
+        else robotRotation = Rotation2d.fromRadians(
+            (poseEstimator.getEstimatedPosition().getRotation().getRadians()
+            /* D=vt. Uses modules and IK to estimate turn */
+            + getRobotChassisSpeeds().omegaRadiansPerSecond * 0.02) 
+                /* Scopes result between 0 and 360 */
+                % 360.0);
 
         /* VISION */
         vision.periodic(poseEstimator.getEstimatedPosition(), odometry.getPoseMeters());
@@ -329,6 +325,7 @@ public class Drive extends SubsystemBase {
                 );
                 break;
             case DRIVE_TO_ALGAE:
+                // desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
                 ChassisSpeeds algaeAlignSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
                 double forwardJoy = (goalPose.getX() > AllianceFlipUtil.apply(FieldConstants.kReefCenter.getX()))
                 ? -teleopSpeeds.vxMetersPerSecond: teleopSpeeds.vxMetersPerSecond;
@@ -355,9 +352,6 @@ public class Drive extends SubsystemBase {
             case RIGHT:
                 desiredSpeeds = new ChassisSpeeds(0.0, 0.5, teleopSpeeds.omegaRadiansPerSecond);
                 break;
-            // case STOP:
-            //     desiredSpeeds = new ChassisSpeeds();
-            //     break;
             case DRIFT_TEST:
                 desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     new ChassisSpeeds(linearTestSpeedMPS.get(), 0.0, 
@@ -408,34 +402,40 @@ public class Drive extends SubsystemBase {
                 headingController.reset(getPoseEstimate().getRotation(), gyroInputs.yawVelocityPS);
                 break;
             case DRIVE_TO_CORAL:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(),
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
-                break;
-            case DRIVE_TO_ALGAE:
-                GoalPoseChooser.setSide(SIDE.ALGAE);
-                autoAlignController.reset(
-                    getPoseEstimate(),
-                    ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), 
-                        getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             case DRIVE_TO_INTAKE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kIntake, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(), 
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kIntake, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
+                break;
+            case DRIVE_TO_ALGAE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
+                autoAlignController.reset(
+                    getPoseEstimate(),
+                    ChassisSpeeds.fromRobotRelativeSpeeds(
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             case DRIVE_TO_BARGE:
+                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kNet, getPoseEstimate());
+                autoAlignController.setConstraintType(ConstraintType.AXIS, getPoseEstimate(), goalPose);
                 autoAlignController.reset(
                     getPoseEstimate(), 
                     ChassisSpeeds.fromRobotRelativeSpeeds(
-                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()));
-                goalPose = GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kNet, getPoseEstimate());
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPose);
                 break;
             default:
         }
@@ -458,6 +458,9 @@ public class Drive extends SubsystemBase {
         previousSetpoint = setpointGenerator.generateSetpoint(
             previousSetpoint, desiredSpeeds, kDriveConstraints, 0.02);
 
+        /* Only for logging purposes */
+        SwerveModuleState[] moduleTorques = SwerveUtils.zeroStates();
+
         // Logger.recordOutput("Drive/Odometry/generatedFieldSpeeds", ChassisSpeeds.fromRobotRelativeSpeeds(previousSetpoint.robotRelativeSpeeds(), robotRotation));
 
         for (int i = 0; i < 4; i++) {
@@ -478,7 +481,7 @@ public class Drive extends SubsystemBase {
                 /* Feedforward cases based on driveState */
                 /* 0 unless in auto or auto-align */
                 double driveAmps = calculateDriveFeedforward(
-                    modules[i].getCurrentState(), unOptimizedSetpointStates[i], setpointStates[i], i);
+                    previousSetpoint, modules[i].getCurrentState(), unOptimizedSetpointStates[i], setpointStates[i], i);
                 
                 /* 
                  * Multiplies by cos(angleError) to stop the drive from going in the wrong direction
@@ -493,6 +496,8 @@ public class Drive extends SubsystemBase {
                 }
 
                 optimizedSetpointStates[i] = modules[i].setDesiredStateWithAmpFF(setpointStates[i], driveAmps);
+
+                moduleTorques[i] = new SwerveModuleState((driveAmps * kMaxLinearSpeedMPS / 80), optimizedSetpointStates[i].angle);
             } else {
                 setpointStates[i] = new SwerveModuleState(
                     setpointStates[i].speedMetersPerSecond,
@@ -512,17 +517,18 @@ public class Drive extends SubsystemBase {
         Logger.recordOutput("Drive/Swerve/SetpointsChassisSpeeds", kKinematics.toChassisSpeeds(optimizedSetpointStates));
         Logger.recordOutput("Drive/Odometry/FieldSetpointChassisSpeed", ChassisSpeeds.fromRobotRelativeSpeeds(
             kKinematics.toChassisSpeeds(optimizedSetpointStates), robotRotation));
+        Logger.recordOutput("Drive/Swerve/ModuleTorqueFF", moduleTorques);
     }
 
     /* Calculates DriveFeedforward based off state */
-    public double calculateDriveFeedforward(SwerveModuleState currentState, SwerveModuleState unoptimizedState, SwerveModuleState optimizedState, int i) {
+    public double calculateDriveFeedforward(SwerveSetpoint setpoint, SwerveModuleState currentState, SwerveModuleState unoptimizedState, SwerveModuleState optimizedState, int i) {
         switch(driveState) {
             case AUTON:
                 /* No need to optimize for Choreo, as it handles it under the hood */
-                // return SwerveUtils.convertChoreoNewtonsToAmps(currentState, pathPlanningFF, i);
-            case DRIVE_TO_CORAL:           
+                return SwerveUtils.convertChoreoNewtonsToAmps(currentState, pathPlanningFF, i);
+            case DRIVE_TO_CORAL: 
             case DRIVE_TO_INTAKE:
-                return 0.0;// return pathPlanningFF.torqueCurrentsAmps()[i];
+                return SwerveUtils.optimizeTorque(unoptimizedState, optimizedState, setpoint.feedforwards().torqueCurrentsAmps()[i], i);
             default:
                 return 0.0;
         }
@@ -534,7 +540,7 @@ public class Drive extends SubsystemBase {
         robotRotation = DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red) ? 
             Rotation2d.fromDegrees(180.0) : Rotation2d.fromDegrees(0.0);
         gyro.resetGyro(robotRotation);
-        setPose(new Pose2d(getPoseEstimate().getTranslation(), robotRotation));
+        setPose(new Pose2d(new Translation2d(), robotRotation));
     }
 
     public void setPose(Pose2d pose) {
