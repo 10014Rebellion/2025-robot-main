@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.ButtonBindings;
+import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -13,7 +14,14 @@ import frc.robot.subsystems.drive.Drive.DriveState;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
@@ -95,16 +103,11 @@ public class RobotContainer {
 
     // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     mAutons = new AutonSubsystem(mDrive, mWrist, mClaw, mElevator, mIntake);
-
     configureButtonBindings();
   }
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
   private void configureButtonBindings() {
-    CommandXboxController controller = new CommandXboxController(3);
-    controller.a().onTrue(mElevator.setSlotCommand(0));
-    controller.x().onTrue(mElevator.setSlotCommand(1));
-    controller.y().onTrue(mElevator.setSlotCommand(2));
     mButtonBindings.initDriverJoysticks();
     mButtonBindings.initDriverButtons();
     mButtonBindings.initOperatorButtons();
