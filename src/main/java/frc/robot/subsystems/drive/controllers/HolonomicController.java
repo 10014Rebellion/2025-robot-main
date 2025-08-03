@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive.controllers;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -156,17 +157,25 @@ public class HolonomicController {
         if(type.equals(ConstraintType.LINEAR)) {
             Rotation2d heading = new Rotation2d(goalPose.getX() - robotPose.getX(), goalPose.getY() - robotPose.getY());
 
+            // Logger.recordOutput("AutoAlign/Linear/X/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/X/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
+            // Logger.recordOutput("AutoAlign/Linear/Y/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/Y/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
             xController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getCos(), 
-                distanceMaxAMPSS.get() * heading.getCos()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getCos()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getCos())));
 
             yController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getSin(), 
-                distanceMaxAMPSS.get() * heading.getSin()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getSin()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getSin())));
         } else {
             xController.setConstraints(new TrapezoidProfile.Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
             yController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
         }
+
+
 
         xController.reset( 
             new State(
