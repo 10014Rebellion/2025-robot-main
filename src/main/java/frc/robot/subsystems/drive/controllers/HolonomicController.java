@@ -175,8 +175,6 @@ public class HolonomicController {
             yController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
         }
 
-
-
         xController.reset( 
             new State(
                 robotPose.getX(),
