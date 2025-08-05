@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive.controllers;
 
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -70,7 +71,7 @@ public class HolonomicController {
         "AutoAlign/Y/ToleranceMeters", 0.03);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
-        "AutoAlign/Omega/kP", 3.0);
+        "AutoAlign/Omega/kP", 3.5);
     public static final LoggedTunableNumber omegaD = new LoggedTunableNumber(
         "AutoAlign/Omega/kD", 0.0);
 
@@ -82,9 +83,9 @@ public class HolonomicController {
         "AutoAlign/Omega/kIRange", 0.0);
 
     public static final LoggedTunableNumber omegaMaxVDPS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPS", 180);
+        "AutoAlign/Omega/kMaxVDPS", 200);
     public static final LoggedTunableNumber omegaMaxADPSS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPSS", 360);
+        "AutoAlign/Omega/kMaxVDPSS", 1800);
 
     public static final LoggedTunableNumber omegaS = new LoggedTunableNumber(
         "AutoAlign/Omega/kS", 0.0);
@@ -97,7 +98,7 @@ public class HolonomicController {
     public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
         "AutoAlign/Distance/kMaxVMPS", 4.0);
     public static final LoggedTunableNumber distanceMaxAMPSS = new LoggedTunableNumber(
-        "AutoAlign/Distance/kMaxVMPSS", 10.0);
+        "AutoAlign/Distance/kMaxVMPSS", 12.5);
     
     public static final LoggedTunableNumber distanceToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Distance/ToleranceMeters", 0.03);
@@ -156,13 +157,19 @@ public class HolonomicController {
         if(type.equals(ConstraintType.LINEAR)) {
             Rotation2d heading = new Rotation2d(goalPose.getX() - robotPose.getX(), goalPose.getY() - robotPose.getY());
 
+            // Logger.recordOutput("AutoAlign/Linear/X/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/X/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
+            // Logger.recordOutput("AutoAlign/Linear/Y/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/Y/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
             xController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getCos(), 
-                distanceMaxAMPSS.get() * heading.getCos()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getCos()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getCos())));
 
             yController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getSin(), 
-                distanceMaxAMPSS.get() * heading.getSin()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getSin()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getSin())));
         } else {
             xController.setConstraints(new TrapezoidProfile.Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
             yController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
