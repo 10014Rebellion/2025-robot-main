@@ -149,7 +149,7 @@ public class WristSubsystem extends SubsystemBase {
   // public FunctionalCommand setTunableCommand
 
   public Command setPIDCmd(WristConstants.Setpoints pSetpoint) {
-    return new ConditionalCommand(setSlotCommand(1), setSlotCommand(0), () -> pSetpoint.equals(WristConstants.Setpoints.BARGE))
+    return new ConditionalCommand(setSlotCommand(1), setSlotCommand(0), () -> pSetpoint.equals(WristConstants.Setpoints.THROW_ALGAE))
     .andThen(new FunctionalCommand(
         () -> {
           SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());

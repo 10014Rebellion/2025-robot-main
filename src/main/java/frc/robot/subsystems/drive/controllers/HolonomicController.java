@@ -40,9 +40,9 @@ public class HolonomicController {
         "AutoAlign/X/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber xS = new LoggedTunableNumber(
-        "AutoAlign/X/kS", 0.0);
+        "AutoAlign/X/kS", 0.1);
     public static final LoggedTunableNumber xV = new LoggedTunableNumber(
-        "AutoAlign/X/kV", 0.8);
+        "AutoAlign/X/kV", 0.5);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/X/ToleranceMeters", 0.03);
@@ -63,9 +63,9 @@ public class HolonomicController {
         "AutoAlign/Y/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber yS = new LoggedTunableNumber(
-        "AutoAlign/Y/kS", 0.0);
+        "AutoAlign/Y/kS", 0.1);
     public static final LoggedTunableNumber yV = new LoggedTunableNumber(
-        "AutoAlign/Y/kV", 0.8);
+        "AutoAlign/Y/kV", 0.5);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Y/ToleranceMeters", 0.03);
@@ -102,6 +102,8 @@ public class HolonomicController {
     
     public static final LoggedTunableNumber distanceToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Distance/ToleranceMeters", 0.03);
+
+    public static final LoggedTunableNumber ffRadius = new LoggedTunableNumber("AutoAlign/ffRadius", 0.25);
 
     private ProfiledPIDController xController;
     private ProfiledPIDController yController;
@@ -197,20 +199,25 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
+        double ffScalar = Math.max(
+            Math.hypot(goalPose.getX() - currentPose.getX(), goalPose.getY() - currentPose.getY()) 
+            / ffRadius.get(), 
+            1.0);
+
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             (xController.calculate( 
                 currentPose.getX(), 
                 new TrapezoidProfile.State(
                     goalPose.getX(),
                     goalSpeed.vxMetersPerSecond) )
-            + xFeedforward.calculate(xController.getSetpoint().velocity)),
+            + ffScalar * xFeedforward.calculate(xController.getSetpoint().velocity)),
 
             (yController.calculate( 
                 currentPose.getY(), 
                 new TrapezoidProfile.State(
                     goalPose.getY(),
                     goalSpeed.vyMetersPerSecond) )
-            + yFeedforward.calculate(yController.getSetpoint().velocity)),
+            + ffScalar * yFeedforward.calculate(yController.getSetpoint().velocity)),
 
             (Math.toRadians (omegaController.calculate( 
                 currentPose.getRotation().getDegrees(), 
