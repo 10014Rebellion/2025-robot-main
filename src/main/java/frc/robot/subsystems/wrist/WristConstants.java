@@ -42,8 +42,8 @@ public class WristConstants {
   public static double k2I = 0.0;
   public static double k2D = 0.01;
 
-  public static double k2MaxAcceleration = 650; // was 500. k2inda slow
-  public static double k2MaxVelocity = 400;
+  public static double k2MaxAcceleration = 1100; // was 500. k2inda slow
+  public static double k2MaxVelocity = 600;
 
   public static double k2S = 0.02;
   public static double k2G = 0.4;

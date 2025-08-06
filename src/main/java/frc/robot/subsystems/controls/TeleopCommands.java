@@ -61,7 +61,7 @@ public class TeleopCommands {
 						mIntake.setIndexCoralCmd(), // Turns on Indexer and ends when coral is in the cradle
 						new SequentialCommandGroup(
 							mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE), // Gets elevator into position
-							mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE) // Brings wrist down
+							mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.getBeamBreak()) // Brings wrist down
 						)
 					), 
 					mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING), // Deploys intake
@@ -71,7 +71,7 @@ public class TeleopCommands {
 				new WaitCommand(0.1),
 				new ParallelCommandGroup(
 					mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE), // Elevator lowers for wrist to pickup coral 
-					mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE), // Wrist holds position to intake coral
+					mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.getBeamBreak()), // Wrist holds position to intake coral
 					mClaw.intakeCoralCmd() // Claw intakes coral
 				),
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE) // Elevator hightens after picking up coral
@@ -121,7 +121,7 @@ public class TeleopCommands {
 		public ParallelCommandGroup getGroundAlgaeCmd() {
 			return new ParallelCommandGroup(
 				mWrist
-					.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE)
+					.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE, () -> mClaw.getBeamBreak())
 					.andThen(mWrist.enableFFCmd()),
 				new ParallelCommandGroup(
 					mClaw.intakeCoralCmd(),
@@ -135,7 +135,7 @@ public class TeleopCommands {
 			return new ParallelCommandGroup(
 			    new InstantCommand(() -> mStateTracker.setCurrentGamePiece(GamePiece.Algae)),
 			    mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-			    mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE)
+			    mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.getBeamBreak())
 			        .andThen(mWrist.enableFFCmd()),
 			    mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())
 			);
@@ -179,14 +179,14 @@ public class TeleopCommands {
 				new DynamicCommand(() -> {
 					if (pCoralLevel == CoralLevel.B1) {
 						return new SequentialCommandGroup(
-							mWrist.coralLevelToPIDCmd(pCoralLevel),
+							mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.getBeamBreak()),
 							mElevator.coralLevelToPIDCmd(pCoralLevel)
 							
 						);
 					}
 					return new ParallelCommandGroup(
 						mElevator.coralLevelToPIDCmd(pCoralLevel),
-						mWrist.coralLevelToPIDCmd(pCoralLevel)
+						mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.getBeamBreak())
 					);
 				})
 			);
@@ -209,14 +209,14 @@ public class TeleopCommands {
 		// Branch 1 / Level 2
 		} else if (pCoralLevel == CoralLevel.B1) {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE).andThen(mWrist.enableFFCmd()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE, () -> mClaw.getBeamBreak()).andThen(mWrist.enableFFCmd()),
 				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0))
 			);
 		
 		// Branch 2 or 3 / Level 3 or 4
 		} else {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.SCORE, () -> mClaw.getBeamBreak()).andThen(mWrist.enableFFCmd()),
 				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
 		}
   	}
@@ -230,21 +230,21 @@ public class TeleopCommands {
 				// 	// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
 				// 	new SequentialCommandGroup(
 				// 		mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
-				// 		mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
+				// 		mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE, () -> mClaw.getBeamBreak())),
 				// 	mClaw.throwAlgae(mWrist, mElevator)));
 				new ParallelCommandGroup(
 					// new WaitCommand(0.25).andThen(mClaw.setClawCmd(0.0)),
 					mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
 					new SequentialCommandGroup(
 						new WaitCommand(0.25),
-						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE)),
+						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE, () -> mClaw.getBeamBreak())),
 					mClaw.throwAlgae(mWrist, mElevator)));
 		}
 
 		// Processor
 		else {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE),
+				mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.getBeamBreak()),
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
 				mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
 		} 
