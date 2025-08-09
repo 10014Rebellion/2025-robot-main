@@ -63,7 +63,7 @@ public class HolonomicController {
         "AutoAlign/Y/kV", 0.5);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/Y/ToleranceMeters", 0.03);
+        "AutoAlign/Y/ToleranceMeters", 0.05);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
         "AutoAlign/Omega/kP", 3.0);
@@ -88,7 +88,7 @@ public class HolonomicController {
         "AutoAlign/Omega/kV", 1.0);
 
     public static final LoggedTunableNumber omegaToleranceDegrees = new LoggedTunableNumber(
-        "AutoAlign/Omega/ToleranceDegrees", 1.0);
+        "AutoAlign/Omega/ToleranceDegrees", 1.5);
 
     public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
         "AutoAlign/Distance/kMaxVMPS", 4.0);
