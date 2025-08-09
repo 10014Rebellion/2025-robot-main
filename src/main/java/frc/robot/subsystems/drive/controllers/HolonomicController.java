@@ -96,7 +96,7 @@ public class HolonomicController {
         "AutoAlign/Omega/ToleranceDegrees", 1.0);
 
     public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
-        "AutoAlign/Distance/kMaxVMPS", 4.0);
+        "AutoAlign/Distance/kMaxVMPS", 3.0);
     public static final LoggedTunableNumber distanceMaxAMPSS = new LoggedTunableNumber(
         "AutoAlign/Distance/kMaxVMPSS", 12.5);
     

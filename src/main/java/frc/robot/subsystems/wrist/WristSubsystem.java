@@ -252,7 +252,7 @@ public class WristSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Wrist/At Setpoint", isPIDAtGoal());
   }
 
-  public Command setSlotCommand(int slot) {
+  private Command setSlotCommand(int slot) {
     return new InstantCommand(() -> {
       this.slot = slot;
       switch(this.slot) {

@@ -18,7 +18,7 @@ public class WristConstants {
   public static double k0I = 0.0;
   public static double k0D = 0.01;
 
-  public static double k0MaxAcceleration = 1100; // was 500. k0inda slow
+  public static double k0MaxAcceleration = 800; // was 500. k0inda slow
   public static double k0MaxVelocity = 800;
 
   public static double k0S = 0.02;
@@ -26,6 +26,7 @@ public class WristConstants {
   public static double k0V = 0.003;
   public static double k0A = 0.0;
 
+  // SLOT 1: BARGE
   public static double k1P = 0.22;
   public static double k1I = 0.0;
   public static double k1D = 0.01;
