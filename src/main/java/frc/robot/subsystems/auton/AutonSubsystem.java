@@ -118,6 +118,7 @@ public class AutonSubsystem {
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mIntake.autonSetIndexCoralCmd()
                 ),
+                new WaitCommand(0.15),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
