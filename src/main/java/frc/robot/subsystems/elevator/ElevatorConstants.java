@@ -73,7 +73,7 @@ public class ElevatorConstants {
     SCORE(20),
     BARGE(55),
     L2ALGAE(38),
-    L3ALGAE(53),
+    L3ALGAE(23),
     HOLD_ALGAE(5),
     PreClimb(40),
     Climb(0.0);

@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.2
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "ScoreCoral"
@@ -176,6 +182,12 @@
                 "type": "named",
                 "data": {
                   "name": "GoToLeftPose"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.2
                 }
               },
               {
