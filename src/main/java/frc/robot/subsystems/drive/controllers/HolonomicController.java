@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive.controllers;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -9,9 +8,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.util.debugging.LoggedTunableNumber;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
@@ -24,7 +20,7 @@ public class HolonomicController {
     }
 
     public static final LoggedTunableNumber xP = new LoggedTunableNumber(
-        "AutoAlign/X/kP", 2.5);
+        "AutoAlign/X/kP", 3.0);
     public static final LoggedTunableNumber xD = new LoggedTunableNumber(
         "AutoAlign/X/kD", 0.0);
     public static final LoggedTunableNumber xI = new LoggedTunableNumber(
@@ -39,9 +35,9 @@ public class HolonomicController {
         "AutoAlign/X/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber xS = new LoggedTunableNumber(
-        "AutoAlign/X/kS", 0.0);
+        "AutoAlign/X/kS", 0.1);
     public static final LoggedTunableNumber xV = new LoggedTunableNumber(
-        "AutoAlign/X/kV", 0.8);
+        "AutoAlign/X/kV", 0.5);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/X/ToleranceMeters", 0.03);
@@ -62,12 +58,12 @@ public class HolonomicController {
         "AutoAlign/Y/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber yS = new LoggedTunableNumber(
-        "AutoAlign/Y/kS", 0.0);
+        "AutoAlign/Y/kS", 0.1);
     public static final LoggedTunableNumber yV = new LoggedTunableNumber(
-        "AutoAlign/Y/kV", 0.8);
+        "AutoAlign/Y/kV", 0.5);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
-        "AutoAlign/Y/ToleranceMeters", 0.03);
+        "AutoAlign/Y/ToleranceMeters", 0.05);
 
     public static final LoggedTunableNumber omegaP = new LoggedTunableNumber(
         "AutoAlign/Omega/kP", 3.0);
@@ -82,9 +78,9 @@ public class HolonomicController {
         "AutoAlign/Omega/kIRange", 0.0);
 
     public static final LoggedTunableNumber omegaMaxVDPS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPS", 180);
+        "AutoAlign/Omega/kMaxVDPS", 200);
     public static final LoggedTunableNumber omegaMaxADPSS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPSS", 360);
+        "AutoAlign/Omega/kMaxVDPSS", 1800);
 
     public static final LoggedTunableNumber omegaS = new LoggedTunableNumber(
         "AutoAlign/Omega/kS", 0.0);
@@ -92,15 +88,17 @@ public class HolonomicController {
         "AutoAlign/Omega/kV", 1.0);
 
     public static final LoggedTunableNumber omegaToleranceDegrees = new LoggedTunableNumber(
-        "AutoAlign/Omega/ToleranceDegrees", 1.0);
+        "AutoAlign/Omega/ToleranceDegrees", 1.5);
 
     public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
         "AutoAlign/Distance/kMaxVMPS", 4.0);
     public static final LoggedTunableNumber distanceMaxAMPSS = new LoggedTunableNumber(
-        "AutoAlign/Distance/kMaxVMPSS", 10.0);
+        "AutoAlign/Distance/kMaxVMPSS", 12.5);
     
     public static final LoggedTunableNumber distanceToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Distance/ToleranceMeters", 0.03);
+
+    public static final LoggedTunableNumber ffRadius = new LoggedTunableNumber("AutoAlign/ffRadius", 0.25);
 
     private ProfiledPIDController xController;
     private ProfiledPIDController yController;
@@ -156,13 +154,19 @@ public class HolonomicController {
         if(type.equals(ConstraintType.LINEAR)) {
             Rotation2d heading = new Rotation2d(goalPose.getX() - robotPose.getX(), goalPose.getY() - robotPose.getY());
 
+            // Logger.recordOutput("AutoAlign/Linear/X/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/X/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
+            // Logger.recordOutput("AutoAlign/Linear/Y/Vel", distanceMaxVMPS.get() *  heading.getCos());
+            // Logger.recordOutput("AutoAlign/Linear/Y/Accel", distanceMaxVMPS.get() *  heading.getCos());
+
             xController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getCos(), 
-                distanceMaxAMPSS.get() * heading.getCos()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getCos()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getCos())));
 
             yController.setConstraints(new TrapezoidProfile.Constraints(
-                distanceMaxVMPS.get() *  heading.getSin(), 
-                distanceMaxAMPSS.get() * heading.getSin()));
+                distanceMaxVMPS.get() *  Math.abs(heading.getSin()), 
+                distanceMaxAMPSS.get() * Math.abs(heading.getSin())));
         } else {
             xController.setConstraints(new TrapezoidProfile.Constraints(xMaxVMPS.get(), xMaxAMPSS.get()));
             yController.setConstraints(new TrapezoidProfile.Constraints(yMaxVMPS.get(), yMaxAMPSS.get()));
@@ -190,20 +194,25 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
+        double ffScalar = Math.max(
+            Math.hypot(goalPose.getX() - currentPose.getX(), goalPose.getY() - currentPose.getY()) 
+            / ffRadius.get(), 
+            1.0);
+
         return ChassisSpeeds.fromFieldRelativeSpeeds(
             (xController.calculate( 
                 currentPose.getX(), 
                 new TrapezoidProfile.State(
                     goalPose.getX(),
                     goalSpeed.vxMetersPerSecond) )
-            + xFeedforward.calculate(xController.getSetpoint().velocity)),
+            + ffScalar * xFeedforward.calculate(xController.getSetpoint().velocity)),
 
             (yController.calculate( 
                 currentPose.getY(), 
                 new TrapezoidProfile.State(
                     goalPose.getY(),
                     goalSpeed.vyMetersPerSecond) )
-            + yFeedforward.calculate(yController.getSetpoint().velocity)),
+            + ffScalar * yFeedforward.calculate(yController.getSetpoint().velocity)),
 
             (Math.toRadians (omegaController.calculate( 
                 currentPose.getRotation().getDegrees(), 

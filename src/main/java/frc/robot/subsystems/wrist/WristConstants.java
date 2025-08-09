@@ -13,11 +13,43 @@ public class WristConstants {
   public static boolean kMotorInverted = true;
 
   public static int kCurrentLimit = 60;
-  public static double kP = 0.22;
-  public static double kD = 0.01;
 
-  public static double kMaxAcceleration = 1100; // was 500. kinda slow
-  public static double kMaxVelocity = 800;
+  public static double k0P = 0.22;
+  public static double k0I = 0.0;
+  public static double k0D = 0.01;
+
+  public static double k0MaxAcceleration = 1100; // was 500. k0inda slow
+  public static double k0MaxVelocity = 800;
+
+  public static double k0S = 0.02;
+  public static double k0G = 0.4;
+  public static double k0V = 0.003;
+  public static double k0A = 0.0;
+
+  public static double k1P = 0.22;
+  public static double k1I = 0.0;
+  public static double k1D = 0.01;
+
+  public static double k1MaxAcceleration = 1100; // was 500. k1inda slow
+  public static double k1MaxVelocity = 400;
+
+  public static double k1S = 0.02;
+  public static double k1G = 0.4;
+  public static double k1V = 0.003;
+  public static double k1A = 0.0;
+
+  public static double k2P = 0.22;
+  public static double k2I = 0.0;
+  public static double k2D = 0.01;
+
+  public static double k2MaxAcceleration = 1100; // was 500. k2inda slow
+  public static double k2MaxVelocity = 600;
+
+  public static double k2S = 0.02;
+  public static double k2G = 0.4;
+  public static double k2V = 0.003;
+  public static double k2A = 0.0;
+
   public static double kTolerance = 1.5;
 
   public static double kForwardSoftLimit = 90;
@@ -30,11 +62,6 @@ public class WristConstants {
 
   public static double kPositionConversionFactor = 360.0;
   public static double kVelocityConversionFactor = kPositionConversionFactor / 60.0;
-
-  public static double kS = 0.02;
-  public static double kG = 0.4;
-  public static double kV = 0.003;
-  public static double kA = 0.0;
 
   public static final SparkMaxConfig kWristConfig = new SparkMaxConfig();
 
@@ -51,7 +78,7 @@ public class WristConstants {
     L2SCORE(9),
     BARGE(71),
     L2ALGAE(-28),
-    L3ALGAE(-16),
+    L3ALGAE(25),
     HOLD_ALGAE(0),
     THROW_ALGAE(90),
     CLIMB(-15),

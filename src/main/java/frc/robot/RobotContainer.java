@@ -101,10 +101,10 @@ public class RobotContainer {
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
   private void configureButtonBindings() {
-    CommandXboxController controller = new CommandXboxController(3);
-    controller.a().onTrue(mElevator.setSlotCommand(0));
-    controller.x().onTrue(mElevator.setSlotCommand(1));
-    controller.y().onTrue(mElevator.setSlotCommand(2));
+    // CommandXboxController controller = new CommandXboxController(3);
+    // controller.a().onTrue(mElevator.setSlotCommand(0));
+    // controller.x().onTrue(mElevator.setSlotCommand(1));
+    // controller.y().onTrue(mElevator.setSlotCommand(2));
     mButtonBindings.initDriverJoysticks();
     mButtonBindings.initDriverButtons();
     mButtonBindings.initOperatorButtons();
