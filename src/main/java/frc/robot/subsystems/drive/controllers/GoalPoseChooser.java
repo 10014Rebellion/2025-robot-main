@@ -69,28 +69,23 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "D");
             reefFace = ReefFace.F1;
 
-            if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
-            }
-            
-            else if(side.equals(SIDE.RIGHT)) {
+            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
+            if(side.equals(SIDE.LEFT))
                 goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            }
-            
+            else if(side.equals(SIDE.RIGHT))
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
         else if(inBetween(30.0, 90.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "E");
             reefFace = ReefFace.F2;
-            if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
-            }
-            
-            else if(side.equals(SIDE.RIGHT)) {
+
+            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
+            if(side.equals(SIDE.LEFT))
                 goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            }
-            
+            else if(side.equals(SIDE.RIGHT))
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
@@ -125,14 +120,11 @@ public class GoalPoseChooser {
         else if(inBetween(-90.0, -30.0, angleFromReefCenter.getDegrees())){
             Logger.recordOutput("Drive/ReefSide", "C");
             reefFace = ReefFace.F6;
-            if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
-            }
-            
-            else if(side.equals(SIDE.RIGHT)) {
+            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
+            if(side.equals(SIDE.LEFT))
                 goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            }
-            
+            else if(side.equals(SIDE.RIGHT))
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
@@ -154,12 +146,19 @@ public class GoalPoseChooser {
         return goal;  // .plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
     }
 
-    public static Pose2d getTargetPoseLeft(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : PoseOffsets.LEFT.getOffsetM());
+    public static boolean isBlueAlliance() {
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
     }
 
+
+    // TODO: REMOVE THE ALLIANCE CHECK AFTER DRIPPING SPRINGS!
+    public static Pose2d getTargetPoseLeft(int pTagID) {
+        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : isBlueAlliance() ? PoseOffsets.LEFT.getOffsetM() + Units.inchesToMeters(0.375) : PoseOffsets.LEFT.getOffsetM());
+    }
+
+    // TODO: REMOVE THE ALLIANCE CHECK AFTER DRIPPING SPRINGS!
     public static Pose2d getTargetPoseRight(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM());
+        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : isBlueAlliance() ? PoseOffsets.RIGHT.getOffsetM() + Units.inchesToMeters(0.375) : PoseOffsets.RIGHT.getOffsetM());
     }
 
     public static Pose2d getTargetPose(int pTagID) {
@@ -261,9 +260,9 @@ public class GoalPoseChooser {
         return reefFace;
     } 
 
-    public static final double kDistBetweenBranchesCenter =
-        Units.inchesToMeters(13
-        ); // MAKE THIS 13 BEFORE A MATCH
+    public static final double kDistBetweenBranchesCenter = Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
+    public static final double kDistBetweenBranchesBlueCenter = Units.inchesToMeters(13.5); // MAKE THIS 13 BEFORE A MATCH
+
     public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13);
     // made the auton positions no longer have the extra 0.5 inch distance between branches
     public static final double kClawOffset = Units.inchesToMeters(-2.0);
