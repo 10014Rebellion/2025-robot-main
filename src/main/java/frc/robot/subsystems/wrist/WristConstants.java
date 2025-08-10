@@ -79,7 +79,7 @@ public class WristConstants {
     L2SCORE(9),
     BARGE(71),
     L2ALGAE(-28),
-    L3ALGAE(-16),
+    L3ALGAE(-19),
     HOLD_ALGAE(0),
     THROW_ALGAE(90),
     CLIMB(-15),
