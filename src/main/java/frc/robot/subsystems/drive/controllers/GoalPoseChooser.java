@@ -65,16 +65,25 @@ public class GoalPoseChooser {
     public static Pose2d getReefHexagonalPose(Pose2d robotPose) {
         Rotation2d angleFromReefCenter = turnFromReefOriginForHexagon(robotPose);
         Pose2d goal;
+        double xOffset = 0.0;
+        double yOffset = 0.0;
+
         if(inBetween(-30.0, 30.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "D");
             reefFace = ReefFace.F1;
 
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -84,11 +93,17 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "E");
             reefFace = ReefFace.F2;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -98,11 +113,17 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "F");
             reefFace = ReefFace.F3;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -112,11 +133,17 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "B");
             reefFace = ReefFace.F5;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -126,11 +153,17 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "C");
             reefFace = ReefFace.F6;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -140,11 +173,17 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "A");
             reefFace = ReefFace.F4;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                xOffset = (isRedAlliance()) ? 0.0 : 0.0;
+                yOffset = (isRedAlliance()) ? 0.0 : 0.0;
+
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), xOffset, yOffset);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -154,12 +193,18 @@ public class GoalPoseChooser {
         return goal;  // .plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
     }
 
-    public static Pose2d getTargetPoseLeft(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : PoseOffsets.LEFT.getOffsetM());
+    public static Pose2d getTargetPoseLeft(int pTagID, double xOffset, double yOffset) {
+        return getTargetPose(
+            pTagID, 
+            0.02 + xOffset, 
+            (DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : PoseOffsets.LEFT.getOffsetM()) + yOffset);
     }
 
-    public static Pose2d getTargetPoseRight(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM());
+    public static Pose2d getTargetPoseRight(int pTagID, double xOffset, double yOffset) {
+        return getTargetPose(
+            pTagID, 
+            0.02 + xOffset, 
+            (DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM()) + yOffset);
     }
 
     public static Pose2d getTargetPose(int pTagID) {
@@ -260,6 +305,10 @@ public class GoalPoseChooser {
     public static StateTracker.ReefFace getReefFace() {
         return reefFace;
     } 
+
+    public static boolean isRedAlliance() {
+        return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get().equals(Alliance.Red);
+    }
 
     public static final double kDistBetweenBranchesCenter =
         Units.inchesToMeters(13
