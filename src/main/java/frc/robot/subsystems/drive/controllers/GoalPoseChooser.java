@@ -68,12 +68,14 @@ public class GoalPoseChooser {
         if(inBetween(-30.0, 30.0, angleFromReefCenter.getDegrees())) {
             Logger.recordOutput("Drive/ReefSide", "D");
             reefFace = ReefFace.F1;
-
-            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
-            if(side.equals(SIDE.LEFT))
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            else if(side.equals(SIDE.RIGHT))
+            if(side.equals(SIDE.LEFT)) {
                 goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+            }
+            
+            else if(side.equals(SIDE.RIGHT)) {
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+            }
+            
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
@@ -81,11 +83,14 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "E");
             reefFace = ReefFace.F2;
 
-            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
-            if(side.equals(SIDE.LEFT))
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            else if(side.equals(SIDE.RIGHT))
+            if(side.equals(SIDE.LEFT)) {
                 goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+            }
+            
+            else if(side.equals(SIDE.RIGHT)) {
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+            }
+            
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
@@ -120,11 +125,14 @@ public class GoalPoseChooser {
         else if(inBetween(-90.0, -30.0, angleFromReefCenter.getDegrees())){
             Logger.recordOutput("Drive/ReefSide", "C");
             reefFace = ReefFace.F6;
-            // THIS REEF IS INVERTED TO BE IN LINE WITH THE DRIVER POV
-            if(side.equals(SIDE.LEFT))
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
-            else if(side.equals(SIDE.RIGHT))
+            if(side.equals(SIDE.LEFT)) {
                 goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+            }
+            
+            else if(side.equals(SIDE.RIGHT)) {
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+            }
+            
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
         } 
         
@@ -153,12 +161,12 @@ public class GoalPoseChooser {
 
     // TODO: REMOVE THE ALLIANCE CHECK AFTER DRIPPING SPRINGS!
     public static Pose2d getTargetPoseLeft(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() : isBlueAlliance() ? PoseOffsets.LEFT.getOffsetM() + Units.inchesToMeters(0.375) : PoseOffsets.LEFT.getOffsetM());
+        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONLEFT.getOffsetM() :  PoseOffsets.LEFT.getOffsetM());
     }
 
     // TODO: REMOVE THE ALLIANCE CHECK AFTER DRIPPING SPRINGS!
     public static Pose2d getTargetPoseRight(int pTagID) {
-        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : isBlueAlliance() ? PoseOffsets.RIGHT.getOffsetM() + Units.inchesToMeters(0.375) : PoseOffsets.RIGHT.getOffsetM());
+        return getTargetPose(pTagID, 0.02, DriverStation.isAutonomous() ?  PoseOffsets.AUTONRIGHT.getOffsetM() : PoseOffsets.RIGHT.getOffsetM());
     }
 
     public static Pose2d getTargetPose(int pTagID) {

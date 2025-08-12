@@ -32,7 +32,7 @@ public class DriveConstants {
         Math.hypot(kTrackWidthXMeters / 2.0, kTrackWidthYMeters / 2.0);
     
     /* DRIVEBASE CONSTRAINTS */
-    public static final double kMaxLinearSpeedMPS = 4.2;
+    public static final double kMaxLinearSpeedMPS = 4.5;
     public static final double kMaxLinearAccelerationMPSS = 12.0;
 
     public static final double kMaxRotationSpeedRadiansPS = Math.toRadians(360);
