@@ -64,6 +64,7 @@ public class WristSubsystem extends SubsystemBase {
   private ArmFeedforward mWristFF;
   private final DutyCycleEncoder mWristEncoder;
 
+
   public WristSubsystem() {
     this.mWristSparkMax = new SparkMax(WristConstants.kMotorID, WristConstants.kMotorType);
     this.mWristEncoder = new DutyCycleEncoder(WristConstants.kEncoderPort);
@@ -72,6 +73,7 @@ public class WristSubsystem extends SubsystemBase {
         WristConstants.k0I,
         WristConstants.k0D,
         new Constraints(WristConstants.k0MaxVelocity, WristConstants.k0MaxAcceleration));
+
     this.mWristProfiledPID.setTolerance(WristConstants.kTolerance);
     this.mWristFF = new ArmFeedforward(
         WristConstants.k0S, WristConstants.k0G, WristConstants.k0V, WristConstants.k0A);
