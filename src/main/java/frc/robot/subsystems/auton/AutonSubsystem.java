@@ -99,7 +99,7 @@ public class AutonSubsystem {
                 new WaitCommand(0.3),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
+                    mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE))),
             // Added an additional command telling the intake to run the rollers.
             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
             new SequentialCommandGroup(
@@ -121,7 +121,7 @@ public class AutonSubsystem {
                 new WaitCommand(0.15),
                 new ParallelCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                    mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE),
                     mClaw.intakeCoralCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE)))
             .andThen(new InstantCommand(() -> mIntake.setVoltsIntakeRoller(0)));
@@ -139,21 +139,21 @@ public class AutonSubsystem {
             new WaitCommand(0.3),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE).andThen(mWrist.enableFFCmd()),
+                mWrist.setPIDSetpoint(WristConstants.Setpoints.HOLD_ALGAE),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())));
     }
 
     private ParallelCommandGroup readyAlgaeL3() {
         return new ParallelCommandGroup(
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
-            mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE).andThen(mWrist.enableFFCmd()),
+            mWrist.setPIDSetpoint(WristConstants.Setpoints.L3ALGAE),
             mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
     }
 
     private ParallelCommandGroup readyAlgaeL2() {
         return new ParallelCommandGroup(
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
-            mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
+            mWrist.setPIDSetpoint(WristConstants.Setpoints.L2ALGAE),
             mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()));
     }
 
@@ -164,7 +164,7 @@ public class AutonSubsystem {
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE),
+                mWrist.setPIDSetpoint(WristConstants.Setpoints.THROW_ALGAE),
                 mClaw.autonThrowAlgae(mWrist, mElevator)));
     }
 
@@ -175,7 +175,7 @@ public class AutonSubsystem {
         return Commands.runOnce(() -> GoalPoseChooser.setSide( isLeft ? GoalPoseChooser.SIDE.LEFT : GoalPoseChooser.SIDE.RIGHT))
             .andThen(
                 new ParallelCommandGroup(
-                    mWrist.setPIDCmd(intToWristPos(level)), 
+                    mWrist.setPIDSetpoint(intToWristPos(level)), 
                     mElevator.setPIDCmd(intToElevatorPos(level)),
                     mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
                     .withDeadline(
@@ -205,23 +205,23 @@ public class AutonSubsystem {
                 mIntake.autonSetIndexCoralCmd(),
                 new SequentialCommandGroup(
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                    mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
+                    mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE))),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE),
                 mClaw.intakeCoralCmd()),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
     }
 
     private ParallelCommandGroup readyScoreSubsystems(int level) {
         return new ParallelCommandGroup(
-            mWrist.setPIDCmd(intToWristPos(level)), mElevator.setPIDCmd(intToElevatorPos(level)));
+            mWrist.setPIDSetpoint(intToWristPos(level)), mElevator.setPIDCmd(intToElevatorPos(level)));
     }
 
     private ParallelDeadlineGroup scoreCoral() {
         return new ParallelDeadlineGroup(
             new WaitCommand(0.5),
-            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE).andThen(mWrist.enableFFCmd()));
+            mWrist.setPIDSetpoint(WristConstants.Setpoints.SCORE));
             //new WaitCommand(0.1).andThen(mClaw.setClawCmd(0.0)));
     }
 
@@ -232,12 +232,12 @@ public class AutonSubsystem {
                     mIntake.autonSetIndexCoralCmd(),
                     new SequentialCommandGroup(
                         mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                        mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE))),
+                        mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE))),
                 mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
                 mIntake.setRollerCmd(8)),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                mWrist.setPIDSetpoint(WristConstants.Setpoints.INTAKE),
                 mClaw.intakeCoralCmd()),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
     }
@@ -252,7 +252,7 @@ public class AutonSubsystem {
         return new ParallelCommandGroup(
             mIntake.autonSetIndexCoralCmd(),
             mElevator.setPIDCmd(ElevatorConstants.Setpoints.HPINTAKE),
-            mWrist.setPIDCmd(WristConstants.Setpoints.HPINTAKE));
+            mWrist.setPIDSetpoint(WristConstants.Setpoints.HPINTAKE));
     }
 
     private WristConstants.Setpoints intToWristPos(int level) {
