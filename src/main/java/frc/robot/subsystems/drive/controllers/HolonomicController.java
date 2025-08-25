@@ -194,7 +194,7 @@ public class HolonomicController {
 
     /* Uses 3 PID controllers to set the chassis speeds */
     public ChassisSpeeds calculate(Pose2d goalPose, ChassisSpeeds goalSpeed, Pose2d currentPose) {
-        double ffScalar = Math.max(
+        double ffScalar = Math.min(
             Math.hypot(goalPose.getX() - currentPose.getX(), goalPose.getY() - currentPose.getY()) 
             / ffRadius.get(), 
             1.0);
