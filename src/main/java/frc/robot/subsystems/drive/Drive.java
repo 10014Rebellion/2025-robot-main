@@ -5,6 +5,7 @@ import static frc.robot.FieldConstants.*;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.drive.controllers.HeadingController;
@@ -114,7 +116,7 @@ public class Drive extends SubsystemBase {
 
     /* SETPOINTS */
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
-    private ChassisSpeeds ppDesiredSpeeds = new ChassisSpeeds();
+    private ChassisSpeeds teleopSpeeds = new ChassisSpeeds();
     private DriveFeedforwards pathPlanningFF = DriveFeedforwards.zeros(4);
 
     private SwerveModuleState[] prevStates = SwerveUtils.zeroStates();
@@ -169,7 +171,7 @@ public class Drive extends SubsystemBase {
             this::getRobotChassisSpeeds, 
             (speeds, ff) -> {
                 driveState = DriveState.AUTON;
-                ppDesiredSpeeds = new ChassisSpeeds(
+                desiredSpeeds = new ChassisSpeeds(
                     speeds.vxMetersPerSecond,
                     speeds.vyMetersPerSecond,
                     speeds.omegaRadiansPerSecond
@@ -199,7 +201,7 @@ public class Drive extends SubsystemBase {
             this::getPoseEstimate,
             this::getRobotChassisSpeeds, 
             (speeds, ff) -> {
-                ppDesiredSpeeds = speeds;
+                desiredSpeeds = speeds;
                 pathPlanningFF = ff;
             }, 
             new PPHolonomicDriveController( kPPTranslationPID, kPPRotationPID ), 
@@ -216,7 +218,7 @@ public class Drive extends SubsystemBase {
             this::getRobotChassisSpeeds, 
             (speeds, ff) -> {
                 driveState = DriveState.AUTON;
-                ppDesiredSpeeds = speeds;
+                desiredSpeeds = speeds;
                 pathPlanningFF = ff;
             }, 
             drivePID, 
@@ -337,9 +339,6 @@ public class Drive extends SubsystemBase {
                     algaeAlignSpeeds.omegaRadiansPerSecond
                 );
                 break;
-            case AUTON:
-                desiredSpeeds = ppDesiredSpeeds;
-                break;
             case UP:
                 desiredSpeeds = new ChassisSpeeds(0.5, 0.0, teleopSpeeds.omegaRadiansPerSecond);
                 break;
@@ -389,6 +388,56 @@ public class Drive extends SubsystemBase {
         return new FunctionalCommand(
             () -> setDriveState(state), () -> {}, 
             (interrupted) -> {}, () -> false, this);
+    }
+
+    public Command alignToBargeCommand(Pose2d goalPose, ConstraintType type) {
+        return new FunctionalCommand(
+            () -> {
+                this.goalPose = goalPose;
+                autoAlignController.setConstraintType(type, getPoseEstimate(), this.goalPose);
+                autoAlignController.reset(
+                    getPoseEstimate(),
+                    ChassisSpeeds.fromRobotRelativeSpeeds(
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    this.goalPose);
+            }, 
+            () -> {
+                desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+            }, 
+            (interrupted) -> {}, 
+            () -> false, 
+            this);
+    }
+
+    public Command headingAlignCommand(Supplier<Rotation2d>) {}
+
+    public Command alignToPoseCommand(CHOOSER_STRATEGY strat, ConstraintType type) {
+        return alignToPoseCommand(GoalPoseChooser.getGoalPose(CHOOSER_STRATEGY.kReefHexagonal, getPoseEstimate()), type);
+    }
+
+    public Command alignToPoseCommand(Pose2d goalPose, ConstraintType type) {
+        return new SequentialCommandGroup(
+            Commands.runOnce(() -> this.goalPose = goalPose),
+            alignToPoseCommand(() -> this.goalPose, type)
+        );
+    }
+
+    public Command alignToPoseCommand(Supplier<Pose2d> goalPoseSup, ConstraintType type) {
+        return new FunctionalCommand(
+            () -> {
+                autoAlignController.setConstraintType(ConstraintType.LINEAR, getPoseEstimate(), goalPoseSup.get());
+                autoAlignController.reset(
+                    getPoseEstimate(),
+                    ChassisSpeeds.fromRobotRelativeSpeeds(
+                        getRobotChassisSpeeds(), getPoseEstimate().getRotation()),
+                    goalPoseSup.get());
+            }, 
+            () -> {
+                desiredSpeeds = autoAlignController.calculate(goalPose, getPoseEstimate());
+            }, 
+            (interrupted) -> {}, 
+            () -> false, 
+            this);
     }
 
     /* Sets the drive state used in periodic(), and handles init condtions like resetting PID controllers */
