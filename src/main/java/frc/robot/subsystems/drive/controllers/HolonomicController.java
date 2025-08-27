@@ -35,9 +35,9 @@ public class HolonomicController {
         "AutoAlign/X/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber xS = new LoggedTunableNumber(
-        "AutoAlign/X/kS", 0.05);
+        "AutoAlign/X/kS", 0.0);
     public static final LoggedTunableNumber xV = new LoggedTunableNumber(
-        "AutoAlign/X/kV", 0.8);
+        "AutoAlign/X/kV", 0.65);
 
     public static final LoggedTunableNumber xToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/X/ToleranceMeters", 0.03);
@@ -58,9 +58,9 @@ public class HolonomicController {
         "AutoAlign/Y/kMaxVMPSS", 7.0);
 
     public static final LoggedTunableNumber yS = new LoggedTunableNumber(
-        "AutoAlign/Y/kS", 0.05);
+        "AutoAlign/Y/kS", 0.0);
     public static final LoggedTunableNumber yV = new LoggedTunableNumber(
-        "AutoAlign/Y/kV", 0.8);
+        "AutoAlign/Y/kV", 0.65);
 
     public static final LoggedTunableNumber yToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Y/ToleranceMeters", 0.05);
@@ -78,9 +78,9 @@ public class HolonomicController {
         "AutoAlign/Omega/kIRange", 0.0);
 
     public static final LoggedTunableNumber omegaMaxVDPS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPS", 360);
+        "AutoAlign/Omega/kMaxVDPS", 720);
     public static final LoggedTunableNumber omegaMaxADPSS = new LoggedTunableNumber(
-        "AutoAlign/Omega/kMaxVDPSS", 2100);
+        "AutoAlign/Omega/kMaxVDPSS", 2500);
 
     public static final LoggedTunableNumber omegaS = new LoggedTunableNumber(
         "AutoAlign/Omega/kS", 0.0);
@@ -91,14 +91,14 @@ public class HolonomicController {
         "AutoAlign/Omega/ToleranceDegrees", 1.5);
 
     public static final LoggedTunableNumber distanceMaxVMPS = new LoggedTunableNumber(
-        "AutoAlign/Distance/kMaxVMPS", 4.0);
+        "AutoAlign/Distance/kMaxVMPS", 3.75);
     public static final LoggedTunableNumber distanceMaxAMPSS = new LoggedTunableNumber(
-        "AutoAlign/Distance/kMaxVMPSS", 12.5);
+        "AutoAlign/Distance/kMaxVMPSS", 10.0);
     
     public static final LoggedTunableNumber distanceToleranceMeters = new LoggedTunableNumber(
         "AutoAlign/Distance/ToleranceMeters", 0.03);
 
-    public static final LoggedTunableNumber ffRadius = new LoggedTunableNumber("AutoAlign/ffRadius", 0.5);
+    public static final LoggedTunableNumber ffRadius = new LoggedTunableNumber("AutoAlign/ffRadius", 1.0);
 
     private ProfiledPIDController xController;
     private ProfiledPIDController yController;
