@@ -12,7 +12,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED mLED;
   private final AddressableLEDBuffer mLEDBuffer;
 
-  private final int kLEDLength = 30; // TUNE ME
+  private final int kLEDLength = 36; // TUNE ME
 
   private ledColor defaultColor = Robot.gIsBlueAlliance ? ledColor.BLUE : ledColor.RED;
 

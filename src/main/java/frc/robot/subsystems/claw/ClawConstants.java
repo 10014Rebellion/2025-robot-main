@@ -26,6 +26,7 @@ public class ClawConstants {
     EJECT_CORAL(-3),
 
     // Algae Values
+    GROUND_ALGAE(10.0),
     INTAKE_ALGAE(12.0),
     HOLD_ALGAE(7),
     EJECT_ALGAE(-12),

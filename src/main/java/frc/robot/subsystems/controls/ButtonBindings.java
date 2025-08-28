@@ -68,7 +68,7 @@ public class ButtonBindings {
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
-    new Trigger(() -> mClaw.getBeamBreak())
+    new Trigger(() -> mClaw.hasPiece())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
     
@@ -144,7 +144,7 @@ public class ButtonBindings {
       .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
         .whileTrue(
             new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB).andThen(mWrist.enableFFCmd()),
+                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
                 mClimb.pullClimb(),
                 mClimb.setGrabberVoltsCmd(0.0),
@@ -155,7 +155,7 @@ public class ButtonBindings {
         .whileTrue(
           new ParallelCommandGroup(
             mClimb.deployClimb(),
-            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB)));
+            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())));
     // .whileFalse();
 
     mOperatorButtonboard
@@ -179,7 +179,7 @@ public class ButtonBindings {
         .whileTrue(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE).andThen(mWrist.enableFFCmd()),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         .onFalse(mActionCommands.getHoldAlgaeCmd());
 
@@ -188,7 +188,7 @@ public class ButtonBindings {
         .whileTrue(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE).andThen(mWrist.enableFFCmd()),
+                mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
                 mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
         .onFalse(mActionCommands.getHoldAlgaeCmd());
 
@@ -197,14 +197,14 @@ public class ButtonBindings {
         .whileTrue(
             new SequentialCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE),
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()),
                 new ParallelCommandGroup(
                     mClaw.intakeCoralCmd(),
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE))))
         .whileFalse(
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE)));
+                mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece())));
 
     mOperatorButtonboard.axisLessThan(1, -0.5).whileTrue(mElevator.setVoltsCmd(5));
 

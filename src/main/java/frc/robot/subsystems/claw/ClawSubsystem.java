@@ -58,7 +58,7 @@ public class ClawSubsystem extends SubsystemBase {
           setClaw(ClawConstants.RollerSpeed.INTAKE_CORAL);
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.HOLD_CORAL),
-        () -> getBeamBreak(),
+        () -> hasPiece(),
         this);
   }
 
@@ -69,7 +69,7 @@ public class ClawSubsystem extends SubsystemBase {
           setClaw(speed);
         },
         (interrupted) -> setClaw(speed),
-        () -> !getBeamBreak(),
+        () -> !hasPiece(),
         this);
   }
 
@@ -80,7 +80,7 @@ public class ClawSubsystem extends SubsystemBase {
           setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF);
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.OUTTAKE_REEF),
-        () -> !getBeamBreak(),
+        () -> !hasPiece(),
         this);
   }
 
@@ -91,7 +91,18 @@ public class ClawSubsystem extends SubsystemBase {
           setClaw(ClawConstants.RollerSpeed.EJECT_CORAL);
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.EJECT_CORAL),
-        () -> !getBeamBreak(),
+        () -> !hasPiece(),
+        this);
+  }
+
+  public FunctionalCommand groundAlgae() {
+    return new FunctionalCommand(
+        () -> setClaw(ClawConstants.RollerSpeed.GROUND_ALGAE),
+        () -> {
+          setClaw(ClawConstants.RollerSpeed.GROUND_ALGAE);
+        },
+        (interrupted) -> setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE),
+        () -> !hasPiece(),
         this);
   }
 
@@ -106,7 +117,7 @@ public class ClawSubsystem extends SubsystemBase {
           if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
         },
-        () -> false,
+        () -> mWrist.getEncReading() >= WristConstants.throwAlgaePos,
         this);
   }
 
@@ -125,13 +136,13 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
-  public boolean getBeamBreak() {
+  public boolean hasPiece() {
     return !mBeamBreak.get();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Claw/Beam Break", getBeamBreak());
+    SmartDashboard.putBoolean("Claw/Beam Break", hasPiece());
     SmartDashboard.putNumber("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * 12.0);
   }
 }

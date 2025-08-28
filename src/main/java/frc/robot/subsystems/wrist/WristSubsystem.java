@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.wrist;
 
+import java.util.function.BooleanSupplier;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -129,7 +131,7 @@ public class WristSubsystem extends SubsystemBase {
         this);
   }
 
-  public Command coralLevelToPIDCmd(CoralLevel pCoralLevel) {
+  public Command coralLevelToPIDCmd(CoralLevel pCoralLevel, BooleanSupplier hasGamePiece) {
     WristConstants.Setpoints elevatorSetpoint = WristConstants.Setpoints.L1;
 
     if(pCoralLevel == CoralLevel.B3) {
@@ -142,14 +144,24 @@ public class WristSubsystem extends SubsystemBase {
       elevatorSetpoint = WristConstants.Setpoints.L2;
     } 
 
-    return setPIDCmd(elevatorSetpoint);
+    return setPIDCmd(elevatorSetpoint, hasGamePiece);
   }
 
 
   // public FunctionalCommand setTunableCommand
 
-  public Command setPIDCmd(WristConstants.Setpoints pSetpoint) {
-    return new ConditionalCommand(setSlotCommand(1), setSlotCommand(0), () -> pSetpoint.equals(WristConstants.Setpoints.BARGE))
+  public Command setPIDCmd(WristConstants.Setpoints pSetpoint, BooleanSupplier hasGamePiece) {
+    return new InstantCommand(
+      () -> {
+        if(pSetpoint.equals(WristConstants.Setpoints.THROW_ALGAE) || pSetpoint.equals(WristConstants.Setpoints.HOLD_ALGAE)) {
+          setSlot(1);
+        } else if(hasGamePiece.getAsBoolean()) {
+          setSlot(2);
+        } else {
+          setSlot(0);
+        }
+      }
+    )
     .andThen(new FunctionalCommand(
         () -> {
           SmartDashboard.putNumber("Wrist/Setpoint", pSetpoint.getPos());
@@ -252,22 +264,26 @@ public class WristSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("Wrist/At Setpoint", isPIDAtGoal());
   }
 
+  public void setSlot(int slot) {
+    this.slot = slot;
+    switch(this.slot) {
+      case 0:
+        updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
+        break;
+      case 1:
+        updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
+        break;
+      case 2:
+        updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
+        break;
+      default:
+        Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
+    }
+  }
+
   public Command setSlotCommand(int slot) {
     return new InstantCommand(() -> {
-      this.slot = slot;
-      switch(this.slot) {
-        case 0:
-          updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
-          break;
-        case 1:
-          updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
-          break;
-        case 2:
-          updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
-          break;
-        default:
-          Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
-      }
+      setSlot(slot);
     });
   }
 
