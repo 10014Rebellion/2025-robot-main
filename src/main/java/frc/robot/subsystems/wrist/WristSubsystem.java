@@ -7,7 +7,6 @@ package frc.robot.subsystems.wrist;
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -17,10 +16,10 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -153,9 +152,9 @@ public class WristSubsystem extends SubsystemBase {
   public Command setPIDCmd(WristConstants.Setpoints pSetpoint, BooleanSupplier hasGamePiece) {
     return new InstantCommand(
       () -> {
-        if(pSetpoint.equals(WristConstants.Setpoints.THROW_ALGAE) || pSetpoint.equals(WristConstants.Setpoints.HOLD_ALGAE)) {
+        if(hasGamePiece.getAsBoolean()) {
           setSlot(1);
-        } else if(hasGamePiece.getAsBoolean()) {
+        } else if(pSetpoint.equals(WristConstants.Setpoints.THROW_ALGAE)) {
           setSlot(2);
         } else {
           setSlot(0);
@@ -237,11 +236,6 @@ public class WristSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     switch(slot) {
-      case 0:
-        LoggedTunableNumber.ifChanged(hashCode(), () -> {
-          updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
-        }, k0P, k0I, k0D, k0MaxV, k0MaxA, k0S, k0V, k0A, k0G);
-        break;
       case 1:
         LoggedTunableNumber.ifChanged(hashCode(), () -> {
           updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
@@ -253,7 +247,10 @@ public class WristSubsystem extends SubsystemBase {
         }, k2P, k2I, k2D, k2MaxV, k2MaxA, k2S, k2V, k2A, k2G);
         break;
       default:
-        Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
+      if(slot != 0) DriverStation.reportWarning("INVALID SLOT PASSED IN, DEFAULTING TO SLOT 0", true);
+        LoggedTunableNumber.ifChanged(hashCode(), () -> {
+          updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
+        }, k0P, k0I, k0D, k0MaxV, k0MaxA, k0S, k0V, k0A, k0G);
     }
 
     stopIfLimit();
@@ -267,9 +264,6 @@ public class WristSubsystem extends SubsystemBase {
   public void setSlot(int slot) {
     this.slot = slot;
     switch(this.slot) {
-      case 0:
-        updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
-        break;
       case 1:
         updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
         break;
@@ -277,7 +271,8 @@ public class WristSubsystem extends SubsystemBase {
         updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
         break;
       default:
-        Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
+        if(slot != 0) DriverStation.reportWarning("INVALID SLOT PASSED IN, DEFAULTING TO SLOT 0", true);
+        updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
     }
   }
 
