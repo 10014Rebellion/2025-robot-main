@@ -6,6 +6,10 @@ package frc.robot.subsystems.claw;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+
+import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.hardware.CANrange;
 import com.revrobotics.spark.SparkFlex;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,13 +19,20 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
+import frc.robot.Constants;
+
 public class ClawSubsystem extends SubsystemBase {
   private final SparkFlex mClawSparkMax;
   private final DigitalInput mBeamBreak;
 
+  private final CANrange distanceFromClawArcSensor;
+  private double distanceFromClawMeters;
+
   public ClawSubsystem() {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
     this.mBeamBreak = new DigitalInput(ClawConstants.kBeamBreakDIOPort);
+
+    this.distanceFromClawArcSensor = new CANrange(ClawConstants.CANRangeID, Constants.kCanbusName);
 
     mClawSparkMax.configure(
         ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -140,9 +151,17 @@ public class ClawSubsystem extends SubsystemBase {
     return !mBeamBreak.get();
   }
 
+  public boolean isCoral() {
+    return hasPiece() && (distanceFromClawMeters > ClawConstants.coralDetectionCutoff);
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putBoolean("Claw/Beam Break", hasPiece());
     SmartDashboard.putNumber("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * 12.0);
+
+    distanceFromClawMeters = distanceFromClawArcSensor.getDistance().getValueAsDouble();
+    Logger.recordOutput("Claw/CANRange/DistanceFromClaw", distanceFromClawArcSensor.getDistance().getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/isCoral", isCoral());
   }
 }
