@@ -9,8 +9,14 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.configs.CANrangeConfigurator;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.revrobotics.spark.SparkFlex;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -28,11 +34,28 @@ public class ClawSubsystem extends SubsystemBase {
   private final CANrange distanceFromClawArcSensor;
   private double distanceFromClawMeters;
 
+  private final StatusSignal<Distance> distanceFromClaw;
+  private final StatusSignal<Boolean> isDetected;
+  private final StatusSignal<Distance> distanceStdDevClaw;
+  private final StatusSignal<Double> ambience;
+
+
   public ClawSubsystem() {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
     this.mBeamBreak = new DigitalInput(ClawConstants.kBeamBreakDIOPort);
 
     this.distanceFromClawArcSensor = new CANrange(ClawConstants.CANRangeID, Constants.kCanbusName);
+    CANrangeConfiguration config = new CANrangeConfiguration();
+    config.ProximityParams.MinSignalStrengthForValidMeasurement = 2500;
+    config.ProximityParams.ProximityHysteresis = 0.01;
+    config.ProximityParams.ProximityThreshold = 0.5;
+
+    distanceFromClawArcSensor.getConfigurator().apply(config);
+
+    distanceFromClaw = distanceFromClawArcSensor.getDistance();
+    isDetected = distanceFromClawArcSensor.getIsDetected();
+    distanceStdDevClaw = distanceFromClawArcSensor.getDistanceStdDev();
+    ambience = distanceFromClawArcSensor.getAmbientSignal();
 
     mClawSparkMax.configure(
         ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -159,9 +182,17 @@ public class ClawSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putBoolean("Claw/Beam Break", hasPiece());
     SmartDashboard.putNumber("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * 12.0);
-
-    distanceFromClawMeters = distanceFromClawArcSensor.getDistance().getValueAsDouble();
-    Logger.recordOutput("Claw/CANRange/DistanceFromClaw", distanceFromClawArcSensor.getDistance().getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/Connected", BaseStatusSignal.refreshAll(
+      distanceFromClaw,
+      distanceStdDevClaw,
+      isDetected,
+      ambience
+    ).isOK());
+    
+    Logger.recordOutput("Claw/CANRange/DistanceFromClaw", distanceFromClaw.getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/DistanceFromClawStddev", distanceStdDevClaw.getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/IsDetected", isDetected.getValue());
+    Logger.recordOutput("Claw/CANRange/Ambience", ambience.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/isCoral", isCoral());
   }
 }
