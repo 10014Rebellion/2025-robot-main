@@ -201,25 +201,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     return mElevatorSparkMax.getAppliedOutput();
   }
 
-  public Command setSlotCommand(int slot) {
-    return new InstantCommand(() -> {
-      this.slot = slot;
-      switch(this.slot) {
-        case 0:
-          updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
-          break;
-        case 1:
-          updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
-          break;
-        case 2:
-          updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
-          break;
-        default:
-          Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
-      }
-    });
-  }
-
   @Override
   public void periodic() {
     switch(slot) {
