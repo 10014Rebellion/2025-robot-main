@@ -14,9 +14,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CANrangeConfigurator;
 import com.ctre.phoenix6.hardware.CANrange;
+import com.ctre.phoenix6.signals.MeasurementHealthValue;
 import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -32,13 +34,14 @@ public class ClawSubsystem extends SubsystemBase {
   private final DigitalInput mBeamBreak;
 
   private final CANrange distanceFromClawArcSensor;
-  private double distanceFromClawMeters;
 
   private final StatusSignal<Distance> distanceFromClaw;
   private final StatusSignal<Boolean> isDetected;
   private final StatusSignal<Distance> distanceStdDevClaw;
   private final StatusSignal<Double> ambience;
-
+  private final StatusSignal<Double> signalStrength;
+  private final StatusSignal<MeasurementHealthValue> measurementHealth;
+  private final StatusSignal<Time> measurementTime;
 
   public ClawSubsystem() {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
@@ -56,6 +59,10 @@ public class ClawSubsystem extends SubsystemBase {
     isDetected = distanceFromClawArcSensor.getIsDetected();
     distanceStdDevClaw = distanceFromClawArcSensor.getDistanceStdDev();
     ambience = distanceFromClawArcSensor.getAmbientSignal();
+
+    signalStrength = distanceFromClawArcSensor.getSignalStrength();
+    measurementHealth = distanceFromClawArcSensor.getMeasurementHealth();
+    measurementTime = distanceFromClawArcSensor.getMeasurementTime();
 
     mClawSparkMax.configure(
         ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -175,7 +182,7 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public boolean isCoral() {
-    return hasPiece() && (distanceFromClawMeters > ClawConstants.coralDetectionCutoff);
+    return distanceFromClaw.getValueAsDouble() > ClawConstants.coralDetectionCutoff;
   }
 
   @Override
@@ -186,13 +193,19 @@ public class ClawSubsystem extends SubsystemBase {
       distanceFromClaw,
       distanceStdDevClaw,
       isDetected,
-      ambience
+      ambience,
+      signalStrength,
+      measurementHealth,
+      measurementTime
     ).isOK());
     
     Logger.recordOutput("Claw/CANRange/DistanceFromClaw", distanceFromClaw.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/DistanceFromClawStddev", distanceStdDevClaw.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/IsDetected", isDetected.getValue());
     Logger.recordOutput("Claw/CANRange/Ambience", ambience.getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/SignalStrength", signalStrength.getValueAsDouble());
+    Logger.recordOutput("Claw/CANRange/MeasurementHealthBool", measurementHealth.getValue().equals(MeasurementHealthValue.Good));
+    Logger.recordOutput("Claw/CANRange/MeasurementTime", measurementTime.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/isCoral", isCoral());
   }
 }
