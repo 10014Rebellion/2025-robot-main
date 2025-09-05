@@ -50,6 +50,7 @@ public class AutonCommands extends SubsystemBase {
     private Trigger elevInIntakeWristExitRange;
     private Trigger wristInIntakeEntryRange;
     private Trigger wristInIntakeExitRange;
+    private Trigger wristInScoringRange;
     
     private Trigger inAutoAlignRange;
     private Trigger inDrivingScoringTolerance;
@@ -119,7 +120,7 @@ public class AutonCommands extends SubsystemBase {
         return new InstantCommand();
     }
 
-    public PathPlannerAuto nextScorCoralPath(String name) {
+    public PathPlannerAuto nextScoreCoralPath(String name) {
         PathPlannerAuto auto = new PathPlannerAuto(autoPlaceholder());
 
         auto.activePath(name)
@@ -136,13 +137,17 @@ public class AutonCommands extends SubsystemBase {
         auto.condition(inDrivingScoringTolerance)
             .onTrue(wristToScoreCommand());
 
+        auto.condition(inDrivingScoringTolerance.and(wristInScoringRange))
+            .onTrue(clawEjectCommand());
+
         auto.condition(IR3.negate())
+            .onTrue(clawHoldCommand())
             .onTrue(Commands.run(() -> auto.cancel()));
 
         return auto;
     }
 
-    public PathPlannerAuto nextintakeCoralPath(String name) {
+    public PathPlannerAuto nextIntakeCoralPath(String name) {
         PathPlannerAuto auto = new PathPlannerAuto(autoPlaceholder());
 
         auto.activePath(name)
@@ -208,9 +213,11 @@ public class AutonCommands extends SubsystemBase {
             );
 
         auto.condition(IR2.and(wristInIntakeEntryRange))
+            .onTrue(clawIntakeCommand())
             .onTrue(elevatorToIntakeCommand());
 
         auto.condition(IR3)
+            .onTrue(clawHoldCommand())
             .onTrue(elevatorToPreScoreCommand());
 
         auto.condition(IR3.and(elevInIntakeWristExitRange))
@@ -220,6 +227,18 @@ public class AutonCommands extends SubsystemBase {
     }
 
     ///////////////// SUPERSTRUCTURE COMMANDS AND DATA \\\\\\\\\\\\\\\\\\\\\
+    public Command clawHoldCommand() {
+        return new InstantCommand();
+    }
+
+    public Command clawEjectCommand() {
+        return new InstantCommand();
+    }
+
+    public Command clawIntakeCommand() {
+        return new InstantCommand();
+    }
+    
     public Command elevatorToPreScoreCommand() {
         return new InstantCommand();
     }
