@@ -34,6 +34,8 @@ public class LEDConstants {
   public enum ledColor {
     RED(60), // RGB: 255, 255, 0
     BLUE(120), // RGB: 0, 255, 0
+    TURQUOISE(170), // RGB: 0, 255, 0
+    PURPLE(100), // RGB: 0, 255, 0
     GREEN(20), // RGB: 255, 85, 0
     YELLOW(50); // RGB: 255, 213, 0
     // PURPLE(90), // RGB: 128, 255, 0

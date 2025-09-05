@@ -68,8 +68,12 @@ public class ButtonBindings {
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
-    new Trigger(() -> mClaw.hasPiece())
-      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.YELLOW)))
+    new Trigger(() -> mClaw.CANRangeHasAlgae())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.TURQUOISE)))
+      .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
+
+    new Trigger(() -> mClaw.CANRangeHasCoral())
+      .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
     
     new Trigger(() -> mClimb.getBeamBroken()).and(() -> mClimb.isInTolerance(Setpoints.CLIMBED))

@@ -4,30 +4,26 @@
 
 package frc.robot.subsystems.claw;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
-import com.ctre.phoenix6.configs.CANrangeConfigurator;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.signals.MeasurementHealthValue;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-
-import frc.robot.Constants;
 
 public class ClawSubsystem extends SubsystemBase {
   private final SparkFlex mClawSparkMax;
@@ -49,7 +45,7 @@ public class ClawSubsystem extends SubsystemBase {
 
     this.distanceFromClawArcSensor = new CANrange(ClawConstants.CANRangeID, Constants.kCanbusName);
     CANrangeConfiguration config = new CANrangeConfiguration();
-    config.ProximityParams.MinSignalStrengthForValidMeasurement = 2500;
+    config.ProximityParams.MinSignalStrengthForValidMeasurement = 3000;
     config.ProximityParams.ProximityHysteresis = 0.01;
     config.ProximityParams.ProximityThreshold = 0.5;
 
@@ -177,18 +173,40 @@ public class ClawSubsystem extends SubsystemBase {
         this);
   }
 
+  // TODO: CHEK FOR BEAMBREAK AFTER ITS FIXED BY BOSCO (fricken bosco.....)
   public boolean hasPiece() {
+    return CANRangeHasCoral() || CANRangeHasAlgae();
+  }
+
+  private boolean isTherePieceOverlap() {
+    return CANRangeHasCoral() && CANRangeHasAlgae();
+  }
+
+  public boolean beambreakHasPiece() {
     return !mBeamBreak.get();
   }
 
-  public boolean isCoral() {
-    return distanceFromClaw.getValueAsDouble() > ClawConstants.coralDetectionCutoff;
+  public boolean CANRangeHasCoral() {
+    return 
+      (distanceFromClaw.getValueAsDouble() < ClawConstants.coralDetectionCutoff) && 
+      (signalStrength.getValueAsDouble() > 20000)  && 
+      (ambience.getValueAsDouble() < 20);
   }
+
+  public boolean CANRangeHasAlgae() {
+    return 
+      (distanceFromClaw.getValueAsDouble() < 0.08) && 
+      (signalStrength.getValueAsDouble() > 3000) && 
+      (signalStrength.getValueAsDouble() < 20000) &&
+      (ambience.getValueAsDouble() < 20);
+  }
+
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Claw/Beam Break", hasPiece());
-    SmartDashboard.putNumber("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * 12.0);
+    Logger.recordOutput("Claw/Has Piece", hasPiece());
+    Logger.recordOutput("Claw/Beambreak/Has Piece", beambreakHasPiece());
+    Logger.recordOutput("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * mClawSparkMax.getBusVoltage());
     Logger.recordOutput("Claw/CANRange/Connected", BaseStatusSignal.refreshAll(
       distanceFromClaw,
       distanceStdDevClaw,
@@ -206,6 +224,10 @@ public class ClawSubsystem extends SubsystemBase {
     Logger.recordOutput("Claw/CANRange/SignalStrength", signalStrength.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/MeasurementHealthBool", measurementHealth.getValue().equals(MeasurementHealthValue.Good));
     Logger.recordOutput("Claw/CANRange/MeasurementTime", measurementTime.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/isCoral", isCoral());
+    Logger.recordOutput("Claw/CANRange/Detects Coral", CANRangeHasCoral());
+    Logger.recordOutput("Claw/CANRange/Detects Algae", CANRangeHasAlgae());
+    Logger.recordOutput("Claw/CANRange/Detect Both (BAD)", isTherePieceOverlap());
+
+
   }
 }

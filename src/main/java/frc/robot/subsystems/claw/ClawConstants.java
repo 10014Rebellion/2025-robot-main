@@ -16,7 +16,7 @@ public class ClawConstants {
   public static final double kD = 0.0;
 
   public static final int CANRangeID = 55;
-  public static final double coralDetectionCutoff = 0.02;
+  public static final double coralDetectionCutoff = 0.04;
 
   public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
