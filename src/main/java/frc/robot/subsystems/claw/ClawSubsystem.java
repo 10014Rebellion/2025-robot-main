@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.controls.StateTracker.GamePiece;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
@@ -175,30 +176,30 @@ public class ClawSubsystem extends SubsystemBase {
 
   // TODO: CHEK FOR BEAMBREAK AFTER ITS FIXED BY BOSCO (fricken bosco.....)
   public boolean hasPiece() {
-    return CANRangeHasCoral() || CANRangeHasAlgae();
-  }
-
-  private boolean isTherePieceOverlap() {
-    return CANRangeHasCoral() && CANRangeHasAlgae();
+    return CANRangeHasPiece();
   }
 
   public boolean beambreakHasPiece() {
     return !mBeamBreak.get();
   }
 
-  public boolean CANRangeHasCoral() {
-    return 
-      (distanceFromClaw.getValueAsDouble() < ClawConstants.coralDetectionCutoff) && 
-      (signalStrength.getValueAsDouble() > 20000)  && 
-      (ambience.getValueAsDouble() < 20);
+  public boolean CANRangeHasPiece() {
+    return (distanceFromClaw.getValueAsDouble() < 0.08) && 
+    (signalStrength.getValueAsDouble() > 3000) &&
+    (ambience.getValueAsDouble() < 20);
   }
 
-  public boolean CANRangeHasAlgae() {
-    return 
-      (distanceFromClaw.getValueAsDouble() < 0.08) && 
+  public GamePiece CANRangeGuessGamePiece() {
+    if((distanceFromClaw.getValueAsDouble() < 0.08) && 
       (signalStrength.getValueAsDouble() > 3000) && 
       (signalStrength.getValueAsDouble() < 20000) &&
-      (ambience.getValueAsDouble() < 20);
+      (ambience.getValueAsDouble() < 20)) return GamePiece.Algae;
+    
+    if((distanceFromClaw.getValueAsDouble() < ClawConstants.coralDetectionCutoff) && 
+    (signalStrength.getValueAsDouble() > 20000)  && 
+    (ambience.getValueAsDouble() < 20)) return GamePiece.Coral;
+
+    return null;
   }
 
 
@@ -224,9 +225,7 @@ public class ClawSubsystem extends SubsystemBase {
     Logger.recordOutput("Claw/CANRange/SignalStrength", signalStrength.getValueAsDouble());
     Logger.recordOutput("Claw/CANRange/MeasurementHealthBool", measurementHealth.getValue().equals(MeasurementHealthValue.Good));
     Logger.recordOutput("Claw/CANRange/MeasurementTime", measurementTime.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/Detects Coral", CANRangeHasCoral());
-    Logger.recordOutput("Claw/CANRange/Detects Algae", CANRangeHasAlgae());
-    Logger.recordOutput("Claw/CANRange/Detect Both (BAD)", isTherePieceOverlap());
+    Logger.recordOutput("Claw/CANRange/Detects Piece", CANRangeHasPiece());
 
 
   }

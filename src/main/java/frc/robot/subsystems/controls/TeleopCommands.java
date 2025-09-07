@@ -41,14 +41,15 @@ public class TeleopCommands {
 		ElevatorSubsystem pElevator,
 		IntakeSubsystem pIntake,
 		ClawSubsystem pClaw,
-		ClimbSubsystem pClimb) {
+		ClimbSubsystem pClimb,
+		StateTracker pStateTracker) {
 		this.mDrive = pDrive;
 		this.mWrist = pWrist;
 		this.mElevator = pElevator;
 		this.mIntake = pIntake;
 		this.mClaw = pClaw;
 		this.mClimb = pClimb;
-		this.mStateTracker = new StateTracker();
+		this.mStateTracker = pStateTracker;
 	}
 
 	public class ActionCommands {
@@ -56,6 +57,7 @@ public class TeleopCommands {
 		/** INTAKE CORAL: This command uses the intake, elevator, and wrist to intake the coral from the intake */
 		public SequentialCommandGroup getIntakeCoralCmd() {
 			return new SequentialCommandGroup(
+                mStateTracker.setCurrentGamePieceCmd(GamePiece.Coral),
 				new ParallelDeadlineGroup( // End condition: when coral is in the cradle
 					new ParallelCommandGroup(
 						mIntake.setIndexCoralCmd(), // Turns on Indexer and ends when coral is in the cradle
@@ -118,16 +120,20 @@ public class TeleopCommands {
 		}
 
 		/** GROUND ALGAE: Picks up the ground algae */
-		public ParallelCommandGroup getGroundAlgaeCmd() {
-			return new ParallelCommandGroup(
-				mWrist
-					.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE, () -> mClaw.hasPiece())
-					.andThen(mWrist.enableFFCmd()),
+		public SequentialCommandGroup getGroundAlgaeCmd() {
+			return new SequentialCommandGroup(
+				mStateTracker.setCurrentGamePieceCmd(GamePiece.Algae),
+				new ParallelCommandGroup(
+					mWrist
+						.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE, () -> mClaw.hasPiece())
+						.andThen(mWrist.enableFFCmd()),
 				new ParallelCommandGroup(
 					mClaw.groundAlgae(),
 					mElevator.setPIDCmd(
 						ElevatorConstants.Setpoints.GROUNDALGAE))
+				)
 			);
+			
 		}
 
 		/** HOLD ALGAE: Holds the algae with the arm */

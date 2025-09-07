@@ -4,6 +4,7 @@ import java.util.*;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StateTracker extends SubsystemBase {
@@ -48,8 +49,6 @@ public class StateTracker extends SubsystemBase {
         this.left = pLeft;
         this.right = pRight;
         this.algaePickupLevel = pAlgaeLevel;
-
-
     }
 
     public int getAprilTagTag() {
@@ -115,27 +114,18 @@ public class StateTracker extends SubsystemBase {
     mCurrentGamePiece = pGamePiece;
   }
 
+  public InstantCommand setCurrentGamePieceCmd(GamePiece pGamePiece) {
+    return new InstantCommand(()->mCurrentGamePiece = pGamePiece);
+  }
+
   public void setCurrentCoralLevel(CoralLevel pCoralLevel) {
     mCurrentCoralLevel = pCoralLevel;
   }
-
-  // public void setCurrentAlgaeLevel(AlgaeScoringLevel pAlgaeScoringLevel) {
-  //   mCurrentAlgaeScoring = pAlgaeScoringLevel;
-  // }
-
-  // public void setCurrentGamePiece(GamePiece pGamePiece) {
-  //   mCurrentGamePiece = pGamePiece;
-  // }
-
   public CoralLevel getCurrentCoralLevel() {
     return mCurrentCoralLevel;
   }
 
-  // public AlgaeScoringLevel getCurrentAlgaeScoringLevel() {
-  //   return mCurrentAlgaeScoring;
-  // }
-
-  public GamePiece getCurrentGamePieceLevel() {
+  public GamePiece getCurrentGamePiece() {
     return mCurrentGamePiece;
   }
 

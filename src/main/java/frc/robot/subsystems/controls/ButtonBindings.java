@@ -17,6 +17,7 @@ import frc.robot.subsystems.climb.ClimbConstants.Pulley.Setpoints;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.DriverController;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
+import frc.robot.subsystems.controls.StateTracker.GamePiece;
 import frc.robot.subsystems.controls.TeleopCommands.ActionCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
@@ -39,8 +40,9 @@ public class ButtonBindings {
   private final ClawSubsystem mClaw;
   private final ClimbSubsystem mClimb;
   private final LEDSubsystem mLEDs;
+  private final StateTracker mStateTracker;
 
-  public ButtonBindings(Drive pDrive, ElevatorSubsystem pElevator, IntakeSubsystem pIntake, WristSubsystem pWrist, ClawSubsystem pClaw, ClimbSubsystem pClimb, LEDSubsystem pLEDs){
+  public ButtonBindings(Drive pDrive, ElevatorSubsystem pElevator, IntakeSubsystem pIntake, WristSubsystem pWrist, ClawSubsystem pClaw, ClimbSubsystem pClimb, LEDSubsystem pLEDs, StateTracker pStateTracker){
     this.mDrive = pDrive;
     this.mElevator = pElevator;
     this.mIntake = pIntake;
@@ -48,10 +50,11 @@ public class ButtonBindings {
     this.mClaw = pClaw;
     this.mClimb = pClimb;
     this.mLEDs = pLEDs;
+    this.mStateTracker = pStateTracker;
 
     this.mDriverController = new CommandXboxController(DriverController.kDriverControllerPort);
     this.mOperatorButtonboard = new CommandGenericHID(Buttonboard.kButtonboardPort);
-    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pClimb).new ActionCommands();
+    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pClimb , pStateTracker).new ActionCommands();
   }
 
   public void initDriverJoysticks() {
@@ -68,11 +71,11 @@ public class ButtonBindings {
       () -> (mDrive.atGoal() && mElevator.isPIDAtGoal() && mWrist.isPIDAtGoal()))
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
-    new Trigger(() -> mClaw.CANRangeHasAlgae())
+    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Algae))
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.TURQUOISE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 
-    new Trigger(() -> mClaw.CANRangeHasCoral())
+    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral))
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
     
@@ -181,25 +184,33 @@ public class ButtonBindings {
     mOperatorButtonboard
         .button(ButtonBindingsConstants.Buttonboard.kAlgaePickupL2)
         .whileTrue(
+          new SequentialCommandGroup(
+              mStateTracker.setCurrentGamePieceCmd(GamePiece.Algae),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.L2ALGAE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.L2ALGAE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
-        .onFalse(mActionCommands.getHoldAlgaeCmd());
+                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())
+            )
+          )
+        ).onFalse(mActionCommands.getHoldAlgaeCmd());
 
     mOperatorButtonboard
         .button(ButtonBindingsConstants.Buttonboard.kAlgaePickupL3)
         .whileTrue(
-            new ParallelCommandGroup(
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
-                mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
-                mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get())))
-        .onFalse(mActionCommands.getHoldAlgaeCmd());
+            new SequentialCommandGroup(
+              mStateTracker.setCurrentGamePieceCmd(GamePiece.Algae),
+              new ParallelCommandGroup(
+                  mElevator.setPIDCmd(ElevatorConstants.Setpoints.L3ALGAE),
+                  mWrist.setPIDCmd(WristConstants.Setpoints.L3ALGAE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+                  mClaw.setClawCmd(ClawConstants.RollerSpeed.INTAKE_ALGAE.get()))
+            )
+          ).onFalse(mActionCommands.getHoldAlgaeCmd());
 
     mOperatorButtonboard
         .button(ButtonBindingsConstants.Buttonboard.kPickup)
         .whileTrue(
             new SequentialCommandGroup(
+                mStateTracker.setCurrentGamePieceCmd(GamePiece.Coral),
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                 mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()),
                 new ParallelCommandGroup(

@@ -3,6 +3,7 @@ package frc.robot;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.ButtonBindings;
+import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,8 +42,10 @@ public class RobotContainer {
   private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
+  private final StateTracker mStateStracker;
 
   public RobotContainer() {
+    mStateStracker = new StateTracker();
     mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
     mWrist = new WristSubsystem();
@@ -91,7 +94,7 @@ public class RobotContainer {
         break;
     }
 
-    mButtonBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb, mLEDs);
+    mButtonBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb, mLEDs, mStateStracker);
 
     // mControls = new ControlsSubsystem(mDrive, mVision, mWrist, mElevator, mIntake, mClaw, mCLimb);
     mAutons = new AutonSubsystem(mDrive, mWrist, mClaw, mElevator, mIntake);
