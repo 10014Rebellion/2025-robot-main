@@ -6,17 +6,10 @@ package frc.robot.subsystems.claw;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANrangeConfiguration;
-import com.ctre.phoenix6.hardware.CANrange;
-import com.ctre.phoenix6.signals.MeasurementHealthValue;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,36 +23,17 @@ public class ClawSubsystem extends SubsystemBase {
   private final SparkFlex mClawSparkMax;
   private final DigitalInput mBeamBreak;
 
-  private final CANrange distanceFromClawArcSensor;
+  private final ToFIO rangeSensor;
+  private final ToFInputsAutoLogged rangeSensorInputs;
 
-  private final StatusSignal<Distance> distanceFromClaw;
-  private final StatusSignal<Boolean> isDetected;
-  private final StatusSignal<Distance> distanceStdDevClaw;
-  private final StatusSignal<Double> ambience;
-  private final StatusSignal<Double> signalStrength;
-  private final StatusSignal<MeasurementHealthValue> measurementHealth;
-  private final StatusSignal<Time> measurementTime;
+  
 
   public ClawSubsystem() {
     this.mClawSparkMax = new SparkFlex(ClawConstants.kClawID, ClawConstants.kMotorType);
     this.mBeamBreak = new DigitalInput(ClawConstants.kBeamBreakDIOPort);
 
-    this.distanceFromClawArcSensor = new CANrange(ClawConstants.CANRangeID, Constants.kCanbusName);
-    CANrangeConfiguration config = new CANrangeConfiguration();
-    config.ProximityParams.MinSignalStrengthForValidMeasurement = 3000;
-    config.ProximityParams.ProximityHysteresis = 0.01;
-    config.ProximityParams.ProximityThreshold = 0.5;
-
-    distanceFromClawArcSensor.getConfigurator().apply(config);
-
-    distanceFromClaw = distanceFromClawArcSensor.getDistance();
-    isDetected = distanceFromClawArcSensor.getIsDetected();
-    distanceStdDevClaw = distanceFromClawArcSensor.getDistanceStdDev();
-    ambience = distanceFromClawArcSensor.getAmbientSignal();
-
-    signalStrength = distanceFromClawArcSensor.getSignalStrength();
-    measurementHealth = distanceFromClawArcSensor.getMeasurementHealth();
-    measurementTime = distanceFromClawArcSensor.getMeasurementTime();
+    this.rangeSensor = new CANRangeIO(ClawConstants.CANRangeID, Constants.kCanbusName);
+    rangeSensorInputs = new ToFInputsAutoLogged();
 
     mClawSparkMax.configure(
         ClawConstants.kClawConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -97,17 +71,6 @@ public class ClawSubsystem extends SubsystemBase {
         },
         (interrupted) -> setClaw(ClawConstants.RollerSpeed.HOLD_CORAL),
         () -> hasPiece(),
-        this);
-  }
-
-  public FunctionalCommand scoreCoralCmd(ClawConstants.RollerSpeed speed) {
-    return new FunctionalCommand(
-        () -> setClaw(speed),
-        () -> {
-          setClaw(speed);
-        },
-        (interrupted) -> setClaw(speed),
-        () -> !hasPiece(),
         this);
   }
 
@@ -184,20 +147,20 @@ public class ClawSubsystem extends SubsystemBase {
   }
 
   public boolean CANRangeHasPiece() {
-    return (distanceFromClaw.getValueAsDouble() < 0.08) && 
-    (signalStrength.getValueAsDouble() > 3000) &&
-    (ambience.getValueAsDouble() < 20);
+    return (rangeSensorInputs.distanceMeters < 0.08) && 
+    (rangeSensorInputs.signalStrength > 3000) &&
+    (rangeSensorInputs.ambience < 20);
   }
 
   public GamePiece CANRangeGuessGamePiece() {
-    if((distanceFromClaw.getValueAsDouble() < 0.08) && 
-      (signalStrength.getValueAsDouble() > 3000) && 
-      (signalStrength.getValueAsDouble() < 20000) &&
-      (ambience.getValueAsDouble() < 20)) return GamePiece.Algae;
+    if((rangeSensorInputs.distanceMeters < 0.08) && 
+      (rangeSensorInputs.signalStrength > 3000) && 
+      (rangeSensorInputs.signalStrength < 20000) &&
+      (rangeSensorInputs.ambience < 20)) return GamePiece.Algae;
     
-    if((distanceFromClaw.getValueAsDouble() < ClawConstants.coralDetectionCutoff) && 
-    (signalStrength.getValueAsDouble() > 20000)  && 
-    (ambience.getValueAsDouble() < 20)) return GamePiece.Coral;
+    if((rangeSensorInputs.distanceMeters < ClawConstants.coralDetectionCutoff) && 
+    (rangeSensorInputs.signalStrength > 20000)  && 
+    (rangeSensorInputs.ambience < 20)) return GamePiece.Coral;
 
     return null;
   }
@@ -208,25 +171,7 @@ public class ClawSubsystem extends SubsystemBase {
     Logger.recordOutput("Claw/Has Piece", hasPiece());
     Logger.recordOutput("Claw/Beambreak/Has Piece", beambreakHasPiece());
     Logger.recordOutput("Claw/AppliedOutput (Volts)", mClawSparkMax.getAppliedOutput() * mClawSparkMax.getBusVoltage());
-    Logger.recordOutput("Claw/CANRange/Connected", BaseStatusSignal.refreshAll(
-      distanceFromClaw,
-      distanceStdDevClaw,
-      isDetected,
-      ambience,
-      signalStrength,
-      measurementHealth,
-      measurementTime
-    ).isOK());
-    
-    Logger.recordOutput("Claw/CANRange/DistanceFromClaw", distanceFromClaw.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/DistanceFromClawStddev", distanceStdDevClaw.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/IsDetected", isDetected.getValue());
-    Logger.recordOutput("Claw/CANRange/Ambience", ambience.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/SignalStrength", signalStrength.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/MeasurementHealthBool", measurementHealth.getValue().equals(MeasurementHealthValue.Good));
-    Logger.recordOutput("Claw/CANRange/MeasurementTime", measurementTime.getValueAsDouble());
-    Logger.recordOutput("Claw/CANRange/Detects Piece", CANRangeHasPiece());
-
-
+    rangeSensor.updateInputs(rangeSensorInputs);
+    Logger.processInputs("Claw/RangeSensor", rangeSensorInputs);
   }
 }
