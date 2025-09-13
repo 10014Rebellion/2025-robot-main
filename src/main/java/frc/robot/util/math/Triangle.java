@@ -21,25 +21,67 @@ public class Triangle {
         double b2 = -1 * m2 * pose1.getX() + pose1.getY();
         double b1 = -1 * m1 * pose2.getX() + pose2.getY();
 
-        if(pose3.getY() < m3 * pose3.getX() - b3) side3 = () -> checkedPose.getY() < m3 * checkedPose.getX() + b3;
-        else if(pose3.getY() < m3 * pose3.getX() - b3) side3 = () -> checkedPose.getY() > m3 * checkedPose.getX() + b3;
-        else {
-            side3 = null;
-            DriverStation.reportError("DO IT!!!", true);
+        int infinityCount = 0;
+
+        if(!Double.isInfinite(m3)) {
+            if(pose3.getY() < m3 * pose3.getX() + b3) side3 = () -> checkedPose.getY() < m3 * checkedPose.getX() + b3;
+            else if(pose3.getY() > m3 * pose3.getX() + b3) side3 = () -> checkedPose.getY() > m3 * checkedPose.getX() + b3;
+            else {
+                side3 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
+        } else {
+            if(infinityCount > 0) {
+                side3 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
+            else if(pose3.getX() < pose1.getX()) side3 = () -> checkedPose.getX() < pose1.getX();
+            else if(pose3.getX() > pose1.getX()) side3 = () -> checkedPose.getX() > pose1.getX();
+            else {
+                side3 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
         }
 
-        if(pose2.getY() < m2 * pose2.getX() - b2) side2 = () -> checkedPose.getY() < m2 * checkedPose.getX() + b2;
-        else if(pose2.getY() < m2 * pose2.getX() - b2) side2 = () -> checkedPose.getY() > m2 * checkedPose.getX() + b2;
-        else {
-            side2 = null;
-            DriverStation.reportError("DO IT!!!", true);
+        if(!Double.isInfinite(m2)) {
+            if(pose2.getY() < m2 * pose2.getX() + b2) side2 = () -> checkedPose.getY() < m2 * checkedPose.getX() + b2;
+            else if(pose2.getY() > m2 * pose2.getX() + b2) side2 = () -> checkedPose.getY() > m2 * checkedPose.getX() + b2;
+            else {
+                side2 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
+        } else {
+            if(infinityCount > 0) {
+                side2 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
+            else if(pose2.getX() < pose1.getX()) side2 = () -> checkedPose.getX() < pose1.getX();
+            else if(pose2.getX() > pose1.getX()) side2 = () -> checkedPose.getX() > pose1.getX();
+            else {
+                side2 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
         }
 
-        if(pose3.getY() < m1 * pose1.getX() - b1) side1 = () -> checkedPose.getY() < m1 * checkedPose.getX() + b1;
-        else if(pose1.getY() < m1 * pose1.getX() - b1) side1 = () -> checkedPose.getY() > m1 * checkedPose.getX() + b1;
-        else {
-            side1 = null;
-            DriverStation.reportError("DO IT!!!", true);
+        if(!Double.isInfinite(m1)) {
+            if(pose1.getY() < m1 * pose1.getX() + b1) side1 = () -> checkedPose.getY() < m1 * checkedPose.getX() + b1;
+            else if(pose1.getY() > m1 * pose1.getX() + b1) side1 = () -> checkedPose.getY() > m1 * checkedPose.getX() + b1;
+            else {
+                side1 = null;
+                DriverStation.reportError(
+                    "Y:" + pose1.getY() + "\n m:" + m1 + "\nX:" + pose1.getX() + "\nb:" + b1, true);
+            }
+        } else {
+            if(infinityCount > 0) {
+                side1 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
+            else if(pose1.getX() < pose3.getX()) side1 = () -> checkedPose.getX() < pose3.getX();
+            else if(pose1.getX() > pose3.getX()) side1 = () -> checkedPose.getX() > pose3.getX();
+            else {
+                side1 = null;
+                DriverStation.reportError("DO IT!!!", true);
+            }
         }
     }
 

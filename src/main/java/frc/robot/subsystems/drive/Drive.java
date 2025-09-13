@@ -51,6 +51,7 @@ import frc.robot.util.debugging.LoggedTunableNumber;
 import frc.robot.util.debugging.SysIDCharacterization;
 import frc.robot.util.math.AllianceFlipUtil;
 import frc.robot.util.math.GeomUtil;
+import frc.robot.util.math.Zone;
 import frc.robot.util.pathplanner.SwerveSetpoint;
 import frc.robot.util.pathplanner.SwerveSetpointGenerator;
 import frc.robot.util.swerve.LocalADStarAK;
@@ -139,6 +140,8 @@ public class Drive extends SubsystemBase {
     Debouncer autoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
     Debouncer autoAlignDelay = new Debouncer(0.1, DebounceType.kRising);
 
+    private final Zone zone;
+
     public Drive(Module[] modules, GyroIO gyro, Vision vision) {
         this.modules = modules;
         this.gyro = gyro;
@@ -191,6 +194,8 @@ public class Drive extends SubsystemBase {
         SmartDashboard.putData(field);
 
         headingController.setHeadingGoal(() -> goalRotation);
+
+        zone = Zone.hexagnoalZone(kReefCenter, 1.66, Rotation2d.fromDegrees(30));
     }
 
     public Command customFollowPathComamnd(PathPlannerPath path) {
@@ -272,6 +277,8 @@ public class Drive extends SubsystemBase {
         field.setRobotPose(getPoseEstimate());
 
         // Logger.recordOutput("Drive/Odometry/FieldCurrentChassisSpeeds", ChassisSpeeds.fromRobotRelativeSpeeds(getRobotChassisSpeeds(), robotRotation));
+
+        Logger.recordOutput("Drive/ReefZone", zone.inZone(getPoseEstimate()));
 
         /* Updating Controllers */
         headingController.updateHeadingController();
