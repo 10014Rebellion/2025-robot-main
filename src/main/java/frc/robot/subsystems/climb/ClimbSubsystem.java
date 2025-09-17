@@ -1,64 +1,58 @@
 package frc.robot.subsystems.climb;
 
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DigitalInput;
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.climb.ClimbConstants.Pulley;
+import frc.robot.subsystems.climb.grabber.GrabberConstants;
+import frc.robot.subsystems.climb.grabber.GrabberIO;
+import frc.robot.subsystems.climb.pulley.PulleyConstants;
+import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley;
+import frc.robot.subsystems.climb.pulley.PulleyIO;
 
-public class ClimbSubsystem extends SubsystemBase {
-  private final SparkMax mClimbMotor;
-  private final SparkMax mGrabberMotor;
-  private final AbsoluteEncoder mClimbEncoder;
-  private final DigitalInput mBeamBreak;
+public class ClimbSubsystem extends SubsystemBase{
 
-  public ClimbSubsystem() {
-    mClimbMotor = new SparkMax(ClimbConstants.Pulley.kMotorID, ClimbConstants.Pulley.kMotorType);
-    mBeamBreak = new DigitalInput(ClimbConstants.Grabber.kClimbBeamBreakID);
-    mClimbMotor.configure(
-        ClimbConstants.Pulley.kClimbConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    private final GrabberIO kGrabberHardware;
+    private final PulleyIO kPulleyHardware;
 
-    mClimbEncoder = mClimbMotor.getAbsoluteEncoder();
-    mGrabberMotor = new SparkMax(ClimbConstants.Grabber.kMotorID, ClimbConstants.Grabber.kMotorType);
-    mGrabberMotor.configure(
-        ClimbConstants.Grabber.kClimbConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+    private final GrabberIOInputsAutoLogged kGrabberInputs = new GrabberIOInputsAutoLogged();
+    private final PulleyIOInputsAutoLogged kPulleyInputs = new PulleyIOInputsAutoLogged();
+    
 
-  }
+    public ClimbSubsystem(GrabberIO grabberIO, PulleyIO pulleyIO){
+        kGrabberHardware = grabberIO;
+        kPulleyHardware = pulleyIO;
+    }
 
-  public boolean getBeamBroken() {
-    return !mBeamBreak.get();
-  }
+    @Override
+    public void periodic(){
+        kGrabberHardware.updateInputs(kGrabberInputs);
+        Logger.processInputs("Climb/Grabber", kGrabberInputs);
 
-  public FunctionalCommand setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints pVolts) {
-    return setGrabberVoltsCmd(pVolts.getVolts());
-  }
+        kGrabberHardware.updateInputs(kPulleyInputs);
+        Logger.processInputs("Climb/Pulley", kPulleyInputs);
+
+        Logger.recordOutput("Climb/Pulley", getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos());
+
+        if(DriverStation.isDisabled()){
+            kGrabberHardware.stop();
+            kPulleyHardware.stop();
+        }
+        
+    }
 
   public FunctionalCommand setGrabberVoltsCmd(double pVolts) {
     return new FunctionalCommand(
         () -> {
         },
         () -> {
-          setGrabberVolts(pVolts);
+          kGrabberHardware.setVoltage(pVolts);
         },
-        (interrupted) -> setGrabberVolts(0),
+        (interrupted) -> kGrabberHardware.setVoltage(0),
         () -> false);
-  }
-
-  public void setGrabberVolts(double pVolts) {
-    mGrabberMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
-  }
-
-  public FunctionalCommand setPulleyVoltsCmd(ClimbConstants.Pulley.VoltageSetpoints pVolts) {
-    return setPulleyVoltsCmd(pVolts.getVolts());
   }
 
   public FunctionalCommand setPulleyVoltsCmd(double pVolts) {
@@ -66,65 +60,64 @@ public class ClimbSubsystem extends SubsystemBase {
         () -> {
         },
         () -> {
-          setPulleyVolts(pVolts);
+          kPulleyHardware.setVoltage(pVolts);
         },
-        (interrupted) -> setPulleyVolts(0),
+        (interrupted) -> kPulleyHardware.setVoltage(0),
         () -> false);
   }
 
-  private void setPulleyVolts(double pVolts) {
-    mClimbMotor.setVoltage(MathUtil.clamp(pVolts, -12, 12));
+
+  public FunctionalCommand setGrabberVoltsCmd(GrabberConstants.Grabber.VoltageSetpoints pVolts) {
+    return setGrabberVoltsCmd(pVolts.getVolts());
   }
 
-  private void setPulleyVolts(Pulley.VoltageSetpoints pVoltSetpoint) {
-    setPulleyVolts(pVoltSetpoint.getVolts());
+  public FunctionalCommand setPulleyVoltsCmd(PulleyConstants.Pulley.VoltageSetpoints pVolts) {
+    return setPulleyVoltsCmd(pVolts.getVolts());
   }
 
-  private double getEncReading() {
-    double encoderMeasurement = mClimbEncoder.getPosition();
-    if (encoderMeasurement > 180.0)
-      encoderMeasurement -= 360.0;
-    return encoderMeasurement;
+  public void setGrabberVolts(double pVolts){
+    kGrabberHardware.setVoltage(pVolts);
+  }
+
+  public double getEncReading(){
+    return Rotation2d.fromDegrees(kPulleyInputs.posistionDegrees).getRotations();
+  }
+
+  public boolean getBeamBroken(){
+    return kGrabberInputs.hasChain;
+  }
+
+public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
+    return (Math.abs(getEncReading() - pSetpoint.getPos()) < PulleyConstants.Pulley.kTolerance);
   }
 
   public FunctionalCommand deployClimb() {
     return new FunctionalCommand(
       () -> {},
       () -> {
-        if (getEncReading() > ClimbConstants.Pulley.Setpoints.STARTROLLING.getPos())
-          setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
+        if (getEncReading() > PulleyConstants.Pulley.Setpoints.STARTROLLING.getPos())
+          kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
 
-        if (getEncReading() > ClimbConstants.Pulley.Setpoints.EXTENDED.getPos())
-          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.GO.getVolts());
+        if (getEncReading() > PulleyConstants.Pulley.Setpoints.EXTENDED.getPos())
+          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO.getVolts());
         
       }, (interrupted) -> {
-        setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP);
-        setGrabberVolts(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
+        kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts());
+        kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
       }, 
-        () -> isInTolerance(ClimbConstants.Pulley.Setpoints.EXTENDED), this);
+        () -> isInTolerance(PulleyConstants.Pulley.Setpoints.EXTENDED), this);
   }
 
   public FunctionalCommand pullClimb() {
     return new FunctionalCommand(
       () -> {},
       () -> {
-        if (getEncReading() < ClimbConstants.Pulley.Setpoints.CLIMBED.getPos())
-          setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.GO.getVolts());
+        if (getEncReading() < PulleyConstants.Pulley.Setpoints.CLIMBED.getPos())
+          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO.getVolts());
         
-      }, (interrupted) -> setPulleyVolts(ClimbConstants.Pulley.VoltageSetpoints.STOP), 
-        () -> isInTolerance(ClimbConstants.Pulley.Setpoints.CLIMBED), this);
+      }, (interrupted) -> kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts()), 
+        () -> isInTolerance(PulleyConstants.Pulley.Setpoints.CLIMBED), this);
   }
-
-  public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
-    return (Math.abs(getEncReading() - pSetpoint.getPos()) < ClimbConstants.Pulley.kTolerance);
-  }
-
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Climb/Position", getEncReading());
-    SmartDashboard.putBoolean("Climb/BeamBroken", getBeamBroken());
-    SmartDashboard.putBoolean(
-        "Climb/Fully Extended",
-        getEncReading() < ClimbConstants.Pulley.Setpoints.EXTENDED.getPos());
-  }
+    
+    
 }
