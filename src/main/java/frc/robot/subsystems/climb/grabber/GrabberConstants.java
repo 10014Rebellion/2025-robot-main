@@ -17,7 +17,7 @@ public class GrabberConstants {
 
 
     public enum VoltageSetpoints {
-      PULL_IN(4.0);
+      PULL_IN(2.0);
       // SPIN_FREE(2);
 
       public final double setpoint;
