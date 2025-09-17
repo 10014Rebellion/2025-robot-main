@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climb.grabber.GrabberConstants;
 import frc.robot.subsystems.climb.grabber.GrabberIO;
+import frc.robot.subsystems.climb.grabber.GrabberIOInputsAutoLogged;
 import frc.robot.subsystems.climb.pulley.PulleyConstants;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley;
 import frc.robot.subsystems.climb.pulley.PulleyIO;
+import frc.robot.subsystems.climb.pulley.PulleyIOInputsAutoLogged;
 
 public class ClimbSubsystem extends SubsystemBase{
 
@@ -32,10 +34,10 @@ public class ClimbSubsystem extends SubsystemBase{
         kGrabberHardware.updateInputs(kGrabberInputs);
         Logger.processInputs("Climb/Grabber", kGrabberInputs);
 
-        kGrabberHardware.updateInputs(kPulleyInputs);
+        kPulleyHardware.updateInputs(kPulleyInputs);
         Logger.processInputs("Climb/Pulley", kPulleyInputs);
 
-        Logger.recordOutput("Climb/Pulley", getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos());
+        Logger.recordOutput("Climb", getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos());
 
         if(DriverStation.isDisabled()){
             kGrabberHardware.stop();

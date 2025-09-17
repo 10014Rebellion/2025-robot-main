@@ -77,11 +77,11 @@ public class PulleyConstants {
             int kMotorID,
             MotorType kMotorType){}
       
-        public PulleyConfiguration motorConfiguration = new PulleyConfiguration(kSmartLimit, kSecondaryLimit, kIdleMode, kMotorInverted);
+        public static PulleyConfiguration motorConfiguration = new PulleyConfiguration(kSmartLimit, kSecondaryLimit, kIdleMode, kMotorInverted);
 
-        public EncoderConfiguration encoderConfiguration = new EncoderConfiguration(encoderInverted, Rotation2d.fromRotations(encoderZeroOffset), encoderPositionFactor, encoderVelocityFactor, kTolerance);
+        public static EncoderConfiguration encoderConfiguration = new EncoderConfiguration(encoderInverted, Rotation2d.fromRotations(encoderZeroOffset), encoderPositionFactor, encoderVelocityFactor, kTolerance);
       
-        public PulleyHardware pulleyHardware = new PulleyHardware(kMotorID, kMotorType);
+        public static PulleyHardware pulleyHardware = new PulleyHardware(kMotorID, kMotorType);
 
         // static {
         // kClimbConfig.idleMode(kIdleMode).smartCurrentLimit(kCurrentLimit).inverted(kMotorInverted);

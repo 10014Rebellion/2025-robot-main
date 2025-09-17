@@ -2,6 +2,12 @@ package frc.robot;
 
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.grabber.*;
+import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberConfiguration;
+import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberHardware;
+import frc.robot.subsystems.climb.pulley.*;
+import frc.robot.subsystems.climb.grabber.GrabberIOSparkMax;
+import frc.robot.subsystems.climb.pulley.PulleyIOSparkMax;
 import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -51,7 +57,14 @@ public class RobotContainer {
     mWrist = new WristSubsystem();
     mElevator = new ElevatorSubsystem();
     mIntake = new IntakeSubsystem();
-    mClimb = new ClimbSubsystem();
+    mClimb = new ClimbSubsystem(
+      new GrabberIOSparkMax(
+        (GrabberConstants.Grabber.grabberHardware), 
+        (GrabberConstants.Grabber.motorConfiguration)),
+      new PulleyIOSparkMax(
+        (PulleyConstants.Pulley.pulleyHardware), 
+        (PulleyConstants.Pulley.motorConfiguration), 
+        (PulleyConstants.Pulley.encoderConfiguration)));
     mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {

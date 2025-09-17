@@ -37,14 +37,14 @@ public class GrabberConstants {
         IdleMode kIdleMode,
         boolean inverted){}
   
-    public GrabberConfiguration motorConfiguration = new GrabberConfiguration(kSmartCurrentLimit, kSecondaryCurrentLimit, kIdleMode, kMotorInverted);
+    public static GrabberConfiguration motorConfiguration = new GrabberConfiguration(kSmartCurrentLimit, kSecondaryCurrentLimit, kIdleMode, kMotorInverted);
 
     public record GrabberHardware(
         int kMotorID,
         int kBeamBreakID,
         MotorType kMotorType){}
   
-    public GrabberHardware grabberHardware = new GrabberHardware(kMotorID, kClimbBeamBreakID, kMotorType);
+    public static GrabberHardware grabberHardware = new GrabberHardware(kMotorID, kClimbBeamBreakID, kMotorType);
 
 }
 }
