@@ -1,7 +1,12 @@
 package frc.robot.subsystems.claw;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import frc.robot.util.debugging.LoggedTunableNumber;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class ClawConstants {
@@ -20,30 +25,32 @@ public class ClawConstants {
 
   public static final SparkMaxConfig kClawConfig = new SparkMaxConfig();
 
+  public static final LoggedTunableNumber holdCoralvoltage = new LoggedTunableNumber("Intake/HoldCoralVolt", 0.25);
+
   public enum RollerSpeed {
     // Coral Values
-    INTAKE_CORAL(6.0),
-    HOLD_CORAL(0.35),
-    OUTTAKE_REEF(-0.6),
-    OUTTAKE_L1(-3),
-    EJECT_CORAL(-3),
+    INTAKE_CORAL(() -> 6.0),
+    HOLD_CORAL(() -> 0.25),
+    OUTTAKE_REEF(() -> -0.6),
+    OUTTAKE_L1(() -> -3),
+    EJECT_CORAL(() -> -3),
 
     // Algae Values
-    GROUND_ALGAE(10.0),
-    INTAKE_ALGAE(12.0),
-    HOLD_ALGAE(7),
-    EJECT_ALGAE(-12),
-    OUTTAKE_PROCESSOR(-6),
-    SCORE_BARGE(-12.0);
+    GROUND_ALGAE(() -> 10.0),
+    INTAKE_ALGAE(() -> 12.0),
+    HOLD_ALGAE(() -> 7),
+    EJECT_ALGAE(() -> -12),
+    OUTTAKE_PROCESSOR(() -> -6),
+    SCORE_BARGE(() -> -12.0);
 
-    public final double setVolts;
+    public final DoubleSupplier setVolts;
 
-    private RollerSpeed(double pSetVolts) {
+    private RollerSpeed(DoubleSupplier pSetVolts) {
       this.setVolts = pSetVolts;
     }
 
     public double get() {
-      return this.setVolts;
+      return this.setVolts.getAsDouble();
     }
   };
 
