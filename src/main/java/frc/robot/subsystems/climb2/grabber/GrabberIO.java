@@ -1,19 +1,19 @@
 
-package frc.robot.subsystems.claw;
+package frc.robot.subsystems.climb2.grabber;
 
 import org.littletonrobotics.junction.AutoLog;
 
 /** The intake subsystem's hardware interface. */
-public interface IntakeIO {
+public interface GrabberIO {
   @AutoLog
-  public static class IntakeIOInputs {
+  public static class GrabberIOInputs {
     public boolean isMotorConnected = false;
 
-    public double velocityRotationsPerSec = 0.0;
     public double appliedVoltage = 0.0;
     public double supplyCurrentAmps = 0.0;
     public double statorCurrentAmps = 0.0;
     public double temperatureCelsius = 0.0;
+    public boolean hasChain = false;
   }
 
   /**
@@ -21,7 +21,7 @@ public interface IntakeIO {
    * 
    * @param inputs The inputs object
    */
-  public default void updateInputs(IntakeIOInputs inputs) {};
+  public default void updateInputs(GrabberIOInputs inputs) {};
 
   /**
    * @param volts The voltage that should be applied to the motor from -12 to 12
