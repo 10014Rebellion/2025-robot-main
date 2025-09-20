@@ -66,6 +66,26 @@ public class AutonCommands extends SubsystemBase {
         autoChooser = new SendableChooser<>();
 
         autoChooser.setDefaultOption("Stationary", backUpAuton());
+        tryToAddPathToChooser("String", nextScoreCoralPath("A1-Barge"));
+
+        preScoreCoral = new Trigger(() ->  true);
+        scoreCoral = new Trigger(() ->  true);
+        prIntakeCoral = new Trigger(() ->  true);
+        IntakeCoral = new Trigger(() ->  true);
+    
+        IR1 = new Trigger(() ->  true);
+        IR2 = new Trigger(() ->  true);
+        IR3 = new Trigger(() ->  true);
+    
+        elevInIntakeWristExitRange = new Trigger(() ->  true);
+        wristInIntakeEntryRange = new Trigger(() ->  true);
+        wristInIntakeExitRange = new Trigger(() ->  true);
+        wristInScoringRange = new Trigger(() ->  true);
+        
+        inAutoAlignRange = new Trigger(() ->  true);
+        inDrivingScoringTolerance = new Trigger(() ->  true);
+        inIntakeStartTolerance = new Trigger(() ->  true);
+        inIntakeTolerance = new Trigger(() ->  true);
     }
 
     ///////////////// PATH CHAINING LOGIC \\\\\\\\\\\\\\\\\\\\\\

@@ -26,6 +26,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.subsystems.auton.AutonCommands;
 import frc.robot.subsystems.auton.AutonSubsystem;
 
 
@@ -41,6 +42,8 @@ public class RobotContainer {
   private final LEDSubsystem mLEDs;
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
+
+  private final AutonCommands mAutons2;
 
   public RobotContainer() {
     mTelemetry = new TelemetrySubsystem();
@@ -90,6 +93,8 @@ public class RobotContainer {
         }));
         break;
     }
+
+    mAutons2 = new AutonCommands(mDrive);
 
     mButtonBindings = new ButtonBindings(mDrive, mElevator, mIntake, mWrist, mClaw, mClimb, mLEDs);
 
