@@ -1,28 +1,20 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 import frc.robot.util.debugging.LoggedTunableNumber;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase{
+
   @AutoLogOutput(key = "Elevator/Slot")
   public int slot = 0;
 
@@ -56,192 +48,168 @@ public class ElevatorSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber k2A = new LoggedTunableNumber("Elevator/Slot2/A", ElevatorConstants.k2A);
   private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/G", ElevatorConstants.k2G);
 
-  private final SparkMax mElevatorSparkMax;
-  private final ProfiledPIDController mElevatorProfiledPID;
-  private ElevatorFeedforward mElevatorFF;
+    private final ElevatorIO kElevatorHardware;
+    private final ElevatorIoInputsAutoLogged kElevatorInputs = new ElevatorIOInputsAutoLogged();
 
-  private final RelativeEncoder mEncoder;
+    private ProfiledPIDController kElevatorPID;
+    private ElevatorFeedforward kElevatorFF;
 
-  public ElevatorSubsystem() {
-    this.mElevatorSparkMax = new SparkMax(ElevatorConstants.kMotorID, MotorType.kBrushless);
-    this.mEncoder = mElevatorSparkMax.getEncoder();
-    this.mElevatorProfiledPID = new ProfiledPIDController(
-        ElevatorConstants.k0P,
-        ElevatorConstants.k0I,
-        ElevatorConstants.k0D,
-        new Constraints(ElevatorConstants.k0MaxVelocity, ElevatorConstants.k0MaxAcceleration));
-    this.mElevatorProfiledPID.setTolerance(ElevatorConstants.k0Tolerance);
-    this.mElevatorFF = new ElevatorFeedforward(
-        ElevatorConstants.k0S, ElevatorConstants.k0G, ElevatorConstants.k0V, ElevatorConstants.k0A);
 
-    this.setDefaultCommand(enableFFCmd());
+    public ElevatorSubsystem(ElevatorIO elevatorIO){
+        kElevatorHardware = elevatorIO;
 
-    this.mElevatorSparkMax.configure(
-        ElevatorConstants.kElevatorConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
-  }
+        this.kElevatorPID = new ProfiledPIDController(
+            ElevatorConstants.k0P,
+            ElevatorConstants.k0I,
+            ElevatorConstants.k0D,           
+            new Constraints(ElevatorConstants.k0MaxVelocity, ElevatorConstants.k0MaxAcceleration));
+        
+        this.kElevatorPID.setTolerance(ElevatorConstants.k0Tolerance);
+        this.kElevatorFF = new ElevatorFeedforward(
+            ElevatorConstants.k0S, 
+            ElevatorConstants.k0G, 
+            ElevatorConstants.k0V, 
+            ElevatorConstants.k0A);
 
-  public FunctionalCommand enableFFCmd() {
-    return new FunctionalCommand(
-        () -> {
-        },
-        () -> {
-          double calculatedOutput = mElevatorFF.calculate(0);
-          setVolts(calculatedOutput);
-        },
-        (interrupted) -> setVolts(mElevatorFF.calculate(0)),
-        () -> false,
-        this);
-  }
-
-  public boolean isPIDAtGoal() {
-    return mElevatorProfiledPID.atGoal();
-  }
-
-  public FunctionalCommand coralLevelToPIDCmd(CoralLevel pCoralLevel) {
-    ElevatorConstants.Setpoints elevatorSetpoint = ElevatorConstants.Setpoints.L1;
-
-    if(pCoralLevel == CoralLevel.B3) {
-      elevatorSetpoint = ElevatorConstants.Setpoints.L4;
-    } else
-    if(pCoralLevel == CoralLevel.B2) {
-      elevatorSetpoint = ElevatorConstants.Setpoints.L3;
-    } else
-    if(pCoralLevel == CoralLevel.B1) {
-      elevatorSetpoint = ElevatorConstants.Setpoints.L2;
-    } 
-
-    return setPIDCmd(elevatorSetpoint);
-  }
-
-  public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {
-    return new FunctionalCommand(
-        () -> {
-          mElevatorProfiledPID.reset(getEncReading());
-          mElevatorProfiledPID.setGoal(pSetpoint.getPos());
-          SmartDashboard.putNumber("Elevator/Setpoint", pSetpoint.getPos());
-        },
-        () -> {
-          double encoderReading = getEncReading();
-          double calculatedPID = mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity);
-          double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
-          setVolts(calculatedPID + calculatedFF);
-        },
-        (interrupted) -> setVolts(mElevatorFF.calculate(0.0)),
-        () -> isPIDAtGoal(),
-        this);
-  }
-
-  public FunctionalCommand setVoltsCmd(double pVoltage) {
-    return new FunctionalCommand(
-        () -> {
-        },
-        () -> {
-          setVolts(pVoltage);
-        },
-        (interrupted) -> setVolts(0),
-        () -> false,
-        this);
-  }
-
-  public FunctionalCommand setTunablePIDCommand() {
-    return new FunctionalCommand(
-        () -> {},
-        () -> {
-          double encoderReading = getEncReading();
-          double calculatedPID = mElevatorFF.calculate(mElevatorProfiledPID.getSetpoint().velocity);
-          double calculatedFF = mElevatorProfiledPID.calculate(encoderReading);
-
-          setVolts(calculatedPID + calculatedFF);
-          SmartDashboard.putNumber("Elevator/Full Output", calculatedPID + calculatedFF);
-          SmartDashboard.putNumber("Elevator/PID Output", calculatedPID);
-          SmartDashboard.putNumber("Elevator/FF Output", calculatedFF);
-        },
-        (interrupted) -> setVolts(0),
-        () -> false,
-        this);
-  }
-
-  public void setVolts(double pVoltage) {
-    mElevatorSparkMax.setVoltage(filterVoltage(pVoltage));
-  }
-
-  private double filterVoltage(double pVoltage) {
-    return filterToLimits(MathUtil.clamp(pVoltage, -12, 12.0));
-  }
-
-  public double getRawEncReading() {
-    return mEncoder.getPosition();
-  }
-
-  public double getEncReading() {
-    return getRawEncReading() * ElevatorConstants.kPositionConversionFactor;
-  }
-
-  private boolean isOutOfBounds(double pInput) {
-    return (pInput > 0 && getEncReading() >= ElevatorConstants.kForwardSoftLimit)
-        || (pInput < 0 && getEncReading() <= ElevatorConstants.kReverseSoftLimit);
-  }
-
-  private double filterToLimits(double pInput) {
-    return isOutOfBounds(pInput) ? 0.0 : pInput;
-  }
-
-  private void stopIfLimit() {
-    if (isOutOfBounds(getMotorOutput())) {
-      setVolts(0);
-    }
-  }
-
-  public double getMotorOutput() {
-    return mElevatorSparkMax.getAppliedOutput();
-  }
-
-  @Override
-  public void periodic() {
-    switch(slot) {
-      case 0:
-        LoggedTunableNumber.ifChanged(hashCode(), () -> {
-          updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
-        }, k0P, k0I, k0D, k0MaxV, k0MaxA, k0S, k0V, k0A, k0G);
-        break;
-      case 1:
-        LoggedTunableNumber.ifChanged(hashCode(), () -> {
-          updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
-        }, k1P, k1I, k1D, k1MaxV, k1MaxA, k1S, k1V, k1A, k1G);
-        break;
-      case 2:
-        LoggedTunableNumber.ifChanged(hashCode(), () -> {
-          updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
-        }, k2P, k2I, k2D, k2MaxV, k2MaxA, k2S, k2V, k2A, k2G);
-        break;
-      default:
-        Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
+        this.setDefaultCommand(enableFFCmd());
     }
 
-    Logger.recordOutput("Elevator/kP", mElevatorProfiledPID.getP());
-    Logger.recordOutput("Elevator/kI", mElevatorProfiledPID.getI());
-    Logger.recordOutput("Elevator/kD", mElevatorProfiledPID.getD());
-    Logger.recordOutput("Elevator/kMaxV", mElevatorProfiledPID.getConstraints().maxVelocity);
-    Logger.recordOutput("Elevator/kMaxA", mElevatorProfiledPID.getConstraints().maxAcceleration);
-    Logger.recordOutput("Elevator/kS", mElevatorFF.getKs());
-    Logger.recordOutput("Elevator/kV", mElevatorFF.getKv());
-    Logger.recordOutput("Elevator/kA", mElevatorFF.getKa());
-    Logger.recordOutput("Elevator/kG", mElevatorFF.getKg());
+    @Override
+    public void periodic(){
+        kElevatorHardware.updateInputs(kElevatorInputs);
 
-    stopIfLimit();
+        if(DriverStation.isDisabled()){
+            kElevatorHardware.stop();
+        }
 
-    SmartDashboard.putNumber("Elevator/Position", getEncReading());
-    // SmartDashboard.putNumber("Elevator/Velocity", mEncoder.getVelocity());
-    SmartDashboard.putNumber("Elevator/Output", getMotorOutput());
-    SmartDashboard.putNumber("Elevator/Voltage", mElevatorSparkMax.getBusVoltage());
-    SmartDashboard.putBoolean("Elevator/At Setpoint", isPIDAtGoal());
-  }
+        Logger.recordOutput("Elevator/atGoal", atGoal());
 
-  public void updatePIDandFF(double kP, double kI, double kD, double kMaxV, double kMaxA, double kS, double kV, double kA, double kG) {
-    mElevatorProfiledPID.setPID(kP, kI, kD);
-    mElevatorProfiledPID.setConstraints(new Constraints(kMaxV, kMaxA));
-    mElevatorFF = new ElevatorFeedforward(kS, kG, kV, kA);
-  }
+        switch(slot) {
+        case 0:
+            LoggedTunableNumber.ifChanged(hashCode(), () -> {
+            updatePIDandFF(k0P.get(), k0I.get(), k0D.get(), k0MaxV.get(), k0MaxA.get(), k0S.get(), k0V.get(), k0A.get(), k0G.get());
+            }, k0P, k0I, k0D, k0MaxV, k0MaxA, k0S, k0V, k0A, k0G);
+            break;
+        case 1:
+            LoggedTunableNumber.ifChanged(hashCode(), () -> {
+            updatePIDandFF(k1P.get(), k1I.get(), k1D.get(), k1MaxV.get(), k1MaxA.get(), k1S.get(), k1V.get(), k1A.get(), k1G.get());
+            }, k1P, k1I, k1D, k1MaxV, k1MaxA, k1S, k1V, k1A, k1G);
+            break;
+        case 2:
+            LoggedTunableNumber.ifChanged(hashCode(), () -> {
+            updatePIDandFF(k2P.get(), k2I.get(), k2D.get(), k2MaxV.get(), k2MaxA.get(), k2S.get(), k2V.get(), k2A.get(), k2G.get());
+            }, k2P, k2I, k2D, k2MaxV, k2MaxA, k2S, k2V, k2A, k2G);
+            break;
+        default:
+            Logger.recordOutput("STOP DUMBAHH", "ELEVATOR");
+        }
+
+        Logger.recordOutput("Elevator/controller/kP", kElevatorPID.getP());
+        Logger.recordOutput("Elevator/controller/kI", kElevatorPID.getI());
+        Logger.recordOutput("Elevator/controller/kD", kElevatorPID.getD());
+        Logger.recordOutput("Elevator/controller/kMaxV", kElevatorPID.getConstraints().maxVelocity);
+        Logger.recordOutput("Elevator/controller/kMaxA", kElevatorPID.getConstraints().maxAcceleration);
+        Logger.recordOutput("Elevator/controller/kS", kElevatorFF.getKs());
+        Logger.recordOutput("Elevator/controller/kV", kElevatorFF.getKv());
+        Logger.recordOutput("Elevator/controller/kA", kElevatorFF.getKa());
+        Logger.recordOutput("Elevator/controller/kG", kElevatorFF.getKg());
+
+        stopIfLimit();
+    }
+
+    private void stopIfLimit() {
+        if (isOutOfBounds(kElevatorInputs.motorOutput)) {
+          kElevatorHardware.setVoltage(0);
+        }
+      }
+
+    public FunctionalCommand setVoltsCmd(double pVoltage){
+        return new FunctionalCommand(
+            () -> {
+            },
+            () -> {
+                kElevatorHardware.setVoltage(pVoltage);
+            },
+            (interrupted) -> kElevatorHardware.setVoltage(0),
+            () -> false,
+            this);
+    }
+
+    public FunctionalCommand enableFFCmd() {
+        return new FunctionalCommand(
+            () -> {
+            },
+            () -> {
+              double calculatedOutput = kElevatorFF.calculate(0);
+              kElevatorHardware.setVoltage(calculatedOutput);
+            },
+            (interrupted) -> kElevatorHardware.setVoltage(kElevatorFF.calculate(0)),
+            () -> false,
+            this);
+    }
+
+    public FunctionalCommand setPIDCmd(ElevatorConstants.Setpoints pSetpoint) {
+        return new FunctionalCommand(
+            () -> {
+            kElevatorPID.reset(kElevatorInputs.positionMeters);
+            kElevatorPID.setGoal(pSetpoint.getPos());
+            SmartDashboard.putNumber("Elevator/Setpoint", pSetpoint.getPos());
+            },
+            () -> {
+            double encoderReading = kElevatorInputs.positionMeters;
+            double calculatedPID = kElevatorFF.calculate(kElevatorPID.getSetpoint().velocity);
+            double calculatedFF = kElevatorPID.calculate(encoderReading);
+            kElevatorHardware.setVoltage(calculatedPID + calculatedFF);
+            },
+            (interrupted) -> kElevatorHardware.setVoltage(kElevatorFF.calculate(0.0)),
+            () -> atGoal(),
+            this);
+    }
+
+    public FunctionalCommand setTunablePIDCommand() {
+        return new FunctionalCommand(
+            () -> {},
+            () -> {
+              double encoderReading = kElevatorInputs.positionMeters;
+              double calculatedPID = kElevatorFF.calculate(kElevatorPID.getSetpoint().velocity);
+              double calculatedFF = kElevatorPID.calculate(encoderReading);
+    
+              kElevatorHardware.setVoltage(calculatedPID + calculatedFF);
+              SmartDashboard.putNumber("Elevator/Full Output", calculatedPID + calculatedFF);
+              SmartDashboard.putNumber("Elevator/PID Output", calculatedPID);
+              SmartDashboard.putNumber("Elevator/FF Output", calculatedFF);
+            },
+            (interrupted) -> kElevatorHardware.setVoltage(0),
+            () -> false,
+            this);
+    }
+
+    public FunctionalCommand coralLevelToPIDCmd(CoralLevel pCoralLevel) {
+        ElevatorConstants.Setpoints elevatorSetpoint = ElevatorConstants.Setpoints.L1;
+
+        if(pCoralLevel == CoralLevel.B3) {
+            elevatorSetpoint = ElevatorConstants.Setpoints.L4;
+        } 
+        
+        else if(pCoralLevel == CoralLevel.B2) {
+            elevatorSetpoint = ElevatorConstants.Setpoints.L3;
+        } 
+        
+        else if(pCoralLevel == CoralLevel.B1) {
+            elevatorSetpoint = ElevatorConstants.Setpoints.L2;
+        } 
+
+        return setPIDCmd(elevatorSetpoint);
+    }
+    
+    public boolean atGoal(){
+        return kElevatorPID.atGoal();
+    }
+
+    public void updatePIDandFF(double kP, double kI, double kD, double kMaxV, double kMaxA, double kS, double kV, double kA, double kG) {
+        kElevatorPID.setPID(kP, kI, kD);
+        kElevatorPID.setConstraints(new Constraints(kMaxV, kMaxA));
+        kElevatorFF = new ElevatorFeedforward(kS, kG, kV, kA);
+    }
+    
 }

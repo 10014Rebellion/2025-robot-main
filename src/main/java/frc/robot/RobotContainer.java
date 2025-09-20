@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
@@ -55,8 +57,14 @@ public class RobotContainer {
     mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
     mWrist = new WristSubsystem();
-    mElevator = new ElevatorSubsystem();
+
+    mElevator = new ElevatorSubsystem(
+      new ElevatorIOSparkMax(
+        ElevatorConstants.elevatorHardware, 
+        ElevatorConstants.motorConfiguration));
+
     mIntake = new IntakeSubsystem();
+    
     mClimb = new ClimbSubsystem(
       new GrabberIOSparkMax(
         (GrabberConstants.Grabber.grabberHardware), 
