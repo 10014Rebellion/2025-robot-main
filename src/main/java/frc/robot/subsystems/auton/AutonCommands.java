@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -18,9 +19,15 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveState;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorConstants.Setpoints;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.wrist.WristSubsystem;
 import frc.robot.util.math.AllianceFlipUtil;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -35,6 +42,10 @@ public class AutonCommands extends SubsystemBase {
     private SendableChooser<Command> autoChooser;
 
     private Drive robotDrive;
+    private ElevatorSubsystem robotElevator;
+    private WristSubsystem robotWrist;
+    private ClawSubsystem robotClaw;
+    private IntakeSubsystem robotIntake;
 
     private AutoState autoState = AutoState.PreScoreCoral;
 
@@ -59,9 +70,13 @@ public class AutonCommands extends SubsystemBase {
 
     private Pose2d pose;
 
-    public AutonCommands(Drive robotDrive) {
+    public AutonCommands(Drive robotDrive, ElevatorSubsystem robotElevator, WristSubsystem robotWrist, ClawSubsystem robotClaw, IntakeSubsystem robotIntake) {
         // store subsystems
         this.robotDrive = robotDrive;
+        this.robotElevator = robotElevator;
+        this.robotWrist = robotWrist;
+        this.robotClaw = robotClaw;
+        this.robotIntake = robotIntake;
 
         autoChooser = new SendableChooser<>();
 
@@ -145,7 +160,7 @@ public class AutonCommands extends SubsystemBase {
 
         auto.activePath(name)
             .onTrue(followChoreoPath(name))
-            .onTrue(elevatorToPreScoreCommand())
+            .onTrue(elevatorToPreScoreCommand(ElevatorConstants.Setpoints.L4))
             .onTrue(wristToPreScoreCommand())
             .onTrue(intakePivotToPreScoreCommand())
             .onTrue(intakeToPreScoreCommand())
@@ -238,7 +253,7 @@ public class AutonCommands extends SubsystemBase {
 
         auto.condition(IR3)
             .onTrue(clawHoldCommand())
-            .onTrue(elevatorToPreScoreCommand());
+            .onTrue(elevatorToIntakeCommand());
 
         auto.condition(IR3.and(elevInIntakeWristExitRange))
             .onTrue(Commands.run(() -> auto.cancel()));
@@ -259,8 +274,8 @@ public class AutonCommands extends SubsystemBase {
         return new InstantCommand();
     }
     
-    public Command elevatorToPreScoreCommand() {
-        return new InstantCommand();
+    public Command elevatorToPreScoreCommand(ElevatorConstants.Setpoints setpoint) {
+        return robotElevator.setPIDCmd(setpoint);
     }
 
     public Command wristToPreScoreCommand() {
@@ -316,7 +331,7 @@ public class AutonCommands extends SubsystemBase {
     }
 
     public Command elevatorToIntakeCommand() {
-        return new PrintCommand("Elevator To Intake");
+        return new InstantCommand();
     }
 
     public Command scoreAlgaeCommand() {
@@ -348,7 +363,7 @@ public class AutonCommands extends SubsystemBase {
 
     public BooleanSupplier getWristAtGoal() {
         return () -> false;
-    }    
+    } 
 
     ///////////////// PATH CREATION LOGIC \\\\\\\\\\\\\\\\\\\\\\
     public Command followFirstChoreoPath(String pathName, Rotation2d startingRotation) {
