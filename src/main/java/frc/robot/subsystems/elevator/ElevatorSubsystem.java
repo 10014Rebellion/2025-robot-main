@@ -49,7 +49,7 @@ public class ElevatorSubsystem extends SubsystemBase{
   private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/G", ElevatorConstants.k2G);
 
     private final ElevatorIO kElevatorHardware;
-    private final ElevatorIoInputsAutoLogged kElevatorInputs = new ElevatorIOInputsAutoLogged();
+    private final ElevatorIOInputsAutoLogged kElevatorInputs = new ElevatorIOInputsAutoLogged();
 
     private ProfiledPIDController kElevatorPID;
     private ElevatorFeedforward kElevatorFF;
@@ -77,6 +77,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     @Override
     public void periodic(){
         kElevatorHardware.updateInputs(kElevatorInputs);
+
+        Logger.processInputs("Elevator", kElevatorInputs);
 
         if(DriverStation.isDisabled()){
             kElevatorHardware.stop();
@@ -121,7 +123,12 @@ public class ElevatorSubsystem extends SubsystemBase{
         if (isOutOfBounds(kElevatorInputs.motorOutput)) {
           kElevatorHardware.setVoltage(0);
         }
-      }
+    }
+
+    private boolean isOutOfBounds(double pInput) {
+        return (pInput > 0 && kElevatorInputs.positionMeters >= ElevatorConstants.kForwardSoftLimit)
+            || (pInput < 0 && kElevatorInputs.positionMeters <= ElevatorConstants.kReverseSoftLimit);
+    }
 
     public FunctionalCommand setVoltsCmd(double pVoltage){
         return new FunctionalCommand(
