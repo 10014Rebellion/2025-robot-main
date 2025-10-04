@@ -6,8 +6,6 @@ import frc.robot.subsystems.climb.grabber.*;
 import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberConfiguration;
 import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberHardware;
 import frc.robot.subsystems.climb.pulley.*;
-import frc.robot.subsystems.climb.grabber.GrabberIOSparkMax;
-import frc.robot.subsystems.climb.pulley.PulleyIOSparkMax;
 import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.drive.Drive;
@@ -34,7 +32,10 @@ import frc.robot.subsystems.vision.CameraIOPV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Orientation;
+import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.subsystems.wrist.WristConstants.WristConfiguration;
+import frc.robot.subsystems.wrist.WristIOSparkMax;
 import frc.robot.subsystems.auton.AutonSubsystem;
 
 
@@ -56,7 +57,11 @@ public class RobotContainer {
     mStateStracker = new StateTracker();
     mTelemetry = new TelemetrySubsystem();
     mClaw = new ClawSubsystem();
-    mWrist = new WristSubsystem();
+    mWrist = new WristSubsystem(
+      new WristIOSparkMax(
+        WristConstants.wristHardware, 
+        WristConstants.motorConfiguration, 
+        WristConstants.encoderHardware));
 
     mElevator = new ElevatorSubsystem(
       new ElevatorIOSparkMax(

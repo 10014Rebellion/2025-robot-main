@@ -148,14 +148,14 @@ public class ClawSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE),
         () -> {
-          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+          if (mWrist.getPosition() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
         },
         (interrupted) -> {
-          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+          if (mWrist.getPosition() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
         },
-        () -> mWrist.getEncReading() >= WristConstants.throwAlgaePos,
+        () -> mWrist.getPosition() >= WristConstants.throwAlgaePos,
         this);
   }
 
@@ -163,14 +163,14 @@ public class ClawSubsystem extends SubsystemBase {
     return new FunctionalCommand(
         () -> setClaw(ClawConstants.RollerSpeed.HOLD_ALGAE),
         () -> {
-          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+          if (mWrist.getPosition() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
         },
         (interrupted) -> {
-          if (mWrist.getEncReading() >= WristConstants.throwAlgaePos)
+          if (mWrist.getPosition() >= WristConstants.throwAlgaePos)
             setClaw(ClawConstants.RollerSpeed.SCORE_BARGE);
         },
-        () -> (mWrist.getEncReading() > WristConstants.throwAlgaePos + 6),
+        () -> (mWrist.getPosition() > WristConstants.throwAlgaePos + 6),
         this);
   }
 

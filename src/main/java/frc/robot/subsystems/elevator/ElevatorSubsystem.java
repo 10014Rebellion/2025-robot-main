@@ -15,38 +15,38 @@ import frc.robot.util.debugging.LoggedTunableNumber;
 
 public class ElevatorSubsystem extends SubsystemBase{
 
-  @AutoLogOutput(key = "Elevator/Slot")
-  public int slot = 0;
+    @AutoLogOutput(key = "Elevator/Slot")
+    public int slot = 0;
 
-  private static final LoggedTunableNumber k0P = new LoggedTunableNumber("Elevator/Slot0/P", ElevatorConstants.k0P);
-  private static final LoggedTunableNumber k0I = new LoggedTunableNumber("Elevator/Slot0/I", ElevatorConstants.k0I);
-  private static final LoggedTunableNumber k0D = new LoggedTunableNumber("Elevator/Slot0/D", ElevatorConstants.k0D);
-  private static final LoggedTunableNumber k0MaxV = new LoggedTunableNumber("Elevator/Slot0/MaxV", ElevatorConstants.k0MaxVelocity);
-  private static final LoggedTunableNumber k0MaxA = new LoggedTunableNumber("Elevator/Slot0/MaxA", ElevatorConstants.k0MaxAcceleration);
-  private static final LoggedTunableNumber k0S = new LoggedTunableNumber("Elevator/Slot0/S", ElevatorConstants.k0S);
-  private static final LoggedTunableNumber k0V = new LoggedTunableNumber("Elevator/Slot0/V", ElevatorConstants.k0V);
-  private static final LoggedTunableNumber k0A = new LoggedTunableNumber("Elevator/Slot0/A", ElevatorConstants.k0A);
-  private static final LoggedTunableNumber k0G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k0G);
+    private static final LoggedTunableNumber k0P = new LoggedTunableNumber("Elevator/Slot0/P", ElevatorConstants.k0P);
+    private static final LoggedTunableNumber k0I = new LoggedTunableNumber("Elevator/Slot0/I", ElevatorConstants.k0I);
+    private static final LoggedTunableNumber k0D = new LoggedTunableNumber("Elevator/Slot0/D", ElevatorConstants.k0D);
+    private static final LoggedTunableNumber k0MaxV = new LoggedTunableNumber("Elevator/Slot0/MaxV", ElevatorConstants.k0MaxVelocity);
+    private static final LoggedTunableNumber k0MaxA = new LoggedTunableNumber("Elevator/Slot0/MaxA", ElevatorConstants.k0MaxAcceleration);
+    private static final LoggedTunableNumber k0S = new LoggedTunableNumber("Elevator/Slot0/S", ElevatorConstants.k0S);
+    private static final LoggedTunableNumber k0V = new LoggedTunableNumber("Elevator/Slot0/V", ElevatorConstants.k0V);
+    private static final LoggedTunableNumber k0A = new LoggedTunableNumber("Elevator/Slot0/A", ElevatorConstants.k0A);
+    private static final LoggedTunableNumber k0G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k0G);
 
-  private static final LoggedTunableNumber k1P = new LoggedTunableNumber("Elevator/Slot1/P", ElevatorConstants.k1P);
-  private static final LoggedTunableNumber k1I = new LoggedTunableNumber("Elevator/Slot1/I", ElevatorConstants.k1I);
-  private static final LoggedTunableNumber k1D = new LoggedTunableNumber("Elevator/Slot1/D", ElevatorConstants.k1D);
-  private static final LoggedTunableNumber k1MaxV = new LoggedTunableNumber("Elevator/Slot1/MaxV", ElevatorConstants.k1MaxVelocity);
-  private static final LoggedTunableNumber k1MaxA = new LoggedTunableNumber("Elevator/Slot1/MaxA", ElevatorConstants.k1MaxAcceleration);
-  private static final LoggedTunableNumber k1S = new LoggedTunableNumber("Elevator/Slot1/S", ElevatorConstants.k1S);
-  private static final LoggedTunableNumber k1V = new LoggedTunableNumber("Elevator/Slot1/V", ElevatorConstants.k1V);
-  private static final LoggedTunableNumber k1A = new LoggedTunableNumber("Elevator/Slot1/A", ElevatorConstants.k1A);
-  private static final LoggedTunableNumber k1G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k1G);
+    private static final LoggedTunableNumber k1P = new LoggedTunableNumber("Elevator/Slot1/P", ElevatorConstants.k1P);
+    private static final LoggedTunableNumber k1I = new LoggedTunableNumber("Elevator/Slot1/I", ElevatorConstants.k1I);
+    private static final LoggedTunableNumber k1D = new LoggedTunableNumber("Elevator/Slot1/D", ElevatorConstants.k1D);
+    private static final LoggedTunableNumber k1MaxV = new LoggedTunableNumber("Elevator/Slot1/MaxV", ElevatorConstants.k1MaxVelocity);
+    private static final LoggedTunableNumber k1MaxA = new LoggedTunableNumber("Elevator/Slot1/MaxA", ElevatorConstants.k1MaxAcceleration);
+    private static final LoggedTunableNumber k1S = new LoggedTunableNumber("Elevator/Slot1/S", ElevatorConstants.k1S);
+    private static final LoggedTunableNumber k1V = new LoggedTunableNumber("Elevator/Slot1/V", ElevatorConstants.k1V);
+    private static final LoggedTunableNumber k1A = new LoggedTunableNumber("Elevator/Slot1/A", ElevatorConstants.k1A);
+    private static final LoggedTunableNumber k1G = new LoggedTunableNumber("Elevator/Slot0/G", ElevatorConstants.k1G);
 
-  private static final LoggedTunableNumber k2P = new LoggedTunableNumber("Elevator/Slot2/P", ElevatorConstants.k2P);
-  private static final LoggedTunableNumber k2I = new LoggedTunableNumber("Elevator/Slot2/I", ElevatorConstants.k2I);
-  private static final LoggedTunableNumber k2D = new LoggedTunableNumber("Elevator/Slot2/D", ElevatorConstants.k2D);
-  private static final LoggedTunableNumber k2MaxV = new LoggedTunableNumber("Elevator/Slot2/MaxV", ElevatorConstants.k2MaxVelocity);
-  private static final LoggedTunableNumber k2MaxA = new LoggedTunableNumber("Elevator/Slot2/MaxA", ElevatorConstants.k2MaxAcceleration);
-  private static final LoggedTunableNumber k2S = new LoggedTunableNumber("Elevator/Slot2/S", ElevatorConstants.k2S);
-  private static final LoggedTunableNumber k2V = new LoggedTunableNumber("Elevator/Slot2/V", ElevatorConstants.k2V);
-  private static final LoggedTunableNumber k2A = new LoggedTunableNumber("Elevator/Slot2/A", ElevatorConstants.k2A);
-  private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/G", ElevatorConstants.k2G);
+    private static final LoggedTunableNumber k2P = new LoggedTunableNumber("Elevator/Slot2/P", ElevatorConstants.k2P);
+    private static final LoggedTunableNumber k2I = new LoggedTunableNumber("Elevator/Slot2/I", ElevatorConstants.k2I);
+    private static final LoggedTunableNumber k2D = new LoggedTunableNumber("Elevator/Slot2/D", ElevatorConstants.k2D);
+    private static final LoggedTunableNumber k2MaxV = new LoggedTunableNumber("Elevator/Slot2/MaxV", ElevatorConstants.k2MaxVelocity);
+    private static final LoggedTunableNumber k2MaxA = new LoggedTunableNumber("Elevator/Slot2/MaxA", ElevatorConstants.k2MaxAcceleration);
+    private static final LoggedTunableNumber k2S = new LoggedTunableNumber("Elevator/Slot2/S", ElevatorConstants.k2S);
+    private static final LoggedTunableNumber k2V = new LoggedTunableNumber("Elevator/Slot2/V", ElevatorConstants.k2V);
+    private static final LoggedTunableNumber k2A = new LoggedTunableNumber("Elevator/Slot2/A", ElevatorConstants.k2A);
+    private static final LoggedTunableNumber k2G = new LoggedTunableNumber("Elevator/Slot2/G", ElevatorConstants.k2G);
 
     private final ElevatorIO kElevatorHardware;
     private final ElevatorIOInputsAutoLogged kElevatorInputs = new ElevatorIOInputsAutoLogged();
