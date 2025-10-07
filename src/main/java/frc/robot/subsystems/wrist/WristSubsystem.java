@@ -10,13 +10,13 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 import frc.robot.util.debugging.LoggedTunableNumber;
+
 
 public class WristSubsystem extends SubsystemBase{
     @AutoLogOutput(key = "Wrist/Slot")
@@ -197,7 +197,7 @@ public class WristSubsystem extends SubsystemBase{
     public FunctionalCommand setTunablePIDCmd(double pSetpoint) {
         return new FunctionalCommand(
             () -> {
-            kWristPID.reset(kWristInputs.positionMeter);
+            kWristPID.reset(getPosition());
             kWristPID.setGoal(pSetpoint);
             },
             () -> {
@@ -222,7 +222,7 @@ public class WristSubsystem extends SubsystemBase{
     }
 
     public double getPosition(){
-        return getPosition();
+        return KWristInputs.positionMeters;
     }
 
 
@@ -271,7 +271,7 @@ public class WristSubsystem extends SubsystemBase{
     }
 
     private void stopIfLimit() {
-        if (isOutOfBounds(kWristInputs.motorOutput)) {
+        if (isOutOfBounds(KWristInputs.motorOutput)) {
           kWristHardware.setVoltage(0);
         }
     }

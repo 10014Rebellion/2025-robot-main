@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 /** The intake subsystem's hardware interface. */
 public interface WristIO {
   @AutoLog
-  public static class ElevatorIOInputs {
+  public static class WristIOInputs {
     public boolean isMotorConnected = false;
 
     public double appliedVoltage = 0.0;
@@ -22,7 +22,7 @@ public interface WristIO {
    * 
    * @param inputs The inputs object
    */
-  public default void updateInputs(ElevatorIOInputs inputs) {};
+  public default void updateInputs(WristIOInputs inputs) {};
 
   /**
    * @param volts The voltage that should be applied to the motor from -12 to 12

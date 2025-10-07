@@ -145,25 +145,33 @@ public class ButtonBindings {
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kScoreCoral)
         .whileTrue(mActionCommands.getScoreCoralCmd());
-
+    
     //
 
-    mOperatorButtonboard
-      .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
-        .whileTrue(
-            new ParallelCommandGroup(
-                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
-                mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-                mClimb.pullClimb(),
-                mClimb.setGrabberVoltsCmd(0.0),
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
+    // mOperatorButtonboard
+    //   .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
+    //     .whileTrue(
+    //         new ParallelCommandGroup(
+    //             mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+    //             mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
+    //             mClimb.pullClimb(),
+    //             mClimb.setGrabberVoltsCmd(0.0),
+    //             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
         .whileTrue(
           new ParallelCommandGroup(
             mClimb.deployClimb(),
-            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())));
+            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())).onlyWhile(() -> !mClimb.getBeamBroken())
+            
+            .andThen(
+              new ParallelCommandGroup(
+              mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+              mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
+              mClimb.pullClimb(),
+              mClimb.setGrabberVoltsCmd(0.0),
+              mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED))));
     // .whileFalse();
 
     mOperatorButtonboard
