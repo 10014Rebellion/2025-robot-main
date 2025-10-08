@@ -15,6 +15,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -116,6 +117,7 @@ public class Drive extends SubsystemBase {
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
     private ChassisSpeeds ppDesiredSpeeds = new ChassisSpeeds();
     private DriveFeedforwards pathPlanningFF = DriveFeedforwards.zeros(4);
+    
 
     private SwerveModuleState[] prevStates = SwerveUtils.zeroStates();
 
@@ -132,6 +134,7 @@ public class Drive extends SubsystemBase {
     private Pose2d goalPose = new Pose2d();
 
     /* TUNABLE NUMBERS FOR DRIVEBASE CONSTANTS AND TESTS */
+    private final static LoggedTunableNumber mSpeedLevel = new LoggedTunableNumber("Drive/DriveSpeed", 0);
     private final static LoggedTunableNumber driftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
     private final static LoggedTunableNumber rotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     private final static LoggedTunableNumber linearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);
@@ -455,8 +458,22 @@ public class Drive extends SubsystemBase {
 
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
 
-        previousSetpoint = setpointGenerator.generateSetpoint(
-            previousSetpoint, desiredSpeeds, kDriveConstraints, 0.02);
+        switch(MathUtil.clamp((int) mSpeedLevel.get(), 0, 4)) {
+            case 1:
+                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kHyperDriveConstraints, 0.02);
+                break;
+            case 2:
+                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kFastDriveConstraints, 0.02);
+                break;
+            case 3:
+                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kMediumDriveConstraints, 0.02);
+                break;
+            case 4:
+                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kSlowDriveConstraints, 0.02);
+                break;
+            default:
+                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kAutoDriveConstraints, 0.02);
+        }
 
         /* Only for logging purposes */
         SwerveModuleState[] moduleTorques = SwerveUtils.zeroStates();

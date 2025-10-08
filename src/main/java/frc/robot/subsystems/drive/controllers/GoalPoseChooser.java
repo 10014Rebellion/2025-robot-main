@@ -265,7 +265,7 @@ public class GoalPoseChooser {
         Units.inchesToMeters(13); // MAKE THIS 13 BEFORE A MATCH
     public static final double kDistBetweenBranchesCenterWithAlgae = Units.inchesToMeters(13);
     // made the auton positions no longer have the extra 0.5 inch distance between branches
-    public static final double kClawOffset = Units.inchesToMeters(-2.0);
+    public static final double kClawOffset = Units.inchesToMeters(-1); // Drive Left = -.  Drive Right = +
 
     // Positive to the left, negative to thr right, all in meters
     public enum PoseOffsets {
