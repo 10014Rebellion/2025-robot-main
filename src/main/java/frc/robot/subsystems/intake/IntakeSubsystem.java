@@ -2,7 +2,6 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.AbsoluteEncoder;
@@ -19,10 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.intake.IntakeConstants.Beambreak;
 import frc.robot.subsystems.intake.IntakeConstants.Indexer;
 import frc.robot.subsystems.intake.IntakeConstants.IntakePivot;
@@ -44,7 +40,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private ArmFeedforward mIntakePivotFF;
 
   private boolean mBackTriggered;
-  private boolean mFrontTriggered;
   private Timer mCoralStuckTimer;
 
   public IntakeSubsystem() {
@@ -310,50 +305,6 @@ public class IntakeSubsystem extends SubsystemBase {
           return getCoralDetectedFront();
         });
   }
-  /* 
-  public RepeatCommand setIndexCoralCmd() {
-    return new RepeatCommand(
-      new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeStuckTime), initialIndexCommand())
-      .andThen(new ParallelDeadlineGroup(new WaitCommand(IntakeConstants.Indexer.kIntakeReverseTime), reverseIndexCommand()))
-    );
-  }
-
-  private FunctionalCommand initialIndexCommand() {
-    return new FunctionalCommand(
-        () -> {
-          mBackTriggered = getCoralDetectedBack();
-          mFrontTriggered = getCoralDetectedFront();
-        },
-        () -> {
-          if (getCoralDetectedBack()) {
-            mBackTriggered = true;
-          }
-          if(getCoralDetectedFront()) {
-            mFrontTriggered = true;
-          }
-          if (mFrontTriggered = true) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsHold);
-          else if (mBackTriggered) setVoltsIndexer(IntakeConstants.Indexer.kIntakeVoltsSlow); 
-          else setVoltsIndexer(IntakeConstants.Indexer.kIntakeVolts);
-        },
-        (interrupted) -> {
-          setVoltsIndexer(0.0);
-          mBackTriggered = false;
-        },
-        () -> {
-          return getCoralDetectedFront();
-        });
-  } 
-
-  private FunctionalCommand reverseIndexCommand() {
-    return new FunctionalCommand(
-      () -> {}, 
-      () -> {
-        setVoltsIndexer(IntakeConstants.Indexer.kOuttakeVolts);
-      }, 
-      (interrupted) -> setVoltsIndexer(0.0), 
-      () -> getCoralDetectedBack());
-  }
-      */
 
   private double filterVoltageIntakePivot(double pVoltage) {
     return filterToLimitsIntakePivot(MathUtil.clamp(pVoltage, -12.0, 12.0));

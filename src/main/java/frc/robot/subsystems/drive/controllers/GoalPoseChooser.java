@@ -1,7 +1,5 @@
 package frc.robot.subsystems.drive.controllers;
 
-import static edu.wpi.first.units.Units.Rotation;
-
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,7 +19,6 @@ import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.controls.StateTracker.ReefFace;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.math.AllianceFlipUtil;
 
 /* Chooses pose based of strategy and psoe */ 

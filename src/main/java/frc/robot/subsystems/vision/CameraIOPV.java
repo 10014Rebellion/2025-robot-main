@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.vision.VisionConstants.Orientation;
 
 import static frc.robot.subsystems.vision.VisionConstants.kOV2311DiagonalCameraFOV;
 
@@ -31,16 +30,14 @@ public class CameraIOPV implements CameraIO {
     private PhotonCamera photonCam;
     private PhotonPoseEstimator poseEstimator;
     private Transform3d cameraTransform;
-    private Orientation orientation;
 
     private PhotonCameraSim limelightSim;
     private VisionSystemSim visionSim;
 
-    public CameraIOPV(String name, Transform3d cameraTransform, Orientation orientation) {
+    public CameraIOPV(String name, Transform3d cameraTransform) {
         camName = name;
         photonCam = new PhotonCamera(camName);
         this.cameraTransform = cameraTransform;
-        this.orientation = orientation;
         // Don't worry about it
         PhotonCamera.setVersionCheckEnabled(false);
 

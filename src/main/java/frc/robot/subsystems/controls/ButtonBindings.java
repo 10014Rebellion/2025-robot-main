@@ -11,8 +11,6 @@ import frc.robot.subsystems.LEDs.LEDConstants.ledColor;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
-import frc.robot.subsystems.climb.grabber.GrabberConstants;
-import frc.robot.subsystems.climb.pulley.PulleyConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.Setpoints;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
@@ -55,7 +53,7 @@ public class ButtonBindings {
 
     this.mDriverController = new CommandXboxController(DriverController.kDriverControllerPort);
     this.mOperatorButtonboard = new CommandGenericHID(Buttonboard.kButtonboardPort);
-    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pClimb , pStateTracker).new ActionCommands();
+    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pStateTracker).new ActionCommands();
   }
 
   public void initDriverJoysticks() {

@@ -275,12 +275,4 @@ public class WristSubsystem extends SubsystemBase{
           kWristHardware.setVoltage(0);
         }
     }
-
-    
-    private double filterToLimits(double pInput) {
-        return isOutOfBounds(pInput) ? 0.0 : pInput;
-    }
-
-    
-
 }

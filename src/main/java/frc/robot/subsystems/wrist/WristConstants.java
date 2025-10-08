@@ -1,10 +1,7 @@
 package frc.robot.subsystems.wrist;
 
-import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
-import frc.robot.subsystems.elevator.ElevatorConstants.ControllerConfiguration;
 
 public class WristConstants {
 

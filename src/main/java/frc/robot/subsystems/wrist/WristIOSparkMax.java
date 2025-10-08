@@ -19,21 +19,19 @@ public class WristIOSparkMax implements WristIO{
     private SparkMaxConfig motorConfiguration = new SparkMaxConfig();
 
     private WristConfiguration wristConfiguration;
-    private EncoderHardware encoderConfiguration;
-
-    public WristIOSparkMax(WristHardware hardware, WristConfiguration wristConfiguration, EncoderHardware encoderConfiguration){
+    public WristIOSparkMax(WristHardware pHardware, WristConfiguration pWristConfiguration, EncoderHardware pEncoderConfiguration){
         
-        kMotor = new SparkMax(hardware.kMotorPort(), hardware.kMotorType());
+        kMotor = new SparkMax(pHardware.kMotorPort(), pHardware.kMotorType());
         
-        this.wristConfiguration = wristConfiguration;
-        this.encoderConfiguration = encoderConfiguration;
+        this.wristConfiguration = pWristConfiguration;
+        EncoderHardware encoderConfiguration = pEncoderConfiguration;
 
         kEncoder = new DutyCycleEncoder(encoderConfiguration.kEncoderPort());
 
-        motorConfiguration.inverted(wristConfiguration.kInverted());
-        motorConfiguration.idleMode(wristConfiguration.kIdleMode());
-        motorConfiguration.smartCurrentLimit(wristConfiguration.kSmartLimit());
-        motorConfiguration.secondaryCurrentLimit(wristConfiguration.kSecondaryLimit());
+        motorConfiguration.inverted(pWristConfiguration.kInverted());
+        motorConfiguration.idleMode(pWristConfiguration.kIdleMode());
+        motorConfiguration.smartCurrentLimit(pWristConfiguration.kSmartLimit());
+        motorConfiguration.secondaryCurrentLimit(pWristConfiguration.kSecondaryLimit());
 
         motorConfiguration.absoluteEncoder.positionConversionFactor(1);
         motorConfiguration.absoluteEncoder.velocityConversionFactor(1);

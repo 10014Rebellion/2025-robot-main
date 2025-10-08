@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.StateTracker.AlgaeScoringLevel;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 import frc.robot.subsystems.controls.StateTracker.GamePiece;
@@ -32,7 +31,6 @@ public class TeleopCommands {
 	private final ElevatorSubsystem mElevator;
 	private final IntakeSubsystem mIntake;
 	private final ClawSubsystem mClaw;
-	private final ClimbSubsystem mClimb;
 	private final StateTracker mStateTracker;
 
 	public TeleopCommands(
@@ -41,14 +39,12 @@ public class TeleopCommands {
 		ElevatorSubsystem pElevator,
 		IntakeSubsystem pIntake,
 		ClawSubsystem pClaw,
-		ClimbSubsystem pClimb,
 		StateTracker pStateTracker) {
 		this.mDrive = pDrive;
 		this.mWrist = pWrist;
 		this.mElevator = pElevator;
 		this.mIntake = pIntake;
 		this.mClaw = pClaw;
-		this.mClimb = pClimb;
 		this.mStateTracker = pStateTracker;
 	}
 
