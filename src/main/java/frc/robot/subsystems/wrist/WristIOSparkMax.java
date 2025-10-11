@@ -49,7 +49,7 @@ public class WristIOSparkMax implements WristIO{
     }
 
     @Override
-    public void updateInputs(ElevatorIOInputs inputs){
+    public void updateInputs(WristIOInputs inputs){
         // Setting this to true since we don't care about this value
         inputs.isMotorConnected = true;
 

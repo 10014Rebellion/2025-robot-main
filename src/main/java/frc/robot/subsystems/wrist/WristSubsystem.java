@@ -197,7 +197,7 @@ public class WristSubsystem extends SubsystemBase{
     public FunctionalCommand setTunablePIDCmd(double pSetpoint) {
         return new FunctionalCommand(
             () -> {
-            kWristPID.reset(kWristInputs.positionMeter);
+            kWristPID.reset(KWristInputs.positionMeters);
             kWristPID.setGoal(pSetpoint);
             },
             () -> {
@@ -222,7 +222,7 @@ public class WristSubsystem extends SubsystemBase{
     }
 
     public double getPosition(){
-        return getPosition();
+        return KWristInputs.positionMeters;
     }
 
 
@@ -271,7 +271,7 @@ public class WristSubsystem extends SubsystemBase{
     }
 
     private void stopIfLimit() {
-        if (isOutOfBounds(kWristInputs.motorOutput)) {
+        if (isOutOfBounds(KWristInputs.motorOutput)) {
           kWristHardware.setVoltage(0);
         }
     }

@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.LEDs.LEDConstants.ledColor;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
-import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.claw.claw.ClawConstants;
 import frc.robot.subsystems.climb.grabber.GrabberConstants;
 import frc.robot.subsystems.climb.pulley.PulleyConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -76,7 +76,7 @@ public class ButtonBindings {
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.TURQUOISE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 
-    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral))
+    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral) && mElevator.atGoal())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
     
