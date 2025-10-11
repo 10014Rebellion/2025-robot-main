@@ -24,7 +24,7 @@ public class ManualTeleopController {
     public static final LoggedTunableNumber rotationScalar =
         new LoggedTunableNumber("Drive/Teleop/RotationScalar", 0.5);
     public static final LoggedTunableNumber rotationInputsExponent =
-        new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", 1.0);
+        new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", 3.0);
     public static final LoggedTunableNumber rotationDeadband =
         new LoggedTunableNumber("Drive/Teleop/RotationDeadband", 0.1);
     public static final LoggedTunableNumber sniperControl =
