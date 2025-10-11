@@ -3,18 +3,28 @@ package frc.robot;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.grabber.*;
+import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberConfiguration;
+import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberHardware;
 import frc.robot.subsystems.climb.pulley.*;
 import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.Drive.DriveState;
+import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfiles;
+
 import static frc.robot.subsystems.drive.DriveConstants.*;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -26,8 +36,10 @@ import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
+import frc.robot.subsystems.wrist.WristConstants.WristConfiguration;
 import frc.robot.subsystems.wrist.WristIOSparkMax;
 import frc.robot.subsystems.auton.AutonSubsystem;
 
@@ -45,6 +57,8 @@ public class RobotContainer {
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
   private final StateTracker mStateStracker;
+
+  private final LoggedDashboardChooser<Command> driverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
 
   public RobotContainer() {
     mStateStracker = new StateTracker();
@@ -84,8 +98,8 @@ public class RobotContainer {
               }, 
               new GyroIOPigeon2(), 
               new Vision(new CameraIO[] {
-                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
-                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
+                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.BACK), 
+                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.BACK)
                 }));
         break;
 
@@ -96,8 +110,8 @@ public class RobotContainer {
           new Module("BL", new ModuleIOSim()),
           new Module("BR", new ModuleIOSim())
         }, new GyroIO() {}, new Vision(new CameraIO[] {
-          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
-          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
+          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.FRONT), 
+          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.FRONT)
         }));
         break;
 
@@ -119,6 +133,12 @@ public class RobotContainer {
     mAutons = new AutonSubsystem(mDrive, mWrist, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
+
+    driverProfileChooser.addDefaultOption("Default", mDrive.setDriveProfile(DriveConstants.defaultProfile));
+
+    driverProfileChooser.addOption("bosco", mDrive.setDriveProfile(DriveConstants.kBosco));
+
+    driverProfileChooser.addOption("eli", mDrive.setDriveProfile(DriveConstants.kEli));
   }
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
@@ -152,5 +172,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return mAutons.getChosenAuton();
+  }
+
+  public Command getDriverProfileCommand() {
+    return driverProfileChooser.get();
   }
 }

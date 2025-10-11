@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfiles;
 
 public class DriveConstants {
     ///////////////////// DRIVE BASE \\\\\\\\\\\\\\\\\\\\\\\
@@ -80,7 +81,6 @@ public class DriveConstants {
             new PIDController(0.1, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 2.36, 0.005), 
             new PIDController(4.5, 0.0, 0.0), new SimpleMotorFeedforward(0.0, 0.0));
 
-
             
     /* MODULE SPECIFIC CONSTANTS */
     /* If 180 was added, the person who got the offset had the bevel gears on the wrong side when he did it */
@@ -112,9 +112,47 @@ public class DriveConstants {
             24,
             0.454);
 
+    public static final DriverProfiles defaultProfile =  new DriverProfiles(
+        kMaxLinearSpeedMPS, 
+        kMaxLinearAccelerationMPSS, 
+        1, 
+        1, 
+        0.075, 
+        kMaxRotationSpeedRadiansPS, 
+        kMaxRotationAccelRadiansPS, 
+        1.0, 
+        1.0, 
+        0.1, 
+        0.2);
+
+    public static final DriverProfiles kBosco =  new DriverProfiles(
+            kMaxLinearSpeedMPS, 
+            kMaxLinearAccelerationMPSS, 
+            1, 
+            1, 
+            0.075, 
+            kMaxRotationSpeedRadiansPS, 
+            kMaxRotationAccelRadiansPS, 
+            1.0, 
+            1.0, 
+            0.1, 
+            0.2);
+
+    public static final DriverProfiles kEli =  new DriverProfiles(
+        kMaxLinearSpeedMPS, 
+        kMaxLinearAccelerationMPSS, 
+        1, 
+        1, 
+        0.075, 
+        kMaxRotationSpeedRadiansPS, 
+        kMaxRotationAccelRadiansPS, 
+        1.0, 
+        1.0, 
+        0.1, 
+        0.2);
+
     public static record ModuleHardwareConfig(
         int driveID, int azimuthID, int encoderID, double offset) {}
-
     
     public static record ModuleControlConfig(
         PIDController driveController,
