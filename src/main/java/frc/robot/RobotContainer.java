@@ -1,6 +1,5 @@
 package frc.robot;
 
-import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.grabber.*;
 import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberConfiguration;
@@ -42,6 +41,11 @@ import frc.robot.subsystems.wrist.WristSubsystem;
 import frc.robot.subsystems.wrist.WristConstants.WristConfiguration;
 import frc.robot.subsystems.wrist.WristIOSparkMax;
 import frc.robot.subsystems.auton.AutonSubsystem;
+import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.claw.claw.ClawConstants;
+import frc.robot.subsystems.claw.claw.ClawIOSparkMax;
+import frc.robot.subsystems.claw.sensor.SensorConstants;
+import frc.robot.subsystems.claw.sensor.SensorIOSensors;
 
 
 public class RobotContainer {
@@ -63,7 +67,15 @@ public class RobotContainer {
   public RobotContainer() {
     mStateStracker = new StateTracker();
     mTelemetry = new TelemetrySubsystem();
-    mClaw = new ClawSubsystem();
+
+    
+    mClaw = new ClawSubsystem(
+      new ClawIOSparkMax(
+        ClawConstants.motorConfiguration, 
+        ClawConstants.controllerConfig), 
+      new SensorIOSensors(SensorConstants.clawSensorsConfiguration));
+
+
     mWrist = new WristSubsystem(
       new WristIOSparkMax(
         WristConstants.wristHardware, 
