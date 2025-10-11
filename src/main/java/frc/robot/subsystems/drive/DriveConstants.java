@@ -123,12 +123,13 @@ public class DriveConstants {
         1.0, 
         1.0, 
         0.1, 
-        0.2);
+        0.2,
+        "Default");
 
     public static final DriverProfiles kBosco =  new DriverProfiles(
             kMaxLinearSpeedMPS, 
             kMaxLinearAccelerationMPSS, 
-            1, 
+            0.1, 
             1, 
             0.075, 
             kMaxRotationSpeedRadiansPS, 
@@ -136,7 +137,8 @@ public class DriveConstants {
             1.0, 
             1.0, 
             0.1, 
-            0.2);
+            0.2,
+            "Bosco");
 
     public static final DriverProfiles kEli =  new DriverProfiles(
         kMaxLinearSpeedMPS, 
@@ -146,10 +148,11 @@ public class DriveConstants {
         0.075, 
         kMaxRotationSpeedRadiansPS, 
         kMaxRotationAccelRadiansPS, 
-        1.0, 
+        0.1, 
         1.0, 
         0.1, 
-        0.2);
+        0.2,
+        "Eli");
 
     public static record ModuleHardwareConfig(
         int driveID, int azimuthID, int encoderID, double offset) {}
