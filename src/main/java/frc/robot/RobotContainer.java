@@ -98,8 +98,8 @@ public class RobotContainer {
               }, 
               new GyroIOPigeon2(), 
               new Vision(new CameraIO[] {
-                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.BACK), 
-                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.BACK)
+                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
+                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
                 }));
         break;
 
@@ -110,8 +110,8 @@ public class RobotContainer {
           new Module("BL", new ModuleIOSim()),
           new Module("BR", new ModuleIOSim())
         }, new GyroIO() {}, new Vision(new CameraIO[] {
-          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform, Orientation.FRONT), 
-          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform, Orientation.FRONT)
+          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
+          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
         }));
         break;
 
