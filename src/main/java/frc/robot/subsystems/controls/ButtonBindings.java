@@ -9,8 +9,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.LEDs.LEDConstants.ledColor;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
-import frc.robot.subsystems.claw.ClawConstants;
 import frc.robot.subsystems.claw.ClawSubsystem;
+import frc.robot.subsystems.claw.claw.ClawConstants;
+import frc.robot.subsystems.climb.grabber.GrabberConstants;
+import frc.robot.subsystems.climb.pulley.PulleyConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.Setpoints;
 import frc.robot.subsystems.controls.ButtonBindingsConstants.Buttonboard;
@@ -53,7 +55,7 @@ public class ButtonBindings {
 
     this.mDriverController = new CommandXboxController(DriverController.kDriverControllerPort);
     this.mOperatorButtonboard = new CommandGenericHID(Buttonboard.kButtonboardPort);
-    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pStateTracker).new ActionCommands();
+    this.mActionCommands = new TeleopCommands(pDrive, pWrist, pElevator, pIntake, pClaw, pClimb , pStateTracker).new ActionCommands();
   }
 
   public void initDriverJoysticks() {
@@ -74,7 +76,7 @@ public class ButtonBindings {
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.TURQUOISE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
 
-    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral))
+    new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral) && mElevator.atGoal())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
     
@@ -143,33 +145,25 @@ public class ButtonBindings {
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kScoreCoral)
         .whileTrue(mActionCommands.getScoreCoralCmd());
-    
+
     //
 
-    // mOperatorButtonboard
-    //   .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
-    //     .whileTrue(
-    //         new ParallelCommandGroup(
-    //             mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
-    //             mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-    //             mClimb.pullClimb(),
-    //             mClimb.setGrabberVoltsCmd(0.0),
-    //             mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
+    mOperatorButtonboard
+      .button(ButtonBindingsConstants.Buttonboard.kClimbAscend)
+        .whileTrue(
+            new ParallelCommandGroup(
+                mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+                mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
+                mClimb.pullClimb(),
+                mClimb.setGrabberVoltsCmd(0.0),
+                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
 
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
         .whileTrue(
           new ParallelCommandGroup(
             mClimb.deployClimb(),
-            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())).onlyWhile(() -> !mClimb.getBeamBroken())
-            
-            .andThen(
-              new ParallelCommandGroup(
-              mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
-              mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
-              mClimb.pullClimb(),
-              mClimb.setGrabberVoltsCmd(0.0),
-              mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED))));
+            mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())));
     // .whileFalse();
 
     mOperatorButtonboard
