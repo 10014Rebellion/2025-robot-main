@@ -223,6 +223,8 @@ public class Robot extends LoggedRobot {
     }
     robotContainer.initTriggers();
 
+    robotContainer.getDriverProfileCommand().schedule();
+
     Elastic.selectTab("Teleoperated");
   }
 

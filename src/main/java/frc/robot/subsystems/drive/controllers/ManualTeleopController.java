@@ -1,8 +1,11 @@
 package frc.robot.subsystems.drive.controllers;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.debugging.LoggedTunableNumber;
 
@@ -15,19 +18,19 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /* Controls the pose of the robot using 3 PID controllers and Feedforward */
 public class ManualTeleopController {
-    public static final LoggedTunableNumber linearScalar =
+    public static LoggedTunableNumber linearScalar =
         new LoggedTunableNumber("Drive/Teleop/LinearScalar", 1);
-    public static final LoggedTunableNumber linearDeadBand =
+    public static LoggedTunableNumber linearDeadBand =
         new LoggedTunableNumber("Drive/Teleop/Deadband", 0.075);
-    public static final LoggedTunableNumber linearInputsExponent =
+    public static LoggedTunableNumber linearInputsExponent =
         new LoggedTunableNumber("Drive/Teleop/LinearInputsExponent", 3);
-    public static final LoggedTunableNumber rotationScalar =
+    public static LoggedTunableNumber rotationScalar =
         new LoggedTunableNumber("Drive/Teleop/RotationScalar", 0.5);
-    public static final LoggedTunableNumber rotationInputsExponent =
+    public static LoggedTunableNumber rotationInputsExponent =
         new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", 3.0);
-    public static final LoggedTunableNumber rotationDeadband =
+    public static LoggedTunableNumber rotationDeadband =
         new LoggedTunableNumber("Drive/Teleop/RotationDeadband", 0.1);
-    public static final LoggedTunableNumber sniperControl =
+    public static LoggedTunableNumber sniperControl =
         new LoggedTunableNumber("Drive/Teleop/SniperControl", 0.2);
 
     private boolean fieldRelative = true;
@@ -156,4 +159,44 @@ public class ManualTeleopController {
     private double zerotoOneClamp(double val) {
         return MathUtil.clamp(val, 0.0, 1.0);
     }
+
+    public void updateTuneablesWithProfiles(DriverProfiles profiles) {
+        linearScalar.initDefault(kMaxLinearSpeedMPS);
+
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/LinearScalar").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/Deadband").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/LinearInputsExponent").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationScalar").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationInputExponent").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationDeadband").getEntry(0.0).close();
+        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/SniperControl").getEntry(0.0).close();
+
+        linearScalar =
+            new LoggedTunableNumber("Drive/Teleop/LinearScalar", profiles.linearScalar());
+        linearDeadBand =
+            new LoggedTunableNumber("Drive/Teleop/Deadband", profiles.linearDeadband());
+        linearInputsExponent =
+            new LoggedTunableNumber("Drive/Teleop/LinearInputsExponent", profiles.linearExponent());
+        rotationScalar =
+            new LoggedTunableNumber("Drive/Teleop/RotationScalar", profiles.rotationalScalar());
+        rotationInputsExponent =
+            new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", profiles.rotationalExponent());
+        rotationDeadband =
+            new LoggedTunableNumber("Drive/Teleop/RotationDeadband", profiles.rotationDeadband());
+        sniperControl =
+            new LoggedTunableNumber("Drive/Teleop/SniperControl", profiles.sniperScalar());
+    }
+
+    public static record DriverProfiles(
+        double maxLinearDriveSpeed,
+        double maxLinearDriveAcceleration,
+        double linearScalar,
+        double linearExponent,
+        double linearDeadband,
+        double maxRotationalDriveSpeed,
+        double maxRotationalDriveAcceleration,
+        double rotationalScalar,
+        double rotationalExponent,
+        double rotationDeadband,
+        double sniperScalar) {}
 }

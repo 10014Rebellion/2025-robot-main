@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.drive.controllers.HeadingController;
@@ -43,6 +45,7 @@ import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.CHOOSER_STRATEGY;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
 import frc.robot.subsystems.drive.controllers.HolonomicController.ConstraintType;
+import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfiles;
 import frc.robot.subsystems.drive.controllers.ManualTeleopController;
 import frc.robot.subsystems.drive.controllers.HolonomicController;
 
@@ -117,7 +120,7 @@ public class Drive extends SubsystemBase {
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
     private ChassisSpeeds ppDesiredSpeeds = new ChassisSpeeds();
     private DriveFeedforwards pathPlanningFF = DriveFeedforwards.zeros(4);
-    
+    private PathConstraints driveConstraints = DriveConstants.kAutoDriveConstraints;
 
     private SwerveModuleState[] prevStates = SwerveUtils.zeroStates();
 
@@ -458,21 +461,10 @@ public class Drive extends SubsystemBase {
 
         SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
 
-        switch(MathUtil.clamp((int) mSpeedLevel.get(), 0, 4)) {
-            case 1:
-                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kHyperDriveConstraints, 0.02);
-                break;
-            case 2:
-                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kFastDriveConstraints, 0.02);
-                break;
-            case 3:
-                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kMediumDriveConstraints, 0.02);
-                break;
-            case 4:
-                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kSlowDriveConstraints, 0.02);
-                break;
-            default:
-                previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kAutoDriveConstraints, 0.02);
+        if(DriverStation.isAutonomous()) {
+            previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, kAutoDriveConstraints, 0.02);
+        } else {
+            previousSetpoint = setpointGenerator.generateSetpoint(previousSetpoint, desiredSpeeds, driveConstraints, 0.02);
         }
 
         /* Only for logging purposes */
@@ -484,6 +476,7 @@ public class Drive extends SubsystemBase {
             if(useGenerator) {
                 /* Logs the drive feedforward stuff */
                 SwerveUtils.logDriveFeedforward(previousSetpoint.feedforwards(), i);
+
 
                 setpointStates[i] = new SwerveModuleState(
                     previousSetpoint.moduleStates()[i].speedMetersPerSecond,
@@ -549,6 +542,18 @@ public class Drive extends SubsystemBase {
             default:
                 return 0.0;
         }
+    }
+
+    public Command setDriveProfile(DriverProfiles profile) {
+        return new InstantCommand(() -> {
+            driveConstraints = new PathConstraints(
+                profile.maxLinearDriveSpeed(), 
+                profile.maxLinearDriveAcceleration(), 
+                profile.maxRotationalDriveSpeed(), 
+                profile.maxRotationalDriveAcceleration());
+
+            teleopController.updateTuneablesWithProfiles(profile);
+        });
     }
 
     ////////////// LOCALIZATION(MAINLY RESETING LOGIC) \\\\\\\\\\\\\\\\

@@ -9,15 +9,20 @@ import frc.robot.subsystems.climb.pulley.*;
 import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.Drive.DriveState;
+import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfiles;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
@@ -52,6 +57,8 @@ public class RobotContainer {
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
   private final StateTracker mStateStracker;
+
+  private final LoggedDashboardChooser<Command> driverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
 
   public RobotContainer() {
     mStateStracker = new StateTracker();
@@ -126,6 +133,12 @@ public class RobotContainer {
     mAutons = new AutonSubsystem(mDrive, mWrist, mClaw, mElevator, mIntake);
 
     configureButtonBindings();
+
+    driverProfileChooser.addDefaultOption("Default", mDrive.setDriveProfile(DriveConstants.defaultProfile));
+
+    driverProfileChooser.addOption("bosco", mDrive.setDriveProfile(DriveConstants.kBosco));
+
+    driverProfileChooser.addOption("eli", mDrive.setDriveProfile(DriveConstants.kEli));
   }
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!
@@ -159,5 +172,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return mAutons.getChosenAuton();
+  }
+
+  public Command getDriverProfileCommand() {
+    return driverProfileChooser.get();
   }
 }
