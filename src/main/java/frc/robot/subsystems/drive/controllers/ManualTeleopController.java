@@ -1,14 +1,11 @@
 package frc.robot.subsystems.drive.controllers;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.debugging.LoggedTunableNumber;
 
+import static frc.robot.subsystems.drive.DriveConstants.defaultProfile;
 import static frc.robot.subsystems.drive.DriveConstants.kMaxLinearSpeedMPS;
 
 import java.util.function.DoubleSupplier;
@@ -18,20 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /* Controls the pose of the robot using 3 PID controllers and Feedforward */
 public class ManualTeleopController {
-    public static LoggedTunableNumber linearScalar =
-        new LoggedTunableNumber("Drive/Teleop/LinearScalar", 1);
-    public static LoggedTunableNumber linearDeadBand =
-        new LoggedTunableNumber("Drive/Teleop/Deadband", 0.075);
-    public static LoggedTunableNumber linearInputsExponent =
-        new LoggedTunableNumber("Drive/Teleop/LinearInputsExponent", 3);
-    public static LoggedTunableNumber rotationScalar =
-        new LoggedTunableNumber("Drive/Teleop/RotationScalar", 0.5);
-    public static LoggedTunableNumber rotationInputsExponent =
-        new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", 3.0);
-    public static LoggedTunableNumber rotationDeadband =
-        new LoggedTunableNumber("Drive/Teleop/RotationDeadband", 0.1);
-    public static LoggedTunableNumber sniperControl =
-        new LoggedTunableNumber("Drive/Teleop/SniperControl", 0.2);
+    public static TuneableDriverProfile driverProfile = new TuneableDriverProfile(defaultProfile);
 
     private boolean fieldRelative = true;
 
@@ -53,18 +37,18 @@ public class ManualTeleopController {
     }
 
     public ChassisSpeeds computeChassiSpeeds(Rotation2d robotAngle, ChassisSpeeds currentRobotRelativeSpeeds, boolean joystickSniper) {
-        double xAdjustedJoystickInput = MathUtil.applyDeadband(xSupplier.getAsDouble(), linearDeadBand.get());
-        double yAdjustedJoystickInput = MathUtil.applyDeadband(ySupplier.getAsDouble(), linearDeadBand.get());
-        double omegaAdjustedJoystickInput = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), rotationDeadband.get());
+        double xAdjustedJoystickInput = MathUtil.applyDeadband(xSupplier.getAsDouble(), driverProfile.linearDeadBand().get());
+        double yAdjustedJoystickInput = MathUtil.applyDeadband(ySupplier.getAsDouble(), driverProfile.linearDeadBand().get());
+        double omegaAdjustedJoystickInput = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), driverProfile.rotationDeadband().get());
 
         // EXPONENTS CAN ONLY BE INTEGERS FOR THIS TO WORK DUE TO MODULUS
-        int linearExp = (int) Math.round(linearInputsExponent.get());
-        int rotationExp = (int) Math.round(rotationInputsExponent.get());
+        int linearExp = (int) Math.round(driverProfile.linearInputsExponent().get());
+        int rotationExp = (int) Math.round(driverProfile.rotationInputsExponent().get());
 
         // Should never exceed 1 for exponent control to work. Clamped later as an edge case, but not a concern with XBox Controllers HID class
-        double xJoystickScalar = getSniperScalar(joystickSniper) * linearScalar.get();
-        double yJoystickScalar = getSniperScalar(joystickSniper) * linearScalar.get();
-        double omegaJoystickScalar = getSniperScalar(joystickSniper) * linearScalar.get();
+        double xJoystickScalar = getSniperScalar(joystickSniper) * driverProfile.linearScalar().get();
+        double yJoystickScalar = getSniperScalar(joystickSniper) * driverProfile.linearScalar().get();
+        double omegaJoystickScalar = getSniperScalar(joystickSniper) * driverProfile.linearScalar().get();
 
         double xScaledJoystickInput =
             zerotoOneClamp(xJoystickScalar)
@@ -114,7 +98,7 @@ public class ManualTeleopController {
 
     /* Wheter to use the snipler scalar or not based on the cnodition */
     public double getSniperScalar(boolean isSniper) {
-        return isSniper ? sniperControl.get() : 1.0;
+        return isSniper ? driverProfile.sniperControl().get() : 1.0;
     }
 
     /*
@@ -122,13 +106,13 @@ public class ManualTeleopController {
      * If the driver wants simply controlled direction at low speeds for the robot to make little linear adjustments
      */
     public ChassisSpeeds computeSniperPOVChassisSpeeds(Rotation2d robotAngle) {
-        double omegaAdjustedJoystickInput = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), rotationDeadband.get());
+        double omegaAdjustedJoystickInput = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), driverProfile.rotationDeadband().get());
 
-        int rotationExp = (int) Math.round(rotationInputsExponent.get());
+        int rotationExp = (int) Math.round(driverProfile.rotationInputsExponent().get());
 
         /* If the exponent is an even number it's always positive */
         /* You lose the sign when it's squared, so you have to multiply it back in  */
-        double omegaJoystickScalar = getSniperScalar(true) * linearScalar.get();
+        double omegaJoystickScalar = getSniperScalar(true) * driverProfile.linearScalar().get();
 
         double omegaJoystickInput =
             zerotoOneClamp(omegaJoystickScalar)
@@ -140,8 +124,8 @@ public class ManualTeleopController {
 
         /* Does polar to rectangular where POV degree is theta, kSniperControl * maxSpeed is r */
         ChassisSpeeds desiredSpeeds = new ChassisSpeeds(
-            -sniperControl.get() * kMaxLinearSpeedMPS * Math.cos(Math.toRadians(povSupplierDegrees.getAsDouble())), 
-            sniperControl.get() * kMaxLinearSpeedMPS * Math.sin(Math.toRadians(povSupplierDegrees.getAsDouble())), 
+            -driverProfile.sniperControl().get() * kMaxLinearSpeedMPS * Math.cos(Math.toRadians(povSupplierDegrees.getAsDouble())), 
+            driverProfile.sniperControl().get() * kMaxLinearSpeedMPS * Math.sin(Math.toRadians(povSupplierDegrees.getAsDouble())), 
             DriveConstants.kMaxRotationSpeedRadiansPS * omegaJoystickInput);
 
         // if (fieldRelative) {
@@ -161,30 +145,11 @@ public class ManualTeleopController {
     }
 
     public void updateTuneablesWithProfiles(DriverProfiles profiles) {
-        linearScalar.initDefault(kMaxLinearSpeedMPS);
+        driverProfile = new TuneableDriverProfile(profiles);
+    }
 
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/LinearScalar").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/Deadband").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/LinearInputsExponent").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationScalar").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationInputExponent").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/RotationDeadband").getEntry(0.0).close();
-        NetworkTableInstance.getDefault().getDoubleTopic("Drive/Teleop/SniperControl").getEntry(0.0).close();
-
-        linearScalar =
-            new LoggedTunableNumber("Drive/Teleop/LinearScalar", profiles.linearScalar());
-        linearDeadBand =
-            new LoggedTunableNumber("Drive/Teleop/Deadband", profiles.linearDeadband());
-        linearInputsExponent =
-            new LoggedTunableNumber("Drive/Teleop/LinearInputsExponent", profiles.linearExponent());
-        rotationScalar =
-            new LoggedTunableNumber("Drive/Teleop/RotationScalar", profiles.rotationalScalar());
-        rotationInputsExponent =
-            new LoggedTunableNumber("Drive/Teleop/RotationInputExponent", profiles.rotationalExponent());
-        rotationDeadband =
-            new LoggedTunableNumber("Drive/Teleop/RotationDeadband", profiles.rotationDeadband());
-        sniperControl =
-            new LoggedTunableNumber("Drive/Teleop/SniperControl", profiles.sniperScalar());
+    public TuneableDriverProfile getDriverProfile() {
+        return driverProfile;
     }
 
     public static record DriverProfiles(
@@ -198,5 +163,6 @@ public class ManualTeleopController {
         double rotationalScalar,
         double rotationalExponent,
         double rotationDeadband,
-        double sniperScalar) {}
+        double sniperScalar,
+        String key) {}
 }
