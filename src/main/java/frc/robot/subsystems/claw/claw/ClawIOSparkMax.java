@@ -30,10 +30,10 @@ public class ClawIOSparkMax implements ClawIO {
 
   @Override
   public void updateInputs(ClawIOInputs inputs){
-    inputs.appliedVoltage = kMotor.getAppliedOutput();
+    inputs.appliedVoltage = kMotor.getAppliedOutput() * kMotor.getBusVoltage();
     inputs.isMotorConnected = true;
     inputs.statorCurrentAmps = 0.0;
-    inputs.supplyCurrentAmps = 0.0;
+    inputs.supplyCurrentAmps = kMotor.getOutputCurrent();
     inputs.temperatureCelsius = kMotor.getMotorTemperature();
   }
 
