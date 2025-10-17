@@ -156,7 +156,18 @@ public class DriveConstants {
             true,
             "Ishita");
 
-    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kBosco, kEli, kIshita};
+            public static final DriverProfiles kNikki =  new DriverProfiles(
+                0.5, 
+                3, 
+                0.075, 
+                0.5, 
+                2.0, 
+                0.1, 
+                0.2,
+                true,
+                "Nikki");
+
+    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kBosco, kEli, kIshita, kNikki};
 
         
 
