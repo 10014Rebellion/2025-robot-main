@@ -112,47 +112,53 @@ public class DriveConstants {
             24,
             0.454);
 
-    public static final DriverProfiles defaultProfile =  new DriverProfiles(
-        kMaxLinearSpeedMPS, 
-        kMaxLinearAccelerationMPSS, 
+    public static final DriverProfiles kDefaultProfiles =  new DriverProfiles(
         1, 
-        1, 
+        3, 
         0.075, 
-        kMaxRotationSpeedRadiansPS, 
-        kMaxRotationAccelRadiansPS, 
         1.0, 
-        1.0, 
+        2.0, 
         0.1, 
         0.2,
+        true,
         "Default");
 
     public static final DriverProfiles kBosco =  new DriverProfiles(
-            kMaxLinearSpeedMPS, 
-            kMaxLinearAccelerationMPSS, 
-            0.1, 
             1, 
+            3, 
             0.075, 
-            kMaxRotationSpeedRadiansPS, 
-            kMaxRotationAccelRadiansPS, 
-            1.0, 
-            1.0, 
+            0.5, 
+            2.0, 
             0.1, 
             0.2,
+            true,
             "Bosco");
 
     public static final DriverProfiles kEli =  new DriverProfiles(
-        kMaxLinearSpeedMPS, 
-        kMaxLinearAccelerationMPSS, 
         1, 
-        1, 
+        3, 
         0.075, 
-        kMaxRotationSpeedRadiansPS, 
-        kMaxRotationAccelRadiansPS, 
-        0.1, 
         1.0, 
+        2.0, 
         0.1, 
         0.2,
+        true,
         "Eli");
+
+        public static final DriverProfiles kIshita =  new DriverProfiles(
+            1, 
+            3, 
+            0.075, 
+            0.5, 
+            2.0, 
+            0.1, 
+            0.2,
+            true,
+            "Ishita");
+
+    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kBosco, kEli, kIshita};
+
+        
 
     public static record ModuleHardwareConfig(
         int driveID, int azimuthID, int encoderID, double offset) {}

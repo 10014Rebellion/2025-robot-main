@@ -40,6 +40,8 @@ public class GoalPoseChooser {
     private static SIDE side = SIDE.RIGHT;
     private static ReefFace reefFace = ReefFace.F4;
 
+    private static boolean swapSides = false;
+
     public static Pose2d getGoalPose(CHOOSER_STRATEGY strategy, Pose2d pose) {
         switch(strategy) {
             case kTest:
@@ -67,11 +69,11 @@ public class GoalPoseChooser {
             reefFace = ReefFace.F1;
 
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -81,11 +83,11 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "E");
             reefFace = ReefFace.F2;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -123,11 +125,11 @@ public class GoalPoseChooser {
             Logger.recordOutput("Drive/ReefSide", "C");
             reefFace = ReefFace.F6;
             if(side.equals(SIDE.LEFT)) {
-                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseLeft(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else if(side.equals(SIDE.RIGHT)) {
-                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace));
+                goal = getTargetPoseRight(StateTracker.faceToTag(reefFace), swapSides);
             }
             
             else goal = getTargetPose(StateTracker.faceToTag(reefFace));
@@ -149,6 +151,18 @@ public class GoalPoseChooser {
         // Logger.recordOutput("Drive/SelectedSide", side);
 
         return goal;  // .plus(new Transform2d(0.0, 0.0, Rotation2d.fromDegrees(180)));
+    }
+
+    public static void setSwapSides(boolean swap) {
+        swapSides = swap;
+    }
+
+    public static Pose2d getTargetPoseLeft(int pTagID, boolean swap) {
+        return (!swap) ? getTargetPoseLeft(pTagID) : getTargetPoseRight(pTagID);
+    }
+
+    public static Pose2d getTargetPoseRight(int pTagID, boolean swap) {
+        return (!swap) ? getTargetPoseRight(pTagID) : getTargetPoseLeft(pTagID);
     }
 
     public static Pose2d getTargetPoseLeft(int pTagID) {

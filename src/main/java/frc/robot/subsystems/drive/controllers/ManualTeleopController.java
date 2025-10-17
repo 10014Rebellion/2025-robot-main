@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.drive.DriveConstants;
 
-import static frc.robot.subsystems.drive.DriveConstants.defaultProfile;
+import static frc.robot.subsystems.drive.DriveConstants.kDefaultProfiles;
 import static frc.robot.subsystems.drive.DriveConstants.kMaxLinearSpeedMPS;
 
 import java.util.function.DoubleSupplier;
@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /* Controls the pose of the robot using 3 PID controllers and Feedforward */
 public class ManualTeleopController {
-    public static TuneableDriverProfile driverProfile = new TuneableDriverProfile(defaultProfile);
+    public static TuneableDriverProfile driverProfile = new TuneableDriverProfile(kDefaultProfiles);
 
     private boolean fieldRelative = true;
 
@@ -153,16 +153,13 @@ public class ManualTeleopController {
     }
 
     public static record DriverProfiles(
-        double maxLinearDriveSpeed,
-        double maxLinearDriveAcceleration,
         double linearScalar,
         double linearExponent,
         double linearDeadband,
-        double maxRotationalDriveSpeed,
-        double maxRotationalDriveAcceleration,
         double rotationalScalar,
         double rotationalExponent,
         double rotationDeadband,
         double sniperScalar,
+        boolean swapSides,
         String key) {}
 }

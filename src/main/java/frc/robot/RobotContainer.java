@@ -146,11 +146,10 @@ public class RobotContainer {
 
     configureButtonBindings();
 
-    driverProfileChooser.addDefaultOption("Default", mDrive.setDriveProfile(DriveConstants.defaultProfile));
-
-    driverProfileChooser.addOption("bosco", mDrive.setDriveProfile(DriveConstants.kBosco));
-
-    driverProfileChooser.addOption("eli", mDrive.setDriveProfile(DriveConstants.kEli));
+    for(int i = 0; i < DriveConstants.kProfiles.length; i++) {
+      if(DriveConstants.kProfiles[i].key().equals("Default")) driverProfileChooser.addDefaultOption(DriveConstants.kProfiles[i].key(), mDrive.setDriveProfile(DriveConstants.kProfiles[i]));
+      else driverProfileChooser.addOption(DriveConstants.kProfiles[i].key(), mDrive.setDriveProfile(DriveConstants.kProfiles[i]));
+    }
   }
 
   // DO NOT INIT TRIGGERS INSIDE OF HERE UNLESS YOU WANNA DO IT IN AUTON AS WELL!!!

@@ -545,13 +545,9 @@ public class Drive extends SubsystemBase {
 
     public Command setDriveProfile(DriverProfiles profile) {
         return new InstantCommand(() -> {
-            driveConstraints = new PathConstraints(
-                profile.maxLinearDriveSpeed(), 
-                profile.maxLinearDriveAcceleration(), 
-                profile.maxRotationalDriveSpeed(), 
-                profile.maxRotationalDriveAcceleration());
-
             teleopController.updateTuneablesWithProfiles(profile);
+
+            GoalPoseChooser.setSwapSides(profile.swapSides());
         });
     }
 
