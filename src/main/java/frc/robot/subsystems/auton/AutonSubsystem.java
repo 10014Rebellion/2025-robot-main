@@ -20,8 +20,8 @@ import frc.robot.subsystems.drive.Drive.DriveState;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -101,17 +101,17 @@ public class AutonSubsystem {
                     mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                     mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()))),
             // Added an additional command telling the intake to run the rollers.
-            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+            mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.INTAKING),
             new SequentialCommandGroup(
               new WaitCommand(0.3),
-              mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed)
+              mIntake.setRollerCmd(IntakePivotConstants.kIntakeSpeed)
             ));
     }
 
     private SequentialCommandGroup activateIntake() {
         return new ParallelRaceGroup(
-            mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed),
-            mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+            mIntake.setRollerCmd(IntakePivotConstants.kIntakeSpeed),
+            mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.INTAKING),
             new SequentialCommandGroup(
                 //Added an additional command to make sure the elevator is at the right height before trying to pickup the piece.
                 new ParallelCommandGroup(
@@ -232,7 +232,7 @@ public class AutonSubsystem {
                     new SequentialCommandGroup(
                         mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE),
                         mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()))),
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING),
+                mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.INTAKING),
                 mIntake.setRollerCmd(8)),
             new ParallelCommandGroup(
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE),

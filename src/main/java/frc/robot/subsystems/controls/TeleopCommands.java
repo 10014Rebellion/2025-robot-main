@@ -20,8 +20,8 @@ import frc.robot.subsystems.drive.controllers.GoalPoseChooser;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import frc.robot.util.commands.DynamicCommand;
@@ -66,8 +66,8 @@ public class TeleopCommands {
 							mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()) // Brings wrist down
 						)
 					), 
-					mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING), // Deploys intake
-					mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed) // Turns on intake rollers
+					mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.INTAKING), // Deploys intake
+					mIntake.setRollerCmd(IntakePivotConstants.kIntakeSpeed) // Turns on intake rollers
 				),
 				// AFTER CORAL IS DETECTED TO BE IN THE CRADLE \\
 				new WaitCommand(0.1),
@@ -83,7 +83,7 @@ public class TeleopCommands {
 		/** OUTTAKE CORAL: This command is for EMERGENCY or if coral gets stuck*/
 		public ParallelCommandGroup getOuttakeCoralCmd() {
 			return new ParallelCommandGroup(
-				mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.ALGAEINTAKE),
+				mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.ALGAEINTAKE),
 				mIntake.setIndexerCmd(-2),
 				mIntake.setRollerCmd(-8)
 			);
@@ -101,7 +101,7 @@ public class TeleopCommands {
 		public ParallelCommandGroup getStowIntakeCmd(){
 			return new ParallelCommandGroup(
 				mIntake
-					.setEndablePIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED) // Sets intake pivot PID to stowed positon
+					.setEndablePIDIntakePivotCmd(IntakePivotConstants.Setpoints.STOWED) // Sets intake pivot PID to stowed positon
 					.andThen(mIntake.enableFFCmd()), // After PID is over, enables feedforward
 					getStopIndexerAndRollersCmd()
 			);

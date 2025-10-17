@@ -24,8 +24,8 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.controllers.GoalPoseChooser.SIDE;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 
@@ -156,7 +156,7 @@ public class ButtonBindings {
                 mElevator.setPIDCmd(ElevatorConstants.Setpoints.Climb),
                 mClimb.pullClimb(),
                 mClimb.setGrabberVoltsCmd(0.0),
-                mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.STOWED)));
+                mIntake.setPIDIntakePivotCmd(IntakePivotConstants.Setpoints.STOWED)));
 
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)

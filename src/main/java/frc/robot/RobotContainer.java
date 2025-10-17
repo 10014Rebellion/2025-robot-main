@@ -30,6 +30,14 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.BeamBreak.BeamBreakConstants;
+import frc.robot.subsystems.intake.BeamBreak.BeamBreakIODigitalInput;
+import frc.robot.subsystems.intake.Indexer.IndexerConstants;
+import frc.robot.subsystems.intake.Indexer.IndexerIOSparkMax;
+import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants;
+import frc.robot.subsystems.intake.IntakePivot.IntakePivotIOSparkMax;
+import frc.robot.subsystems.intake.IntakeRoller.IntakeRollerConstants;
+import frc.robot.subsystems.intake.IntakeRoller.IntakeRollerIOTalonFX;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
 import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPV;
@@ -87,7 +95,13 @@ public class RobotContainer {
         ElevatorConstants.elevatorHardware, 
         ElevatorConstants.motorConfiguration));
 
-    mIntake = new IntakeSubsystem();
+    mIntake = new IntakeSubsystem(
+      new IndexerIOSparkMax(IndexerConstants.indexerHardware, IndexerConstants.motorConfiguration),
+      new IntakePivotIOSparkMax(IntakePivotConstants.intakePivotHardware, IntakePivotConstants.motorConfiguration, IntakePivotConstants.encoderHardware),
+      new IntakeRollerIOTalonFX(IntakeRollerConstants.intakeRollersHardware, IntakeRollerConstants.motorConfiguration),
+      new BeamBreakIODigitalInput(BeamBreakConstants.frontHardware),
+      new BeamBreakIODigitalInput(BeamBreakConstants.backHardware)
+    );
     
     mClimb = new ClimbSubsystem(
       new GrabberIOSparkMax(
