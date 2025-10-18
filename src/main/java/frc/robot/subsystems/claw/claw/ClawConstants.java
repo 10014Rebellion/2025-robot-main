@@ -5,6 +5,8 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import frc.robot.util.debugging.LoggedTunableNumber;
 
 public class ClawConstants {
@@ -37,6 +39,10 @@ public class ClawConstants {
             kI, 
             kD);
 
+    public static final SimulationConfiguration kIntakeSimulationConfiguration = new SimulationConfiguration(
+        DCMotor.getNEO(1), 
+        0.0002);
+
     public record MotorConfiguration(
         int motorID, 
         MotorType motorType, 
@@ -44,6 +50,10 @@ public class ClawConstants {
         boolean inverted, 
         int smartCurrentLimit,
         int secondaryCurrentLimit){}  
+
+    public record SimulationConfiguration(
+        DCMotor motorType,
+        double measurementStdDevs) {}
 
     public record ControllerConfig(double kP, double kI, double kD){}
 

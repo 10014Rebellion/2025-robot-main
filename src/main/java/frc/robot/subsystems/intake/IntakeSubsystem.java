@@ -1,11 +1,13 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -94,24 +96,32 @@ public class IntakeSubsystem extends SubsystemBase{
         Logger.processInputs("Intake/BeamBreak/Front", kFrontSensorInputs);
 
         kBackSensorHardware.updateInputs(kBackSensorInputs);
-        Logger.processInputs("Intake/BeamBreak/Back", kBackSensorInputs);;
+        Logger.processInputs("Intake/BeamBreak/Back", kBackSensorInputs);
+
+        if(DriverStation.isDisabled()){
+            kIndexerHardware.stop();
+            kIntakePivotHardware.stop();
+            kIntakeRollerHardware.stop();
+        }
 
     }
 
     public FunctionalCommand enableFFCmd() {
         return new FunctionalCommand(
             () -> {
-            double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakePivotConstants.kG);
-            mIntakePivotFF = new ArmFeedforward(
-                IntakePivotConstants.kS,
-                newKg,
-                IntakePivotConstants.kV,
-                IntakePivotConstants.kA);
+              double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakePivotConstants.kG);
+              mIntakePivotFF = new ArmFeedforward(
+                  IntakePivotConstants.kS,
+                  newKg,
+                  IntakePivotConstants.kV,
+                  IntakePivotConstants.kA);
             },
+
             () -> {
-            double calculatedOutput = mIntakePivotFF.calculate(Math.toRadians(getPivotPosition() - 10.0), 0.0);
-            kIntakePivotHardware.setVoltage(calculatedOutput);
+              double calculatedOutput = mIntakePivotFF.calculate(Math.toRadians(getPivotPosition() - 10.0), 0.0);
+              kIntakePivotHardware.setVoltage(calculatedOutput);
             },
+
             (interrupted) -> kIntakePivotHardware.setVoltage(0),
             () -> false,
             this);
@@ -121,6 +131,8 @@ public class IntakeSubsystem extends SubsystemBase{
         mDisableIR = !mDisableIR;
     }
 
+
+    @AutoLogOutput(key="Intake/IntakePivot/atGoal")
     public boolean isPIDAtGoalIntakePivot() {
         return mIntakePivotProfiledPID.atGoal();
     }
@@ -132,28 +144,28 @@ public class IntakeSubsystem extends SubsystemBase{
     public FunctionalCommand setPIDIntakePivotCmd(IntakePivotConstants.Setpoints pSetpoint) {
         return new FunctionalCommand(
             () -> {
-            double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakePivotConstants.kP);
-            double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakePivotConstants.kD);
-            double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakePivotConstants.kG);
-            mIntakePivotFF = new ArmFeedforward(
-                IntakePivotConstants.kS,
-                newKg,
-                IntakePivotConstants.kV,
-                IntakePivotConstants.kA);
-            mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
-            mIntakePivotProfiledPID.reset(getPivotPosition());
-            mIntakePivotProfiledPID.setGoal(pSetpoint.getPos());
+              double newKp = SmartDashboard.getNumber("Intake/PivotKp", IntakePivotConstants.kP);
+              double newKd = SmartDashboard.getNumber("Intake/PivotKd", IntakePivotConstants.kD);
+              double newKg = SmartDashboard.getNumber("Intake/PivotKg", IntakePivotConstants.kG);
+              mIntakePivotFF = new ArmFeedforward(
+                  IntakePivotConstants.kS,
+                  newKg,
+                  IntakePivotConstants.kV,
+                  IntakePivotConstants.kA);
+              mIntakePivotProfiledPID.setPID(newKp, 0.0, newKd);
+              mIntakePivotProfiledPID.reset(getPivotPosition());
+              mIntakePivotProfiledPID.setGoal(pSetpoint.getPos());
             },
             () -> {
-            double encoderReading = getPivotPosition();
-            double calculatedFF = mIntakePivotFF.calculate(
-                Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
-                Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
-            double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
-            kIntakePivotHardware.setVoltage(calculatedPID + calculatedFF);
-            SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
-            SmartDashboard.putNumber("Intake/PID Output", calculatedPID);
-            SmartDashboard.putNumber("Intake/FF Output", calculatedFF);
+              double encoderReading = getPivotPosition();
+              double calculatedFF = mIntakePivotFF.calculate(
+                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().position - 10.0),
+                  Math.toRadians(mIntakePivotProfiledPID.getSetpoint().velocity));
+              double calculatedPID = mIntakePivotProfiledPID.calculate(encoderReading);
+              kIntakePivotHardware.setVoltage(calculatedPID + calculatedFF);
+              SmartDashboard.putNumber("Intake/Full Output", calculatedPID + calculatedFF);
+              SmartDashboard.putNumber("Intake/PID Output", calculatedPID);
+              SmartDashboard.putNumber("Intake/FF Output", calculatedFF);
             },
             (interrupted) -> kIntakePivotHardware.setVoltage(mIntakePivotFF.calculate(Math.toRadians(getPivotPosition()), 0.0)),
             () -> false, // isPIDAtGoalIntakePivot(),

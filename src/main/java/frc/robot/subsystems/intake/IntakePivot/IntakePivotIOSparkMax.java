@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
 
 import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants.IntakePivotConfiguration;
@@ -35,6 +37,11 @@ public class IntakePivotIOSparkMax implements IntakePivotIO{
             .velocityConversionFactor(indexerConfiguration.kVelocityConversionFactor())
             .inverted(encoderConfiguration.kEncoderInverted())
             .zeroOffset(encoderConfiguration.kEncoderOffset());
+
+        kMotor.configure(
+            motorConfiguration, 
+            ResetMode.kResetSafeParameters, 
+            PersistMode.kPersistParameters);
     }
 
 
