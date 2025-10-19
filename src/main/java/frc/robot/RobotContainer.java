@@ -2,8 +2,6 @@ package frc.robot;
 
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.grabber.*;
-import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberConfiguration;
-import frc.robot.subsystems.climb.grabber.GrabberConstants.Grabber.GrabberHardware;
 import frc.robot.subsystems.climb.pulley.*;
 import frc.robot.subsystems.controls.ButtonBindings;
 import frc.robot.subsystems.controls.StateTracker;
@@ -15,15 +13,12 @@ import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.Drive.DriveState;
-import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfiles;
 
 import static frc.robot.subsystems.drive.DriveConstants.*;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.LEDs.LEDSubsystem;
 import frc.robot.subsystems.drive.ModuleIOFXFXS;
 import frc.robot.subsystems.elevator.ElevatorConstants;
@@ -35,10 +30,8 @@ import frc.robot.subsystems.vision.CameraIO;
 import frc.robot.subsystems.vision.CameraIOPV;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.VisionConstants.Orientation;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
-import frc.robot.subsystems.wrist.WristConstants.WristConfiguration;
 import frc.robot.subsystems.wrist.WristIOSparkMax;
 import frc.robot.subsystems.auton.AutonSubsystem;
 import frc.robot.subsystems.claw.ClawSubsystem;

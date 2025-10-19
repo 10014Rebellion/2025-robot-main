@@ -79,9 +79,6 @@ public class ButtonBindings {
     new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral) && mElevator.atGoal())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
-    
-    new Trigger(() -> mClimb.getBeamBroken()).and(() -> mClimb.isInTolerance(Setpoints.CLIMBED))
-      .onTrue(new InstantCommand(() -> mClimb.setGrabberVolts(0)));
 
     new Trigger(() -> mClimb.getBeamBroken())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.GREEN)))
