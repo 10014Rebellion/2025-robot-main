@@ -21,17 +21,19 @@ public class WristConstants {
     public static double kEncoderOffsetDeg = -162.95;
     public static boolean kEncoderInverted = true;
 
+    // NO PIECE
     public static double k0P = 0.22;
     public static double k0I = 0.0;
     public static double k0D = 0.01;
-    public static double k0MaxAcceleration = 1100; // was 500. k0inda slow
-    public static double k0MaxVelocity = 800;
+    public static double k0MaxAcceleration = 1000; // was 500. k0inda slow
+    public static double k0MaxVelocity = 700;
     public static double k0S = 0.02;
     public static double k0G = 0.4;
     public static double k0V = 0.003;
     public static double k0A = 0.0;
-    public static double k0Tolerance = 1.5;
+    public static double k0Tolerance = 1.0;
   
+    // CORAL
     public static double k1P = 0.22;
     public static double k1I = 0.0;
     public static double k1D = 0.01;
@@ -43,6 +45,7 @@ public class WristConstants {
     public static double k1A = 0.0;
     public static double k1Tolerance = 1.5;
   
+    // ALGAE THROW
     public static double k2P = 0.22;
     public static double k2I = 0.0;
     public static double k2D = 0.01;
@@ -149,7 +152,7 @@ public class WristConstants {
 
     public enum Setpoints {
         BOTTOM(0),
-        INTAKE(-88),
+        INTAKE(-87),
         HPINTAKE(0),
         L1(-30),
         L2(46 + 6),
