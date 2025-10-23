@@ -1,5 +1,6 @@
 package frc.robot.subsystems.climb;
 
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -80,6 +81,7 @@ public class ClimbSubsystem extends SubsystemBase{
     kGrabberHardware.setVoltage(pVolts);
   }
 
+  @AutoLogOutput(key="Climb/Position USE")
   public double getEncReading(){
     return Rotation2d.fromDegrees(kPulleyInputs.posistionDegrees).getRotations();
   }
@@ -99,14 +101,17 @@ public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
         if (getEncReading() > PulleyConstants.Pulley.Setpoints.STARTROLLING.getPos())
           kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
 
-        if (getEncReading() > PulleyConstants.Pulley.Setpoints.EXTENDED.getPos())
+        if (getEncReading() > PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
           kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO.getVolts());
+
+        if (getEncReading() <= PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
+          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO_SLOW.getVolts());
         
       }, (interrupted) -> {
         kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts());
         kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
       }, 
-        () -> isInTolerance(PulleyConstants.Pulley.Setpoints.EXTENDED), this);
+        () -> getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos() || isInTolerance(PulleyConstants.Pulley.Setpoints.EXTENDED), this);
   }
 
   public FunctionalCommand pullClimb() {
@@ -114,7 +119,7 @@ public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
       () -> {},
       () -> {
         if (getEncReading() < PulleyConstants.Pulley.Setpoints.CLIMBED.getPos())
-          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO.getVolts());
+          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO_FRICKEN_FAAAST.getVolts());
         
       }, (interrupted) -> kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts()), 
         () -> isInTolerance(PulleyConstants.Pulley.Setpoints.CLIMBED), this);

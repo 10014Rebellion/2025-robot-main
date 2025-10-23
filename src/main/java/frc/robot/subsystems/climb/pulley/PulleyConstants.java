@@ -29,6 +29,8 @@ public class PulleyConstants {
         public enum VoltageSetpoints {
             // ASCEND(0.0),
             GO(7),
+            GO_FRICKEN_FAAAST(7.5), //voltage coming back in! GOING MAX THROTTLEEEE
+            GO_SLOW(2.8),
             STOP(0.0);
 
             public final double setpoint;
@@ -43,8 +45,9 @@ public class PulleyConstants {
         };
 
         public enum Setpoints {
-            EXTENDED(0.0),
+            EXTENDED(5.0),
             STARTROLLING(28.0), // angle of the climb where it start intaking the cage
+            SLOW_DOWN(70.0), 
             CLIMBED(95.0),
             STOWED(149.0);
 
