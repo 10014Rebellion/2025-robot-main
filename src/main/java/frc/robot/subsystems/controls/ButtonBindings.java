@@ -158,7 +158,7 @@ public class ButtonBindings {
 
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
-        .whileTrue(
+        .onTrue(
           new ParallelCommandGroup(
             mClimb.deployClimb(),
             mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())));

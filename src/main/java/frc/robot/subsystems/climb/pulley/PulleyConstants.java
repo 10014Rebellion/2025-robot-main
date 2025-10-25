@@ -16,9 +16,9 @@ public class PulleyConstants {
 
 
         public static boolean encoderInverted = false;
-        public static double encoderZeroOffset = 0.3297160;
-        public static double encoderPositionFactor = 360.0;
-        public static double encoderVelocityFactor = 360.0;
+        public static double encoderZeroOffset = 0.6088358;  //0.3297160;
+        public static double encoderPositionFactor =  360;
+        public static double encoderVelocityFactor = 360;
         public static double kTolerance = 3.0;
 
         public static int kSmartLimit = 60;
@@ -28,9 +28,9 @@ public class PulleyConstants {
 
         public enum VoltageSetpoints {
             // ASCEND(0.0),
-            GO(7),
-            GO_FRICKEN_FAAAST(7.5), //voltage coming back in! GOING MAX THROTTLEEEE
-            GO_SLOW(2.8),
+            GO(4),
+            GO_FRICKEN_FAAAST(5.5), //voltage coming back in! GOING MAX THROTTLEEEE
+            GO_SLOW(1),
             STOP(0.0);
 
             public final double setpoint;
@@ -45,11 +45,12 @@ public class PulleyConstants {
         };
 
         public enum Setpoints {
-            EXTENDED(5.0),
+            EXTENDED(0.0),
+            EXTENDED_PRE(10),
             STARTROLLING(28.0), // angle of the climb where it start intaking the cage
             SLOW_DOWN(70.0), 
             CLIMBED(95.0),
-            STOWED(149.0);
+            STOWED(157.0);
 
             public final double setpoint;
 
@@ -70,7 +71,7 @@ public class PulleyConstants {
 
         public record EncoderConfiguration(
             boolean kInverted,
-            Rotation2d offset,
+            double offsetRev,
             double kPosistionFactor,
             double kVelocityFactor,
             double kTolerance
@@ -82,7 +83,7 @@ public class PulleyConstants {
       
         public static PulleyConfiguration motorConfiguration = new PulleyConfiguration(kSmartLimit, kSecondaryLimit, kIdleMode, kMotorInverted);
 
-        public static EncoderConfiguration encoderConfiguration = new EncoderConfiguration(encoderInverted, Rotation2d.fromRotations(encoderZeroOffset), encoderPositionFactor, encoderVelocityFactor, kTolerance);
+        public static EncoderConfiguration encoderConfiguration = new EncoderConfiguration(encoderInverted, encoderZeroOffset, encoderPositionFactor, encoderVelocityFactor, kTolerance);
       
         public static PulleyHardware pulleyHardware = new PulleyHardware(kMotorID, kMotorType);
 

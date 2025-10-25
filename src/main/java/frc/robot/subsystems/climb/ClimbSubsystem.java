@@ -5,6 +5,7 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climb.grabber.GrabberConstants;
@@ -31,13 +32,16 @@ public class ClimbSubsystem extends SubsystemBase{
 
     @Override
     public void periodic(){
+
+      
+      SmartDashboard.putBoolean("end climb?", getEncReadingDeg() <= PulleyConstants.Pulley.Setpoints.EXTENDED_PRE.getPos());
         kGrabberHardware.updateInputs(kGrabberInputs);
         Logger.processInputs("Climb/Grabber", kGrabberInputs);
 
         kPulleyHardware.updateInputs(kPulleyInputs);
         Logger.processInputs("Climb/Pulley", kPulleyInputs);
 
-        Logger.recordOutput("Climb", getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos());
+        Logger.recordOutput("Climb", getEncReadingDeg() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos());
 
         if(DriverStation.isDisabled()){
             kGrabberHardware.stop();
@@ -82,8 +86,8 @@ public class ClimbSubsystem extends SubsystemBase{
   }
 
   @AutoLogOutput(key="Climb/Position USE")
-  public double getEncReading(){
-    return Rotation2d.fromDegrees(kPulleyInputs.posistionDegrees).getRotations();
+  public double getEncReadingDeg(){
+    return kPulleyInputs.posistionDegrees;
   }
 
   public boolean getBeamBroken(){
@@ -91,34 +95,39 @@ public class ClimbSubsystem extends SubsystemBase{
   }
 
 public boolean isInTolerance(Pulley.Setpoints pSetpoint) {
-    return (Math.abs(getEncReading() - pSetpoint.getPos()) < PulleyConstants.Pulley.kTolerance);
+    return (Math.abs(getEncReadingDeg() - pSetpoint.getPos()) < PulleyConstants.Pulley.kTolerance);
   }
 
   public FunctionalCommand deployClimb() {
     return new FunctionalCommand(
       () -> {},
       () -> {
-        if (getEncReading() > PulleyConstants.Pulley.Setpoints.STARTROLLING.getPos())
+        if (getEncReadingDeg() < PulleyConstants.Pulley.Setpoints.STARTROLLING.getPos())
           kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
 
-        if (getEncReading() > PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
+        if (getEncReadingDeg() > PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
           kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO.getVolts());
 
-        if (getEncReading() <= PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
+        if (getEncReadingDeg() <= PulleyConstants.Pulley.Setpoints.SLOW_DOWN.getPos())
           kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO_SLOW.getVolts());
+
+        if(getEncReadingDeg() <= PulleyConstants.Pulley.Setpoints.EXTENDED_PRE.getPos())
+          kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts());
+
+
         
       }, (interrupted) -> {
         kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts());
         kGrabberHardware.setVoltage(GrabberConstants.Grabber.VoltageSetpoints.PULL_IN.getVolts());
       }, 
-        () -> getEncReading() < PulleyConstants.Pulley.Setpoints.EXTENDED.getPos() || isInTolerance(PulleyConstants.Pulley.Setpoints.EXTENDED), this);
+        () -> getEncReadingDeg() <= PulleyConstants.Pulley.Setpoints.EXTENDED_PRE.getPos(), this);
   }
 
   public FunctionalCommand pullClimb() {
     return new FunctionalCommand(
       () -> {},
       () -> {
-        if (getEncReading() < PulleyConstants.Pulley.Setpoints.CLIMBED.getPos())
+        if (getEncReadingDeg() < PulleyConstants.Pulley.Setpoints.CLIMBED.getPos())
           kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.GO_FRICKEN_FAAAST.getVolts());
         
       }, (interrupted) -> kPulleyHardware.setVoltage(PulleyConstants.Pulley.VoltageSetpoints.STOP.getVolts()), 

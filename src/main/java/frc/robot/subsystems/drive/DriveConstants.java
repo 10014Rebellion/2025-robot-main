@@ -146,7 +146,7 @@ public class DriveConstants {
         "Eli");
 
         public static final DriverProfiles kIshita =  new DriverProfiles(
-            0.5, 
+            0.7, 
             3, 
             0.075, 
             0.5, 
