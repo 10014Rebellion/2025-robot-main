@@ -31,7 +31,7 @@ public class WristConstants {
     public static double k0G = 0.4;
     public static double k0V = 0.003;
     public static double k0A = 0.0;
-    public static double k0Tolerance = 1.0;
+    public static double k0Tolerance = 2.3;
   
     // CORAL
     public static double k1P = 0.22;
@@ -43,7 +43,7 @@ public class WristConstants {
     public static double k1G = 0.4;
     public static double k1V = 0.003;
     public static double k1A = 0.0;
-    public static double k1Tolerance = 1.5;
+    public static double k1Tolerance = 2.3;
   
     // ALGAE THROW
     public static double k2P = 0.22;
@@ -55,7 +55,7 @@ public class WristConstants {
     public static double k2G = 0.4;
     public static double k2V = 0.003;
     public static double k2A = 0.0;
-    public static double k2Tolerance = 1.5;
+    public static double k2Tolerance = 1.7;
 
     public static double kWristDownLimit = -30;
     public static double throwAlgaePos = 50;
@@ -160,6 +160,7 @@ public class WristConstants {
         L4(65),
     
         SCORE(11),
+        AUTON_L4_SCORE(2),
         L2SCORE(9),
         BARGE(71),
         L2ALGAE(-28),

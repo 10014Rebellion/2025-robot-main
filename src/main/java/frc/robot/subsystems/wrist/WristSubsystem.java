@@ -217,6 +217,7 @@ public class WristSubsystem extends SubsystemBase{
             this);
     }
 
+    @AutoLogOutput(key="Toast/Wrist/atGoal")
     public boolean isPIDAtGoal() {
         return kWristPID.atGoal();
     }
