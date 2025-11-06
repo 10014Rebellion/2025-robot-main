@@ -50,7 +50,7 @@ public class ClawConstants {
     public enum RollerSpeed {
         // Coral Values
         INTAKE_CORAL(() -> 6.0),
-        HOLD_CORAL(() -> 0.4),
+        HOLD_CORAL(() -> 0.25),
         OUTTAKE_REEF(() -> -0.6),
         OUTTAKE_L1(() -> -3),
         EJECT_CORAL(() -> -3),

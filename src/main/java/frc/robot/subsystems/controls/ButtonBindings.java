@@ -69,7 +69,7 @@ public class ButtonBindings {
 
   public void initTriggers() {
     new Trigger(
-      () -> (mDrive.atGoal() && mElevator.atGoal() && mWrist.isPIDAtGoal()))
+      () -> (mDrive.atGoal() && mElevator.atGoal() && mWrist.isPIDAtGoal())).debounce(0.25)
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
     new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Algae))

@@ -37,8 +37,8 @@ public class WristConstants {
     public static double k1P = 0.22;
     public static double k1I = 0.0;
     public static double k1D = 0.01;
-    public static double k1MaxAcceleration = 1100; // was 500. k1inda slow
-    public static double k1MaxVelocity = 400;
+    public static double k1MaxAcceleration = 900; // was 500. k1inda slow
+    public static double k1MaxVelocity = 350;
     public static double k1S = 0.02;
     public static double k1G = 0.4;
     public static double k1V = 0.003;
