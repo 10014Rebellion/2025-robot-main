@@ -123,6 +123,28 @@ public class DriveConstants {
         true,
         "Default");
 
+    public static final DriverProfiles kTaha =  new DriverProfiles(
+            0.9, 
+            3, 
+            0.075, 
+            0.9, 
+            3.0, 
+            0.1, 
+            0.2,
+            false,
+            "Taha");
+
+    public static final DriverProfiles kShlok =  new DriverProfiles(
+            0.8, 
+            3, 
+            0.075, 
+            0.8, 
+            3.5, 
+            0.1, 
+            0.2,
+            false,
+            "Shlok");
+        
     public static final DriverProfiles kBosco =  new DriverProfiles(
             1, 
             3, 
@@ -167,7 +189,7 @@ public class DriveConstants {
                 true,
                 "Nikki");
 
-    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kBosco, kEli, kIshita, kNikki};
+    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kShlok, kTaha, kBosco, kEli, kIshita, kNikki};
 
         
 
