@@ -69,7 +69,7 @@ public class ButtonBindings {
 
   public void initTriggers() {
     new Trigger(
-      () -> (mDrive.atGoal() && mElevator.atGoal() && mWrist.isPIDAtGoal()))
+      () -> (mDrive.atGoal() && mElevator.atGoal() && mWrist.isPIDAtGoal())).debounce(0.25)
         .whileTrue(new WaitCommand(0.1).andThen(mActionCommands.getScoreCoralCmd()));
 
     new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Algae))
@@ -79,9 +79,6 @@ public class ButtonBindings {
     new Trigger(() -> mClaw.hasPiece() && mStateTracker.getCurrentGamePiece().equals(GamePiece.Coral) && mElevator.atGoal())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.PURPLE)))
       .whileFalse(new InstantCommand(() -> mLEDs.setDefaultColor()));
-    
-    new Trigger(() -> mClimb.getBeamBroken()).and(() -> mClimb.isInTolerance(Setpoints.CLIMBED))
-      .onTrue(new InstantCommand(() -> mClimb.setGrabberVolts(0)));
 
     new Trigger(() -> mClimb.getBeamBroken())
       .whileTrue(new InstantCommand(() -> mLEDs.setSolid(ledColor.GREEN)))
@@ -134,6 +131,7 @@ public class ButtonBindings {
         .whileTrue(mActionCommands.getGroundAlgaeCmd())
         .whileFalse(mActionCommands.getHoldAlgaeCmd());
 
+
     // mDriverController
     //   .povUp()
     //     .whileTrue(mClimb.setGrabberVoltsCmd(ClimbConstants.Grabber.VoltageSetpoints.PULL_IN));
@@ -160,7 +158,7 @@ public class ButtonBindings {
 
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kClimbDeploy)
-        .whileTrue(
+        .onTrue(
           new ParallelCommandGroup(
             mClimb.deployClimb(),
             mWrist.setPIDCmd(WristConstants.Setpoints.CLIMB, () -> mClaw.hasPiece())));
@@ -229,7 +227,7 @@ public class ButtonBindings {
     mOperatorButtonboard.axisGreaterThan(0, 0.5).whileTrue(mWrist.setVoltsCmd(1.5));
 
     mOperatorButtonboard.axisLessThan(0, -0.50).whileTrue(mWrist.setVoltsCmd(-1.5));
-
+    
     mOperatorButtonboard
       .button(ButtonBindingsConstants.Buttonboard.kEjectAlgaeToBarge)
         .whileTrue(mClaw.setClawCmd(ClawConstants.RollerSpeed.OUTTAKE_L1.get()))

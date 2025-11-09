@@ -1,5 +1,7 @@
 package frc.robot.subsystems.climb.pulley;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -8,6 +10,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.EncoderConfiguration;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.PulleyConfiguration;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.PulleyHardware;
@@ -30,8 +33,8 @@ public class PulleyIOSparkMax implements PulleyIO{
 
         motorConfiguration
             .absoluteEncoder
-            .inverted(encoderConfig.kInverted())
-            .zeroOffset(encoderConfig.offset().getRotations())
+            // .inverted(encoderConfig.kInverted())
+            .zeroOffset(encoderConfig.offsetRev())
             .positionConversionFactor(encoderConfig.kPosistionFactor())
             .velocityConversionFactor(encoderConfig.kVelocityFactor());
 
@@ -52,7 +55,7 @@ public class PulleyIOSparkMax implements PulleyIO{
         inputs.supplyCurrentAmps = kMotor.getOutputCurrent();
         inputs.statorCurrentAmps = 0.0;
         inputs.temperatureCelsius = kMotor.getMotorTemperature();
-        inputs.posistionDegrees = getPulleyPosition().getDegrees();
+        inputs.posistionDegrees = getPulleyPosition();
     }
 
     @Override
@@ -66,11 +69,17 @@ public class PulleyIOSparkMax implements PulleyIO{
         kMotor.stopMotor();
     }
 
-    private Rotation2d getPulleyPosition() {
+    private double getPulleyPosition() {
         double encoderMeasurement = kEncoder.getPosition();
         if (encoderMeasurement > 180.0)
           encoderMeasurement -= 360.0;
-        return Rotation2d.fromRotations(encoderMeasurement);
-      }
+        return encoderMeasurement;
+    }
+
+    @AutoLogOutput(key="Climb/Pulley/MotorOutput")
+    public double getMotorOutput(){
+        return kMotor.getAppliedOutput();
+    }
+
     
 }

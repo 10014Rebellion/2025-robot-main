@@ -36,7 +36,7 @@ public class DriveConstants {
     public static final double kMaxRotationSpeedRadiansPS = Math.toRadians(360);
     public static final double kMaxRotationAccelRadiansPS = Math.toRadians(360) * 10;
 
-    public static final double kMaxAzimuthAngularRadiansPS = Math.toRadians(1200);
+    public static final double kMaxAzimuthAngularRadiansPS = Math.toRadians(1000);
 
     /* Plugged into setpoint generator */
     public static final PathConstraints kAutoDriveConstraints = new PathConstraints(kMaxLinearSpeedMPS, kMaxLinearAccelerationMPSS, kMaxRotationSpeedRadiansPS, kMaxRotationAccelRadiansPS);
@@ -70,7 +70,7 @@ public class DriveConstants {
     public static final double kDriveFOCAmpLimit = 80.0;
     public static final double kDriveSupplyAmpLimit = 80.0;
 
-    public static final double kAzimuthStatorAmpLimit = 40.0;
+    public static final double kAzimuthStatorAmpLimit = 20.0;
     public static final double kAzimuthFOCAmpLimit = -30.0;
 
     public static final ModuleControlConfig kModuleControllerConfigs = RobotBase.isReal() ? 
@@ -123,12 +123,34 @@ public class DriveConstants {
         true,
         "Default");
 
+    public static final DriverProfiles kTaha =  new DriverProfiles(
+            0.9, 
+            3, 
+            0.075, 
+            0.9, 
+            3.0, 
+            0.1, 
+            0.2,
+            false,
+            "Taha");
+
+    public static final DriverProfiles kShlok =  new DriverProfiles(
+            0.8, 
+            3, 
+            0.075, 
+            0.8, 
+            3.5, 
+            0.1, 
+            0.2,
+            false,
+            "Shlok");
+        
     public static final DriverProfiles kBosco =  new DriverProfiles(
             1, 
             3, 
             0.075, 
             0.5, 
-            2.0, 
+            3.0, 
             0.1, 
             0.2,
             true,
@@ -146,7 +168,7 @@ public class DriveConstants {
         "Eli");
 
         public static final DriverProfiles kIshita =  new DriverProfiles(
-            1, 
+            0.7, 
             3, 
             0.075, 
             0.5, 
@@ -167,7 +189,7 @@ public class DriveConstants {
                 true,
                 "Nikki");
 
-    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kBosco, kEli, kIshita, kNikki};
+    public static DriverProfiles[] kProfiles = {kDefaultProfiles, kShlok, kTaha, kBosco, kEli, kIshita, kNikki};
 
         
 

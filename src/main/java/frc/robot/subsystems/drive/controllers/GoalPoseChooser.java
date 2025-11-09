@@ -158,11 +158,11 @@ public class GoalPoseChooser {
     }
 
     public static Pose2d getTargetPoseLeft(int pTagID, boolean swap) {
-        return (!swap) ? getTargetPoseLeft(pTagID) : getTargetPoseRight(pTagID);
+        return (!swap || DriverStation.isAutonomous()) ? getTargetPoseLeft(pTagID) : getTargetPoseRight(pTagID);
     }
 
     public static Pose2d getTargetPoseRight(int pTagID, boolean swap) {
-        return (!swap) ? getTargetPoseRight(pTagID) : getTargetPoseLeft(pTagID);
+        return (!swap || DriverStation.isAutonomous()) ? getTargetPoseRight(pTagID) : getTargetPoseLeft(pTagID);
     }
 
     public static Pose2d getTargetPoseLeft(int pTagID) {
@@ -219,6 +219,7 @@ public class GoalPoseChooser {
         } else return (robotPose.getY() < Constants.kFieldWidthMeters / 2.0) ? FieldConstants.R_IL : FieldConstants.R_IR;
     }
 
+    
     /* DO NOT USE X COORDINATE, REPLACE y holonomic speeds with driver controller when using this! */
     public static Pose2d getNetPose(Pose2d robotPose) {
         return AllianceFlipUtil.apply(new Pose2d(FieldConstants.kXNetLineMeters, 0.0, Rotation2d.k180deg));

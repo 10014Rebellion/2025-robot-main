@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "HoldCoral"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -148,9 +154,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "race",
                 "data": {
-                  "pathName": "HPN-F5"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "HPN-F5 Last"
+                      }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.25
+                      }
+                    }
+                  ]
                 }
               },
               {

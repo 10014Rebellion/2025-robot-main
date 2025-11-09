@@ -178,12 +178,8 @@ public class AutonSubsystem {
                     mElevator.setPIDCmd(intToElevatorPos(level)),
                     mDrive.setDriveStateCommandContinued(DriveState.DRIVE_TO_CORAL)
                     .withDeadline(
-                        new ParallelRaceGroup(
-                            mDrive.waitUnitllAutoAlignFinishes(),
-                            new WaitCommand(2.0)
-                            // added a deadline to hopefully force end the aligning command if something goes wrong.
-                        ))
-                    )
+                            mDrive.waitUnitllAutoAlignFinishes().withTimeout(1)
+                    ))
                 );
                     
     }
@@ -220,8 +216,10 @@ public class AutonSubsystem {
     private ParallelDeadlineGroup scoreCoral() {
         return new ParallelDeadlineGroup(
             new WaitCommand(0.5),
-            mWrist.setPIDCmd(WristConstants.Setpoints.SCORE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()));
-            //new WaitCommand(0.1).andThen(mClaw.setClawCmd(0.0)));
+            mWrist.setPIDCmd(
+                WristConstants.Setpoints.AUTON_L4_SCORE, () -> mClaw.hasPiece()
+            ).andThen(mWrist.enableFFCmd())
+        );
     }
 
     private SequentialCommandGroup intakeCoral() {

@@ -141,7 +141,7 @@ public class ElevatorConstants {
         BOTTOM(0),
         HPINTAKE(2),
         PREINTAKE(25.0),
-        POSTINTAKE(15.0),
+        POSTINTAKE(16.6),
         GROUNDALGAE(8),
         L1(27),
         L2(7),

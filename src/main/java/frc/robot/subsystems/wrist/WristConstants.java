@@ -21,28 +21,31 @@ public class WristConstants {
     public static double kEncoderOffsetDeg = -162.95;
     public static boolean kEncoderInverted = true;
 
+    // NO PIECE
     public static double k0P = 0.22;
     public static double k0I = 0.0;
     public static double k0D = 0.01;
-    public static double k0MaxAcceleration = 1100; // was 500. k0inda slow
-    public static double k0MaxVelocity = 800;
+    public static double k0MaxAcceleration = 1000; // was 500. k0inda slow
+    public static double k0MaxVelocity = 700;
     public static double k0S = 0.02;
     public static double k0G = 0.4;
     public static double k0V = 0.003;
     public static double k0A = 0.0;
-    public static double k0Tolerance = 1.5;
+    public static double k0Tolerance = 2.3;
   
+    // CORAL
     public static double k1P = 0.22;
     public static double k1I = 0.0;
     public static double k1D = 0.01;
-    public static double k1MaxAcceleration = 1100; // was 500. k1inda slow
-    public static double k1MaxVelocity = 400;
+    public static double k1MaxAcceleration = 900; // was 500. k1inda slow
+    public static double k1MaxVelocity = 350;
     public static double k1S = 0.02;
     public static double k1G = 0.4;
     public static double k1V = 0.003;
     public static double k1A = 0.0;
-    public static double k1Tolerance = 1.5;
+    public static double k1Tolerance = 2.3;
   
+    // ALGAE THROW
     public static double k2P = 0.22;
     public static double k2I = 0.0;
     public static double k2D = 0.01;
@@ -52,7 +55,7 @@ public class WristConstants {
     public static double k2G = 0.4;
     public static double k2V = 0.003;
     public static double k2A = 0.0;
-    public static double k2Tolerance = 1.5;
+    public static double k2Tolerance = 1.7;
 
     public static double kWristDownLimit = -30;
     public static double throwAlgaePos = 50;
@@ -149,7 +152,7 @@ public class WristConstants {
 
     public enum Setpoints {
         BOTTOM(0),
-        INTAKE(-88),
+        INTAKE(-87),
         HPINTAKE(0),
         L1(-30),
         L2(46 + 6),
@@ -157,6 +160,7 @@ public class WristConstants {
         L4(65),
     
         SCORE(11),
+        AUTON_L4_SCORE(2),
         L2SCORE(9),
         BARGE(71),
         L2ALGAE(-28),

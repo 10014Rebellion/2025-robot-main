@@ -70,7 +70,7 @@ public class TeleopCommands {
 					mIntake.setRollerCmd(IntakePivotConstants.kIntakeSpeed) // Turns on intake rollers
 				),
 				// AFTER CORAL IS DETECTED TO BE IN THE CRADLE \\
-				new WaitCommand(0.1),
+				new WaitCommand(0.35),
 				new ParallelCommandGroup(
 					mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE), // Elevator lowers for wrist to pickup coral 
 					mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()), // Wrist holds position to intake coral
