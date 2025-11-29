@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.claw.ClawSubsystem;
 import frc.robot.subsystems.claw.claw.ClawConstants;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.controls.StateTracker.AlgaeScoringLevel;
 import frc.robot.subsystems.controls.StateTracker.CoralLevel;
 import frc.robot.subsystems.controls.StateTracker.GamePiece;
@@ -32,7 +31,6 @@ public class TeleopCommands {
 	private final ElevatorSubsystem mElevator;
 	private final IntakeSubsystem mIntake;
 	private final ClawSubsystem mClaw;
-	private final ClimbSubsystem mClimb;
 	private final StateTracker mStateTracker;
 
 	public TeleopCommands(
@@ -41,14 +39,12 @@ public class TeleopCommands {
 		ElevatorSubsystem pElevator,
 		IntakeSubsystem pIntake,
 		ClawSubsystem pClaw,
-		ClimbSubsystem pClimb,
 		StateTracker pStateTracker) {
 		this.mDrive = pDrive;
 		this.mWrist = pWrist;
 		this.mElevator = pElevator;
 		this.mIntake = pIntake;
 		this.mClaw = pClaw;
-		this.mClimb = pClimb;
 		this.mStateTracker = pStateTracker;
 	}
 
@@ -61,22 +57,34 @@ public class TeleopCommands {
 				new ParallelDeadlineGroup( // End condition: when coral is in the cradle
 					new ParallelCommandGroup(
 						mIntake.setIndexCoralCmd(), // Turns on Indexer and ends when coral is in the cradle
-						new SequentialCommandGroup(
-							mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE), // Gets elevator into position
-							mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()) // Brings wrist down
+						new ConditionalCommand(
+							new InstantCommand(() -> {}), 
+							new SequentialCommandGroup(
+								mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE), // Gets elevator into position
+								mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasCoral()) // Brings wrist down
+							),
+							() -> mClaw.hasAlgae()
 						)
 					), 
 					mIntake.setPIDIntakePivotCmd(IntakeConstants.IntakePivot.Setpoints.INTAKING), // Deploys intake
 					mIntake.setRollerCmd(IntakeConstants.IntakeRoller.kIntakeSpeed) // Turns on intake rollers
 				),
 				// AFTER CORAL IS DETECTED TO BE IN THE CRADLE \\
-				new WaitCommand(0.35),
-				new ParallelCommandGroup(
-					mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE), // Elevator lowers for wrist to pickup coral 
-					mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()), // Wrist holds position to intake coral
-					mClaw.intakeCoralCmd() // Claw intakes coral
-				),
-				mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE) // Elevator hightens after picking up coral
+				new ConditionalCommand(
+					new InstantCommand(() -> {}), 
+					new SequentialCommandGroup(
+						new WaitCommand(0.2),
+						new ParallelCommandGroup(
+							mElevator.setPIDCmd(ElevatorConstants.Setpoints.POSTINTAKE), // Elevator lowers for wrist to pickup coral 
+							mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasCoral()), // Wrist holds position to intake coral
+							mClaw.intakeCoralCmd() // Claw intakes coral
+						),
+						new WaitCommand(0.1),
+						mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE) // Elevator hightens after picking up coral
+					), 
+					() -> mClaw.hasAlgae()
+				)
+				
 			);
 		}
 
@@ -125,7 +133,7 @@ public class TeleopCommands {
 				mStateTracker.setCurrentGamePieceCmd(GamePiece.Algae),
 				new ParallelCommandGroup(
 					mWrist
-						.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE, () -> mClaw.hasPiece())
+						.setPIDCmd(WristConstants.Setpoints.GROUNDALGAE, () -> mClaw.hasAlgae())
 						.andThen(mWrist.enableFFCmd()),
 				new ParallelCommandGroup(
 					mClaw.groundAlgae(),
@@ -133,7 +141,6 @@ public class TeleopCommands {
 						ElevatorConstants.Setpoints.GROUNDALGAE))
 				)
 			);
-			
 		}
 
 		/** HOLD ALGAE: Holds the algae with the arm */
@@ -141,7 +148,7 @@ public class TeleopCommands {
 			return new ParallelCommandGroup(
 			    new InstantCommand(() -> mStateTracker.setCurrentGamePiece(GamePiece.Algae)),
 			    mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
-			    mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.hasPiece())
+			    mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.hasAlgae())
 			        .andThen(mWrist.enableFFCmd()),
 			    mClaw.setClawCmd(ClawConstants.RollerSpeed.HOLD_ALGAE.get())
 			);
@@ -185,14 +192,14 @@ public class TeleopCommands {
 				new DynamicCommand(() -> {
 					if (pCoralLevel == CoralLevel.B1) {
 						return new SequentialCommandGroup(
-							mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.hasPiece()),
+							mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.hasCoral()),
 							mElevator.coralLevelToPIDCmd(pCoralLevel)
 							
 						);
 					}
 					return new ParallelCommandGroup(
 						mElevator.coralLevelToPIDCmd(pCoralLevel),
-						mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.hasPiece())
+						mWrist.coralLevelToPIDCmd(pCoralLevel, () -> mClaw.hasCoral())
 					);
 				})
 			);
@@ -215,14 +222,14 @@ public class TeleopCommands {
 		// Branch 1 / Level 2
 		} else if (pCoralLevel == CoralLevel.B1) {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.L2SCORE, () -> mClaw.hasCoral()).andThen(mWrist.enableFFCmd()),
 				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0))
 			);
 		
 		// Branch 2 or 3 / Level 3 or 4
 		} else {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.SCORE, () -> mClaw.hasPiece()).andThen(mWrist.enableFFCmd()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.SCORE, () -> mClaw.hasCoral()).andThen(mWrist.enableFFCmd()),
 				new WaitCommand(0.1).andThen(mClaw.setClawCmd(-1.0)));
 		}
   	}
@@ -243,18 +250,18 @@ public class TeleopCommands {
 					mElevator.setPIDCmd(ElevatorConstants.Setpoints.BARGE),
 					new SequentialCommandGroup(
 						new WaitCommand(0.25),
-						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE, () -> mClaw.hasPiece())),
+						mWrist.setPIDCmd(WristConstants.Setpoints.THROW_ALGAE, () -> mClaw.hasAlgae())),
 					mClaw.throwAlgae(mWrist, mElevator)),
 				new WaitCommand(0.5),
 				mClaw.setClawCmd(0),
-				mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasPiece()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.INTAKE, () -> mClaw.hasCoral()),
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.PREINTAKE));
 		}
 
 		// Processor
 		else {
 			return new ParallelCommandGroup(
-				mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.hasPiece()),
+				mWrist.setPIDCmd(WristConstants.Setpoints.HOLD_ALGAE, () -> mClaw.hasAlgae()),
 				mElevator.setPIDCmd(ElevatorConstants.Setpoints.HOLD_ALGAE),
 				mClaw.setClawCmd(ClawConstants.RollerSpeed.EJECT_ALGAE.get()));
 		} 

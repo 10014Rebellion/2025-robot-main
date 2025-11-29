@@ -159,7 +159,7 @@ public class WristConstants {
         L3(46 + 6),
         L4(65),
     
-        SCORE(11),
+        SCORE(9),
         AUTON_L4_SCORE(2),
         L2SCORE(9),
         BARGE(71),
