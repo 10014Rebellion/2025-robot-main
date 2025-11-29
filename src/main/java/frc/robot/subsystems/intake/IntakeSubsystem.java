@@ -48,8 +48,9 @@ public class IntakeSubsystem extends SubsystemBase {
     mBackTriggered = false;
     this.mDisableIR = false;
     this.mIntakePivotMotor = new SparkMax(IntakePivot.kPivotID, IntakePivot.kMotorType);
+    this.mIntakePivotMotor.configure(IntakeConstants.IntakePivot.kPivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     this.mEncoder = mIntakePivotMotor.getAbsoluteEncoder();
-    // this.mEncoder.
+
 
     this.mIntakePivotProfiledPID = new ProfiledPIDController(
         IntakePivot.kP,

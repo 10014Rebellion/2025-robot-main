@@ -2,6 +2,8 @@ package frc.robot.subsystems.claw;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,6 +29,7 @@ public class ClawSubsystem extends SubsystemBase{
 
     private final ClawIOInputsAutoLogged kClawInputs = new ClawIOInputsAutoLogged();
     private final SensorIOInputsAutoLogged kSensorInputs = new SensorIOInputsAutoLogged();
+    private final Debouncer kHasPieceDebouncer = new Debouncer(0.01, DebounceType.kRising);
 
     public ClawSubsystem(ClawIO clawIO, SensorIO sensorIO){
         kClawHardware = clawIO;
@@ -77,10 +80,11 @@ public class ClawSubsystem extends SubsystemBase{
     }
 
     public boolean hasPiece(){
-        return CANRangeHasPiece();
+        return kHasPieceDebouncer.calculate(CANRangeHasPiece());
+        // || beambreakHasPiece();
     }
 
-    public boolean beambreakHasPiece() {
+    private boolean beambreakHasPiece() {
         return kSensorHardware.getBeamBreakValue();
     }
 
@@ -99,9 +103,9 @@ public class ClawSubsystem extends SubsystemBase{
         return null;
     }
 
-    public boolean CANRangeHasPiece() {
-        return (kSensorInputs.distanceFromClaw < 0.08) && 
-        (kSensorInputs.signalStrength > 3000) &&
+    private boolean CANRangeHasPiece() {
+        return (kSensorInputs.distanceFromClaw < 0.06) && 
+        (kSensorInputs.signalStrength > 8000) &&
         (kSensorInputs.ambience < 20);
     }
 
