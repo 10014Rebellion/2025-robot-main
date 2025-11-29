@@ -15,8 +15,6 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
-
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
@@ -136,7 +134,7 @@ public class Drive extends SubsystemBase {
     private Pose2d goalPose = new Pose2d();
 
     /* TUNABLE NUMBERS FOR DRIVEBASE CONSTANTS AND TESTS */
-    private final static LoggedTunableNumber mSpeedLevel = new LoggedTunableNumber("Drive/DriveSpeed", 0);
+    // private final static LoggedTunableNumber mSpeedLevel = new LoggedTunableNumber("Drive/DriveSpeed", 0);
     private final static LoggedTunableNumber driftRate = new LoggedTunableNumber("Drive/DriftRate", DriveConstants.kDriftRate);
     private final static LoggedTunableNumber rotationDriftTestSpeedDeg = new LoggedTunableNumber("Drive/DriftRotationTestDeg", 360);
     private final static LoggedTunableNumber linearTestSpeedMPS = new LoggedTunableNumber("Drive/LinearTestMPS", 4.5);

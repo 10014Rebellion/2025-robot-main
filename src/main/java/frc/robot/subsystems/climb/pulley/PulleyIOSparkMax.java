@@ -9,8 +9,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.EncoderConfiguration;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.PulleyConfiguration;
 import frc.robot.subsystems.climb.pulley.PulleyConstants.Pulley.PulleyHardware;

@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 public class PulleyConstants {
     public class Pulley {
         public static int kMotorID = 61;
