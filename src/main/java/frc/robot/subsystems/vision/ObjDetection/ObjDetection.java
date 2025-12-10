@@ -15,10 +15,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.ObjDetection.ObjDetectionIO.ObjDetectionIOInputs;
 import frc.robot.util.debugging.LoggedTunableNumber;;
 
-public class ObjDetection {
+public class ObjDetection extends SubsystemBase{
     private ObjDetectionIO[] cameras;
     private ObjDetectionIOInputsAutoLogged[] camerasData;
 
@@ -32,9 +33,10 @@ public class ObjDetection {
         }
     }
 
-    public void periodic(Pose2d lastRobotPose, Pose2d simOdomPose) {
+    @Override
+    public void periodic() {
         for(int i = 0; i < cameras.length; i++) {
-            cameras[i].updateInputs(camerasData[i], lastRobotPose, simOdomPose);
+            cameras[i].updateInputs(camerasData[i], new Pose2d(), new Pose2d());
             Logger.processInputs("Vision/ObjDetection/"+camerasData[i].camName, camerasData[i]);
         }
     }

@@ -11,7 +11,7 @@ public class ObjDetectionVisionConstants {
 
     // CURRENTLY THE LEFT CAMERA WE SHALL REPLACE //
     public static final String kTopCamName = "BackTop-OV9782";
-    public static final Orientation kTopCamOrientnation = Orientation.BACK;
+    public static final Orientation kTopCamOrientnation = Orientation.FRONT;
     public static final Transform3d kTopCamTransform = new Transform3d(
         new Translation3d(
             Units.inchesToMeters(10.284), // X: inches forward

@@ -54,11 +54,18 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
                 inputs.isConnected = photonCamera.isConnected();
                 inputs.hasTarget = result.hasTargets();
 
+
+                //TODO: Make it print out all the targets wtih the game piece type along with poses //
+                //TODO: Get the camera to 3d mode so we can get the Transform3D's working //
+                //TODO: Feed this into the drive subsystem //
                 if(result.hasTargets()){
                     PhotonTrackedTarget target = result.getBestTarget();
                     inputs.bestTargetArea = target.area;
                     inputs.bestTargetPitch = target.pitch;
                     inputs.bestTargetYaw = target.yaw;
+
+                    // The object detection model maps the objDetectId as 0 for algae and 1 for coral //
+                    inputs.bestTargetClass = (target.objDetectId == 0) ? "Algae" : "Coral";
                     inputs.bestPoseAmbiguity = target.poseAmbiguity;
 
                     inputs.latencySeconds = result.getTimestampSeconds() / 1000.0;
@@ -82,6 +89,7 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
             inputs.bestTargetPitch = 0;
             inputs.bestTargetArea = 0;
             inputs.bestPoseAmbiguity = 0;
+            inputs.bestTargetClass = "";
             inputs.latencySeconds = 0;
     
             inputs.hasTarget = false;

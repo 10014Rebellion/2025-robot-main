@@ -18,6 +18,7 @@ public interface ObjDetectionIO {
         public double bestTargetPitch = 0.0;
         public double bestTargetArea = 0.0;
         public double bestPoseAmbiguity = 0.0;
+        public String bestTargetClass = "";
         public double latencySeconds = 0.0;
 
         public boolean hasTarget = false;
