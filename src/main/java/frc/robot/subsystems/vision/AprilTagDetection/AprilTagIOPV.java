@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTagDetection;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -8,8 +8,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.Orientation;
 
-import static frc.robot.subsystems.vision.VisionConstants.kOV2311DiagonalCameraFOV;
+import static  frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kOV2311DiagonalCameraFOV;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,18 +26,21 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class CameraIOPV implements CameraIO {
+public class AprilTagIOPV implements AprilTagIO {
     private String camName;
     private PhotonCamera photonCam;
     private PhotonPoseEstimator poseEstimator;
     private Transform3d cameraTransform;
+    private Orientation orientation;
+
 
     private PhotonCameraSim limelightSim;
     private VisionSystemSim visionSim;
 
-    public CameraIOPV(String name, Transform3d cameraTransform) {
+    public AprilTagIOPV(String name, Transform3d cameraTransform, Orientation orientation) {
         camName = name;
         photonCam = new PhotonCamera(camName);
+        this.orientation = orientation;
         this.cameraTransform = cameraTransform;
         // Don't worry about it
         PhotonCamera.setVersionCheckEnabled(false);
@@ -67,7 +71,7 @@ public class CameraIOPV implements CameraIO {
     }
 
     @Override
-    public void updateInputs(CameraIOInputs inputs, Pose2d lastRobotPose, Pose2d simOdomPose) {
+    public void updateInputs(AprilTagIOInputs inputs, Pose2d lastRobotPose, Pose2d simOdomPose) {
         inputs.camName = camName;
         inputs.cameraToRobot= cameraTransform;
         // To stop the dangerous case where the camera disconnects, and causes the code to crash
@@ -104,16 +108,16 @@ public class CameraIOPV implements CameraIO {
 
                     latestEstimatedRobotPose.ifPresent(est -> {
 
-                        // if(orientation.equals(Orientation.FRONT)){
-                        //     inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose;
-                        // }
+                        if(orientation.equals(Orientation.FRONT)){
+                            inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose;
+                        }
 
-                        // else{
+                        else{
                             inputs.latestEstimatedRobotPose = latestEstimatedRobotPose.get().estimatedPose
                             // Rotate by 180 to account for camera being on back, needs to be come parameter in constructor later
                                 .transformBy(new Transform3d(
                                     new Translation3d(), new Rotation3d(0.0, 0.0, 0.0)));
-                        // }
+                        }
 
                         ArrayList<Transform3d> tagTs = new ArrayList<>();
                         double[] ambiguities = new double[latestEstimatedRobotPose.get().targetsUsed.size()];

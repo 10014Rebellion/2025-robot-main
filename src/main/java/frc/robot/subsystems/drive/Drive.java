@@ -46,8 +46,8 @@ import frc.robot.subsystems.drive.controllers.ManualTeleopController.DriverProfi
 import frc.robot.subsystems.drive.controllers.ManualTeleopController;
 import frc.robot.subsystems.drive.controllers.HolonomicController;
 
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.Vision.VisionObservation;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTag;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTag.VisionObservation;
 import frc.robot.util.debugging.LoggedTunableNumber;
 import frc.robot.util.debugging.SysIDCharacterization;
 import frc.robot.util.math.AllianceFlipUtil;
@@ -94,7 +94,7 @@ public class Drive extends SubsystemBase {
     private Module[] modules;
     private GyroIO gyro;
     private GyroInputsAutoLogged gyroInputs = new GyroInputsAutoLogged();
-    private Vision vision;
+    private AprilTag vision;
 
     /* LOCALIZATION(tracks position and orientation of robot) */
     private Rotation2d robotRotation;
@@ -142,7 +142,7 @@ public class Drive extends SubsystemBase {
     Debouncer autoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
     Debouncer autoAlignDelay = new Debouncer(0.1, DebounceType.kRising);
 
-    public Drive(Module[] modules, GyroIO gyro, Vision vision) {
+    public Drive(Module[] modules, GyroIO gyro, AprilTag vision) {
         this.modules = modules;
         this.gyro = gyro;
         this.vision = vision;

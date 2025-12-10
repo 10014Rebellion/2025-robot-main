@@ -25,19 +25,15 @@ import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorIOSparkMax;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.BeamBreak.BeamBreakConstants;
-import frc.robot.subsystems.intake.BeamBreak.BeamBreakIODigitalInput;
-import frc.robot.subsystems.intake.Indexer.IndexerConstants;
-import frc.robot.subsystems.intake.Indexer.IndexerIOSparkMax;
-import frc.robot.subsystems.intake.IntakePivot.IntakePivotConstants;
-import frc.robot.subsystems.intake.IntakePivot.IntakePivotIOSparkMax;
-import frc.robot.subsystems.intake.IntakeRoller.IntakeRollerConstants;
-import frc.robot.subsystems.intake.IntakeRoller.IntakeRollerIOTalonFX;
 import frc.robot.subsystems.telemetry.TelemetrySubsystem;
-import frc.robot.subsystems.vision.CameraIO;
-import frc.robot.subsystems.vision.CameraIOPV;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTag;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTagIO;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTagIOPV;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants;
+import frc.robot.subsystems.vision.ObjDetection.ObjDetection;
+import frc.robot.subsystems.vision.ObjDetection.ObjDetectionIO;
+import frc.robot.subsystems.vision.ObjDetection.ObjDetectionIOPV;
+import frc.robot.subsystems.vision.ObjDetection.ObjDetectionVisionConstants;
 import frc.robot.subsystems.wrist.WristConstants;
 import frc.robot.subsystems.wrist.WristSubsystem;
 import frc.robot.subsystems.wrist.WristIOSparkMax;
@@ -62,6 +58,7 @@ public class RobotContainer {
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
   private final StateTracker mStateStracker;
+  private final ObjDetection mObjDetection;
 
   private final LoggedDashboardChooser<Command> driverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
 
@@ -88,13 +85,7 @@ public class RobotContainer {
         ElevatorConstants.elevatorHardware, 
         ElevatorConstants.motorConfiguration));
 
-    mIntake = new IntakeSubsystem(
-      new IndexerIOSparkMax(IndexerConstants.indexerHardware, IndexerConstants.motorConfiguration),
-      new IntakePivotIOSparkMax(IntakePivotConstants.intakePivotHardware, IntakePivotConstants.motorConfiguration, IntakePivotConstants.encoderHardware),
-      new IntakeRollerIOTalonFX(IntakeRollerConstants.intakeRollersHardware, IntakeRollerConstants.motorConfiguration),
-      new BeamBreakIODigitalInput(BeamBreakConstants.frontHardware),
-      new BeamBreakIODigitalInput(BeamBreakConstants.backHardware)
-    );
+    mIntake = new IntakeSubsystem();
     
     mClimb = new ClimbSubsystem(
       new GrabberIOSparkMax(
@@ -104,6 +95,15 @@ public class RobotContainer {
         (PulleyConstants.Pulley.pulleyHardware), 
         (PulleyConstants.Pulley.motorConfiguration), 
         (PulleyConstants.Pulley.encoderConfiguration)));
+
+
+    mObjDetection = new ObjDetection(
+      new ObjDetectionIO[]{
+        new ObjDetectionIOPV(
+          ObjDetectionVisionConstants.kTopCamName, 
+          ObjDetectionVisionConstants.kTopCamTransform, 
+          ObjDetectionVisionConstants.kTopCamOrientnation)});
+
     mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
@@ -116,10 +116,12 @@ public class RobotContainer {
                     new Module("BR", new ModuleIOFXFXS(kBackRightHardware ))
               }, 
               new GyroIOPigeon2(), 
-              new Vision(new CameraIO[] {
-                    new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
-                    new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
-                }));
+              new AprilTag(
+                new AprilTagIO[]{ 
+                  new AprilTagIOPV(
+                    AprilTagVisionConstants.kRightCamName, 
+                    AprilTagVisionConstants.kRightCamTransform, 
+                    AprilTagVisionConstants.kRightCamOrientation)}));
         break;
 
       case SIM:
@@ -128,10 +130,14 @@ public class RobotContainer {
           new Module("FR", new ModuleIOSim()),
           new Module("BL", new ModuleIOSim()),
           new Module("BR", new ModuleIOSim())
-        }, new GyroIO() {}, new Vision(new CameraIO[] {
-          new CameraIOPV(VisionConstants.kRightCamName, VisionConstants.kRightCamTransform), 
-          new CameraIOPV(VisionConstants.kLeftCamName, VisionConstants.kLeftCamTransform)
-        }));
+        }, 
+        new GyroIO() {}, 
+        new AprilTag(
+          new AprilTagIO[]{ 
+            new AprilTagIOPV(
+              AprilTagVisionConstants.kRightCamName, 
+              AprilTagVisionConstants.kRightCamTransform, 
+              AprilTagVisionConstants.kRightCamOrientation)}));
         break;
 
       default:
@@ -140,8 +146,10 @@ public class RobotContainer {
           new Module("FR", new ModuleIO() {}),
           new Module("BL", new ModuleIO() {}),
           new Module("BR", new ModuleIO() {})
-        }, new GyroIO() {}, new Vision(new CameraIO[] {
-          new CameraIO() {}, new CameraIO() {}
+        }, 
+        new GyroIO() {}, 
+        new AprilTag(new AprilTagIO[] {
+          new AprilTagIO() {}, new AprilTagIO() {}
         }));
         break;
     }

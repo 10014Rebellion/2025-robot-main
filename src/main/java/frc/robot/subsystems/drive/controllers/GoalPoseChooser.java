@@ -18,7 +18,7 @@ import frc.robot.FieldConstants;
 import frc.robot.subsystems.controls.StateTracker;
 import frc.robot.subsystems.controls.StateTracker.ReefFace;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.AprilTagDetection.AprilTag;
 import frc.robot.util.math.AllianceFlipUtil;
 
 /* Chooses pose based of strategy and psoe */ 
@@ -179,7 +179,7 @@ public class GoalPoseChooser {
 
     public static Pose2d getTargetPose(int pTagID, double pXOffsetM, double pYOffsetM) {
         Pose2d tagPose =
-            Vision.k2025Field.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
+            AprilTag.k2025Field.getTagPose(pTagID).map(Pose3d::toPose2d).orElse(null);
 
         Translation2d tagTranslation =
             tagPose.getTranslation()

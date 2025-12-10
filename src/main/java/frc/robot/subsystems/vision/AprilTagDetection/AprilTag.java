@@ -1,9 +1,9 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTagDetection;
 
-import static frc.robot.subsystems.vision.VisionConstants.KUseSingleTagTransform;
-import static frc.robot.subsystems.vision.VisionConstants.kAmbiguityThreshold;
-import static frc.robot.subsystems.vision.VisionConstants.kMultiStdDevs;
-import static frc.robot.subsystems.vision.VisionConstants.kSingleStdDevs;
+import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.KUseSingleTagTransform;
+import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kAmbiguityThreshold;
+import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kMultiStdDevs;
+import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kSingleStdDevs;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -17,9 +17,9 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import frc.robot.util.debugging.LoggedTunableNumber;;
 
-public class Vision {
-    private CameraIO[] cameras;
-    private CameraIOInputsAutoLogged[] camerasData;
+public class AprilTag {
+    private AprilTagIO[] cameras;
+    private AprilTagIOInputsAutoLogged[] camerasData;
 
     private static final LoggedTunableNumber kSingleXYStdev = new LoggedTunableNumber(
         "Vision/kSingleXYStdev", kSingleStdDevs.get(0));
@@ -28,19 +28,19 @@ public class Vision {
 
     public static final AprilTagFieldLayout k2025Field = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
-    public Vision(CameraIO[] cameras) {
+    public AprilTag(AprilTagIO[] cameras) {
         Logger.recordOutput("Vision/UseSingleTagTransform", KUseSingleTagTransform);
         this.cameras = cameras;
-        camerasData = new CameraIOInputsAutoLogged[cameras.length];
+        camerasData = new AprilTagIOInputsAutoLogged[cameras.length];
         for(int i = 0; i < cameras.length; i++) {
-            camerasData[i] = new CameraIOInputsAutoLogged();
+            camerasData[i] = new AprilTagIOInputsAutoLogged();
         }
     }
 
     public void periodic(Pose2d lastRobotPose, Pose2d simOdomPose) {
         for(int i = 0; i < cameras.length; i++) {
             cameras[i].updateInputs(camerasData[i], lastRobotPose, simOdomPose);
-            Logger.processInputs("Vision/"+camerasData[i].camName, camerasData[i]);
+            Logger.processInputs("Vision/AprilTag/"+camerasData[i].camName, camerasData[i]);
             // Logger.recordOutput("Vision/"+camerasData[i].camName+"/Pose", camerasData[i].latestEstimatedRobotPose.toPose2d());
             // Logger.recordOutput("Vision/"+camerasData[i].camName+"/X", camerasData[i].latestEstimatedRobotPose.getRotation().getX());
             // Logger.recordOutput("Vision/"+camerasData[i].camName+"/Y", camerasData[i].latestEstimatedRobotPose.getRotation().getY());
@@ -55,7 +55,7 @@ public class Vision {
         VisionObservation[] observations = new VisionObservation[cameras.length];
         int i = 0;
         // STANDARD DEVIATION CALCULATIONS \\
-        for(CameraIOInputsAutoLogged camData : camerasData) {
+        for(AprilTagIOInputsAutoLogged camData : camerasData) {
             // No point in adding vision data if it doesn't exist
             if(camData.hasTarget && camData.hasBeenUpdated) {
                 // Average distance from tag, and the number of tags to determine estimate stability

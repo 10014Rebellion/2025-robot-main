@@ -1,13 +1,13 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTagDetection;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface CameraIO {
+public interface AprilTagIO {
     @AutoLog
-    public static class CameraIOInputs {
+    public static class AprilTagIOInputs {
         public String camName = "";
         public boolean isConnected = false;
         public double yaw = 0.0;
@@ -30,5 +30,5 @@ public interface CameraIO {
         public double[] latestTagAmbiguities = new double[] {};
     }
 
-    public default void updateInputs(CameraIOInputs inputs, Pose2d lastRobotPose, Pose2d simOdomPose) {}
+    public default void updateInputs(AprilTagIOInputs inputs, Pose2d lastRobotPose, Pose2d simOdomPose) {}
 }
