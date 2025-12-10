@@ -1,23 +1,13 @@
 package frc.robot.subsystems.vision.ObjDetection;
 
-import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.KUseSingleTagTransform;
-import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kAmbiguityThreshold;
-import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kMultiStdDevs;
-import static frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.kSingleStdDevs;
-
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.ObjDetection.ObjDetectionIO.ObjDetectionIOInputs;
-import frc.robot.util.debugging.LoggedTunableNumber;;
 
 public class ObjDetection extends SubsystemBase{
     private ObjDetectionIO[] cameras;
@@ -33,10 +23,9 @@ public class ObjDetection extends SubsystemBase{
         }
     }
 
-    @Override
-    public void periodic() {
+    public void periodic(Pose2d latestPose) {
         for(int i = 0; i < cameras.length; i++) {
-            cameras[i].updateInputs(camerasData[i], new Pose2d(), new Pose2d());
+            cameras[i].updateInputs(camerasData[i], latestPose);
             Logger.processInputs("Vision/ObjDetection/"+camerasData[i].camName, camerasData[i]);
         }
     }

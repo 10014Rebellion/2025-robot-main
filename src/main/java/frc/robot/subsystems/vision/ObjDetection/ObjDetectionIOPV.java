@@ -7,6 +7,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -32,8 +33,14 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
         return new PhotonPipelineResult();
     }
 
+    public String mapClass(int label){
+        return (label == 0) ? "Algae" : "Coral";
+    }
+
     @Override
-    public void updateInputs(ObjDetectionIOInputs inputs, Pose2d lastRobotPose, Pose2d simOdomPose){
+    public void updateInputs(ObjDetectionIOInputs inputs, Pose2d latestPose){
+        Pose3d latestRobotPose;
+
         inputs.camName = camName;
         inputs.cameraToRobot = cameraTransform;
 
@@ -54,10 +61,9 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
                 inputs.isConnected = photonCamera.isConnected();
                 inputs.hasTarget = result.hasTargets();
 
-
-                //TODO: Make it print out all the targets wtih the game piece type along with poses //
                 //TODO: Get the camera to 3d mode so we can get the Transform3D's working //
                 //TODO: Feed this into the drive subsystem //
+                //TODO: Flip by trasnform since camera will be in the back???? //
                 if(result.hasTargets()){
                     PhotonTrackedTarget target = result.getBestTarget();
                     inputs.bestTargetArea = target.area;
@@ -65,7 +71,7 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
                     inputs.bestTargetYaw = target.yaw;
 
                     // The object detection model maps the objDetectId as 0 for algae and 1 for coral //
-                    inputs.bestTargetClass = (target.objDetectId == 0) ? "Algae" : "Coral";
+                    inputs.bestTargetClass = mapClass(target.objDetectId);
                     inputs.bestPoseAmbiguity = target.poseAmbiguity;
 
                     inputs.latencySeconds = result.getTimestampSeconds() / 1000.0;
@@ -73,6 +79,24 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
 
                     inputs.cameraToObj = target.getBestCameraToTarget();
                     inputs.robotToObj = target.getBestCameraToTarget().plus(cameraTransform);
+
+                    Transform3d[] targetTransforms = new Transform3d[result.targets.size()];
+                    Pose3d[] targetFieldRelativeTransforms = new Pose3d[result.targets.size()];
+                    String[] targetTypes = new String[result.targets.size()];
+
+                    latestRobotPose = new Pose3d(latestPose);
+
+                    if(result.hasTargets()){
+                        for(int i = 0; i < result.targets.size(); i++){
+                            targetTransforms[i] = result.targets.get(i).getBestCameraToTarget().plus(cameraTransform);
+                            targetFieldRelativeTransforms[i] = latestRobotPose.transformBy(targetTransforms[i]);
+                            targetTypes[i] = mapClass(result.targets.get(i).objDetectId);
+                        }
+                    }
+
+
+                    inputs.trackedTargetsPose = targetFieldRelativeTransforms;
+                    inputs.trackedTargetsClass = targetTypes;
 
                     inputs.result = result;
                     

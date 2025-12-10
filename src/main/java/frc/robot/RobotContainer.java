@@ -58,7 +58,6 @@ public class RobotContainer {
   private final AutonSubsystem mAutons;
   private final ClimbSubsystem mClimb;
   private final StateTracker mStateStracker;
-  private final ObjDetection mObjDetection;
 
   private final LoggedDashboardChooser<Command> driverProfileChooser = new LoggedDashboardChooser<>("DriverProfile");
 
@@ -96,14 +95,6 @@ public class RobotContainer {
         (PulleyConstants.Pulley.motorConfiguration), 
         (PulleyConstants.Pulley.encoderConfiguration)));
 
-
-    mObjDetection = new ObjDetection(
-      new ObjDetectionIO[]{
-        new ObjDetectionIOPV(
-          ObjDetectionVisionConstants.kTopCamName, 
-          ObjDetectionVisionConstants.kTopCamTransform, 
-          ObjDetectionVisionConstants.kTopCamOrientnation)});
-
     mLEDs = new LEDSubsystem();
 
     switch (Constants.currentMode) {
@@ -121,7 +112,13 @@ public class RobotContainer {
                   new AprilTagIOPV(
                     AprilTagVisionConstants.kRightCamName, 
                     AprilTagVisionConstants.kRightCamTransform, 
-                    AprilTagVisionConstants.kRightCamOrientation)}));
+                    AprilTagVisionConstants.kRightCamOrientation)}),
+                  new ObjDetection(
+                      new ObjDetectionIO[]{
+                        new ObjDetectionIOPV(
+                          ObjDetectionVisionConstants.kTopCamName, 
+                          ObjDetectionVisionConstants.kTopCamTransform, 
+                          ObjDetectionVisionConstants.kTopCamOrientnation)}));
         break;
 
       case SIM:
@@ -137,7 +134,13 @@ public class RobotContainer {
             new AprilTagIOPV(
               AprilTagVisionConstants.kRightCamName, 
               AprilTagVisionConstants.kRightCamTransform, 
-              AprilTagVisionConstants.kRightCamOrientation)}));
+              AprilTagVisionConstants.kRightCamOrientation)}),
+            new ObjDetection(
+                new ObjDetectionIO[]{
+                  new ObjDetectionIOPV(
+                    ObjDetectionVisionConstants.kTopCamName, 
+                    ObjDetectionVisionConstants.kTopCamTransform, 
+                    ObjDetectionVisionConstants.kTopCamOrientnation)}));
         break;
 
       default:
@@ -150,7 +153,8 @@ public class RobotContainer {
         new GyroIO() {}, 
         new AprilTag(new AprilTagIO[] {
           new AprilTagIO() {}, new AprilTagIO() {}
-        }));
+        }),
+        new ObjDetection(new ObjDetectionIO[] {new ObjDetectionIO() {}}));
         break;
     }
 

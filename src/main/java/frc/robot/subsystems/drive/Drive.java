@@ -48,6 +48,7 @@ import frc.robot.subsystems.drive.controllers.HolonomicController;
 
 import frc.robot.subsystems.vision.AprilTagDetection.AprilTag;
 import frc.robot.subsystems.vision.AprilTagDetection.AprilTag.VisionObservation;
+import frc.robot.subsystems.vision.ObjDetection.ObjDetection;
 import frc.robot.util.debugging.LoggedTunableNumber;
 import frc.robot.util.debugging.SysIDCharacterization;
 import frc.robot.util.math.AllianceFlipUtil;
@@ -94,7 +95,8 @@ public class Drive extends SubsystemBase {
     private Module[] modules;
     private GyroIO gyro;
     private GyroInputsAutoLogged gyroInputs = new GyroInputsAutoLogged();
-    private AprilTag vision;
+    private AprilTag aprilTag;
+    private ObjDetection objDetection;
 
     /* LOCALIZATION(tracks position and orientation of robot) */
     private Rotation2d robotRotation;
@@ -142,10 +144,11 @@ public class Drive extends SubsystemBase {
     Debouncer autoAlignTimeout = new Debouncer(0.1, DebounceType.kRising);
     Debouncer autoAlignDelay = new Debouncer(0.1, DebounceType.kRising);
 
-    public Drive(Module[] modules, GyroIO gyro, AprilTag vision) {
+    public Drive(Module[] modules, GyroIO gyro, AprilTag aprilTag, ObjDetection objDetection) {
         this.modules = modules;
         this.gyro = gyro;
-        this.vision = vision;
+        this.aprilTag = aprilTag;
+        this.objDetection = objDetection;
 
         robotRotation = gyroInputs.yawPosition;
 
@@ -257,8 +260,8 @@ public class Drive extends SubsystemBase {
                 % 360.0);
 
         /* VISION */
-        vision.periodic(poseEstimator.getEstimatedPosition(), odometry.getPoseMeters());
-        VisionObservation[] observations = vision.getVisionObservations();
+        aprilTag.periodic(poseEstimator.getEstimatedPosition(), odometry.getPoseMeters());
+        VisionObservation[] observations = aprilTag.getVisionObservations();
         for(VisionObservation observation : observations) {
             if(observation.hasObserved()) poseEstimator.addVisionMeasurement(
                 observation.pose(), observation.timeStamp(), observation.stdDevs());
@@ -268,6 +271,8 @@ public class Drive extends SubsystemBase {
             Logger.recordOutput(observation.camName()+"/stdDevTheta", observation.stdDevs().get(2));
             // Logger.recordOutput(observation.camName()+"/TransformFromOdometry", odometry.getPoseMeters().minus(observation.pose()));
         }
+
+        objDetection.periodic(getPoseEstimate());
 
         poseEstimator.update(robotRotation, getModulePositions());
         odometry.update(robotRotation, getModulePositions());
