@@ -17,7 +17,6 @@ public interface ObjDetectionIO {
         public double bestTargetYaw = 0.0;
         public double bestTargetPitch = 0.0;
         public double bestTargetArea = 0.0;
-        public double bestPoseAmbiguity = 0.0;
         public String bestTargetClass = "";
         public double latencySeconds = 0.0;
 
@@ -26,12 +25,10 @@ public interface ObjDetectionIO {
 
         public boolean hasBeenUpdated = false;
 
-        public Transform3d cameraToRobot = new Transform3d();
-        public Transform3d cameraToObj = new Transform3d();
-        public Transform3d robotToObj = new Transform3d(); 
-
-        public Pose3d[] trackedTargetsPose = new Pose3d[] {};
         public String[] trackedTargetsClass = new String[] {};
+        public double[] trackedTargetsArea = new double[] {};
+        public double[] trackedTargetsPitch = new double[] {};
+        public double[] trackedTargetsYaw = new double[] {};     
         
         public PhotonPipelineResult result = new PhotonPipelineResult();
 

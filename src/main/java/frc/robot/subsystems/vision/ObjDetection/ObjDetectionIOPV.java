@@ -7,7 +7,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -39,10 +38,8 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
 
     @Override
     public void updateInputs(ObjDetectionIOInputs inputs, Pose2d latestPose){
-        Pose3d latestRobotPose;
 
         inputs.camName = camName;
-        inputs.cameraToRobot = cameraTransform;
 
         try {
 
@@ -61,9 +58,6 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
                 inputs.isConnected = photonCamera.isConnected();
                 inputs.hasTarget = result.hasTargets();
 
-                //TODO: Get the camera to 3d mode so we can get the Transform3D's working //
-                //TODO: Feed this into the drive subsystem //
-                //TODO: Flip by trasnform since camera will be in the back???? //
                 if(result.hasTargets()){
                     PhotonTrackedTarget target = result.getBestTarget();
                     inputs.bestTargetArea = target.area;
@@ -72,30 +66,28 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
 
                     // The object detection model maps the objDetectId as 0 for algae and 1 for coral //
                     inputs.bestTargetClass = mapClass(target.objDetectId);
-                    inputs.bestPoseAmbiguity = target.poseAmbiguity;
 
                     inputs.latencySeconds = result.getTimestampSeconds() / 1000.0;
                     inputs.numberOfTargets = result.targets.size();
 
-                    inputs.cameraToObj = target.getBestCameraToTarget();
-                    inputs.robotToObj = target.getBestCameraToTarget().plus(cameraTransform);
-
-                    Transform3d[] targetTransforms = new Transform3d[result.targets.size()];
-                    Pose3d[] targetFieldRelativeTransforms = new Pose3d[result.targets.size()];
                     String[] targetTypes = new String[result.targets.size()];
 
-                    latestRobotPose = new Pose3d(latestPose);
+
+                    double[] areas = new double[result.targets.size()];
+                    double[] pitches = new double[result.targets.size()];
+                    double[] yaws = new double[result.targets.size()];
+                    String[] classes = new String[result.targets.size()];
 
                     if(result.hasTargets()){
                         for(int i = 0; i < result.targets.size(); i++){
-                            targetTransforms[i] = result.targets.get(i).getBestCameraToTarget().plus(cameraTransform);
-                            targetFieldRelativeTransforms[i] = latestRobotPose.transformBy(targetTransforms[i]);
-                            targetTypes[i] = mapClass(result.targets.get(i).objDetectId);
+                            areas[i] = result.targets.get(i).area;
+                            pitches[i] = result.targets.get(i).pitch;
+                            yaws[i] = result.targets.get(i).yaw;
+                            classes[i] = mapClass(result.targets.get(i).objDetectId);
                         }
                     }
 
 
-                    inputs.trackedTargetsPose = targetFieldRelativeTransforms;
                     inputs.trackedTargetsClass = targetTypes;
 
                     inputs.result = result;
@@ -112,7 +104,6 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
             inputs.bestTargetYaw = 0;
             inputs.bestTargetPitch = 0;
             inputs.bestTargetArea = 0;
-            inputs.bestPoseAmbiguity = 0;
             inputs.bestTargetClass = "";
             inputs.latencySeconds = 0;
     
@@ -120,10 +111,6 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
             inputs.numberOfTargets = 0;
     
             inputs.hasBeenUpdated = false;
-    
-            inputs.cameraToRobot = new Transform3d();
-            inputs.cameraToObj = new Transform3d();
-            inputs.robotToObj = new Transform3d(); 
             
             inputs.result = new PhotonPipelineResult();
 

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision.ObjDetection;
 
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -8,6 +10,12 @@ import frc.robot.subsystems.vision.AprilTagDetection.AprilTagVisionConstants.Ori
 
 public class ObjDetectionVisionConstants {
     // From CAD and decided by you in configuration
+
+    public record ObjectOrientation(
+        double area,
+        double pitch,
+        double yaw,
+        boolean inverted){}
 
     // CURRENTLY THE LEFT CAMERA WE SHALL REPLACE //
     public static final String kTopCamName = "BackTop-OV9782";
