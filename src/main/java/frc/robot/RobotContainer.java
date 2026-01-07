@@ -113,12 +113,12 @@ public class RobotContainer {
                     AprilTagVisionConstants.kRightCamName, 
                     AprilTagVisionConstants.kRightCamTransform, 
                     AprilTagVisionConstants.kRightCamOrientation)}),
-                  new ObjDetection(
-                      new ObjDetectionIO[]{
-                        new ObjDetectionIOPV(
-                          ObjDetectionVisionConstants.kTopCamName, 
-                          ObjDetectionVisionConstants.kTopCamTransform, 
-                          ObjDetectionVisionConstants.kTopCamOrientnation)}));
+                new ObjDetection(
+                    new ObjDetectionIO[]{
+                      new ObjDetectionIOPV(
+                        ObjDetectionVisionConstants.kTopCamName, 
+                        ObjDetectionVisionConstants.kTopCamTransform, 
+                        ObjDetectionVisionConstants.kTopCamOrientnation)}));
         break;
 
       case SIM:

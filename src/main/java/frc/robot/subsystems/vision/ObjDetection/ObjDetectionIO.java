@@ -2,6 +2,8 @@ package frc.robot.subsystems.vision.ObjDetection;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.TargetCorner;
+import org.photonvision.targeting.proto.TargetCornerProto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -29,6 +31,9 @@ public interface ObjDetectionIO {
         public double[] trackedTargetsArea = new double[] {};
         public double[] trackedTargetsPitch = new double[] {};
         public double[] trackedTargetsYaw = new double[] {};     
+
+        public double[] trackedTargetsCornersX = new double[] {};
+        public double[] trackedTargetsCornersY = new double[] {};
         
         public PhotonPipelineResult result = new PhotonPipelineResult();
 

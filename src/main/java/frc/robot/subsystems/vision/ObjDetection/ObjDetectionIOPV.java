@@ -1,10 +1,13 @@
 package frc.robot.subsystems.vision.ObjDetection;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.proto.TargetCornerProto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -36,6 +39,12 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
         return (label == 0) ? "Algae" : "Coral";
     }
 
+    public String findOrientation(double[] xs, double[] ys){
+        
+
+        return "toilet";
+    }
+
     @Override
     public void updateInputs(ObjDetectionIOInputs inputs, Pose2d latestPose){
 
@@ -47,14 +56,18 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
             }
 
             List<PhotonPipelineResult> unreadResults = photonCamera.getAllUnreadResults();
-            inputs.hasBeenUpdated = !unreadResults.isEmpty();
+            System.out.println(unreadResults.size());
+            inputs.hasBeenUpdated = unreadResults.size() != 0;
+
 
             if(!unreadResults.isEmpty()){
 
                 // Grabbing the very last result (most recent) //
                 // Maybe just use -1 instead of unreadResults.size() -1 //
-                PhotonPipelineResult result = unreadResults.get(unreadResults.size()-1);
+                PhotonPipelineResult result = unreadResults.get(unreadResults.size() - 1);
 
+
+                inputs.result = result;
                 inputs.isConnected = photonCamera.isConnected();
                 inputs.hasTarget = result.hasTargets();
 
@@ -78,21 +91,44 @@ public class ObjDetectionIOPV implements ObjDetectionIO{
                     double[] yaws = new double[result.targets.size()];
                     String[] classes = new String[result.targets.size()];
 
-                    if(result.hasTargets()){
-                        for(int i = 0; i < result.targets.size(); i++){
-                            areas[i] = result.targets.get(i).area;
-                            pitches[i] = result.targets.get(i).pitch;
-                            yaws[i] = result.targets.get(i).yaw;
-                            classes[i] = mapClass(result.targets.get(i).objDetectId);
-                        }
+                    List<Double> x = new ArrayList<Double>();
+                    List<Double> y = new ArrayList<Double>();
+
+                    for(int i = 0; i < result.targets.size(); i++){
+                        areas[i] = result.targets.get(i).area;
+                        pitches[i] = result.targets.get(i).pitch;
+                        yaws[i] = result.targets.get(i).yaw;
+                        classes[i] = mapClass(result.targets.get(i).objDetectId);
+
+                        Logger.recordOutput(camName+"i"+"j"+"x", result.targets.get(i).getMinAreaRectCorners().get(0).x);
+                        Logger.recordOutput(camName+"i"+"j"+"y", result.targets.get(i).getMinAreaRectCorners().get(0).y);
+                        x.add(result.targets.get(i).getMinAreaRectCorners().get(0).x);
+                        y.add(result.targets.get(i).getMinAreaRectCorners().get(0).y);
+
+                        x.add(result.targets.get(i).getMinAreaRectCorners().get(1).x);
+                        y.add(result.targets.get(i).getMinAreaRectCorners().get(1).y);
+
+                        x.add(result.targets.get(i).getMinAreaRectCorners().get(2).x);
+                        y.add(result.targets.get(i).getMinAreaRectCorners().get(2).y);
+
+                        x.add(result.targets.get(i).getMinAreaRectCorners().get(3).x);
+                        y.add(result.targets.get(i).getMinAreaRectCorners().get(3).y);
                     }
 
-
-                    inputs.trackedTargetsClass = targetTypes;
-
-                    inputs.result = result;
+                    inputs.trackedTargetsArea = areas;
+                    inputs.trackedTargetsClass = classes;
+                    inputs.trackedTargetsPitch = pitches;
+                    inputs.trackedTargetsYaw = yaws;
                     
+                    double[] X = new double[x.size()];
+                    double[] Y = new double[y.size()];
+                    for(int i = 0; i < x.size(); i++) {
+                        X[i]  = x.get(i);
+                        Y[i]  = y.get(i);
+                    }
 
+                    inputs.trackedTargetsCornersX = X;
+                    inputs.trackedTargetsCornersY = Y;
                 }
             }
         }

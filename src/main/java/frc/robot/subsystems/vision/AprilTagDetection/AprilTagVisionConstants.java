@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class AprilTagVisionConstants {
     // From CAD and decided by you in configuration
-    public static final String kLeftCamName = "FrontLeft-OV9281";
+    public static final String kLeftCamName = "FrontRight-OV9281";
     public static final Orientation kLeftCamOrientation = Orientation.FRONT;
     public static final Transform3d kLeftCamTransform = new Transform3d(
         new Translation3d(
